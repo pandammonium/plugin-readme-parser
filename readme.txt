@@ -1,5 +1,5 @@
 === Plugin README Parser ===
-Contributors: dartiss
+Contributors: dartiss,pandammonium
 Tags: embed, markdown, parser, plugin, readme
 Requires at least: 4.6
 Tested up to: 6.1
