@@ -1,0 +1,4 @@
+*.sublime-workspace
+.svn
+*.md
+build/
