@@ -4,7 +4,7 @@
 *
 * Various functions relating to the various administration screens
 *
-* @package	Artiss-README-Parser
+* @package	Pandammonium-README-Parser
 */
 
 /**

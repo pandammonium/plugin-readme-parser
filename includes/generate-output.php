@@ -4,7 +4,7 @@
 *
 * Functions to generate requires output
 *
-* @package	Artiss-README-Parser
+* @package	Pandammonium-README-Parser
 * @since	1.0
 */
 

@@ -4,7 +4,7 @@
 *
 * Functions called by main output generator
 *
-* @package	Artiss-README-Parser
+* @package	Pandammonium-README-Parser
 * @since	1.2
 */
 

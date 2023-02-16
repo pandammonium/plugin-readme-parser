@@ -1,0 +1,82 @@
+== Changelog ==ß
+
+= 1.3.7 =
+* Maintenance: Removed donation links
+
+= 1.3.6 =
+* Maintenance: Updated this README to better reflect the new plugin directory format
+* Maintenance: Plugin now works with a minimum WordPress version of 4.6. This also means that various language changes could be made
+* Enhancement: Using Yoda conditions throughout
+
+= 1.3.5 =
+* Bug: Fixed a bug in the internationalization code
+* Maintenance: Updated branding, inc. adding donation links
+
+= 1.3.4 =
+* Maintenance: Updated Markdown script to 1.6.0
+* Maintenance: Updated branding
+* Maintenance: Removed the arp- prefix from the file names
+* Maintenance: Stopped doing the naughty thing of hardcoding the plugin name in the includes
+
+= 1.3.3 =
+* Maintenance: Added text domain and domain path
+
+= 1.3.2 =
+* Maintenance: Minor update to ensure compatibility with another of my plugins
+
+= 1.3.1 =
+* Maintenance: Upgraded PHP Markdown to the latest release.
+
+= 1.3 =
+* Maintenance: Removed deprecated functionality.
+* Enhancement: Added new INCLUDE parameter to allow you to specify only the README sections that you list.
+* Enhancement: Banner function will now return the high DPI banner, if available. It will also check for both PNG and JPG files.
+* Enhancement: Added assets parameter which allows you to force the plugin to look in your assets folder for screenshots.
+* Enhancement: Added license and license URI to meta section.
+* Enhancement: Reduced the ridiculous number of blank lines being output.
+* Bug: Fixed issue (not reported but found when testing this release!) where download links won't work if meta content is suppressed.
+* Bug: Fixed an error (is anybody actually using this plugin?) when trying to display banners.
+
+= 1.2.1 =
+* Maintenance: Changed plugin name
+* Maintenance: Correct support forum link
+
+= 1.2 =
+* Maintenance: Split out code and improved code quality
+* Maintenance: Major update to README
+* Maintenance: Updated Artiss Content Reveal function names - was using older, deprecated names
+* Enhancement: NOFOLLOW and TARGET information added to tags
+* Enhancement: Changed DIVs to use CLASS instead of ID
+* Enhancement: You may now specify which version of the README you wish to display
+* Enhancement: Output may now be cached (by default it isn't)
+* Enhancement: Added option to specify download mirrors
+* Enhancement: Code output has a CLASS added that prevents Google translation
+* Enhancement: Added responsive output on screenshots
+* Enhancement: You can specify where the download/links section will appear
+* Enhancement: Added `readme_banner` shortcode to display an assigned banner image
+* Enhancement: Added `readme_info` shortcode to output various useful bits of information about the README separately from the main shortcode
+* Enhancement: Added new `name` parameter. If a filename was specified and the name at the top of the README was not the same as it's held in the WP repository (this plugin is an example) then it would not work. This new parameter allows you to specify a correct plugin name
+* Enhancement: Added internationalization
+* Enhancement: Added additional meta information to the plugin settings
+* Enhancement: `ext` parameter no longer needed - automatic detection of screenshot extension type
+* Bug: Resolved a number of WP Debug errors
+
+= 1.1.1 =
+* Bug: Updated Markdown Extra script to latest version - this fixes a number of bugs
+
+= 1.1 =
+* Bug: Fixed file fetching bug
+* Enhancement: Improved code display - particularly code multi-lines
+* Enhancement: New option to suppress specific lines
+
+= 1.0.2 =
+* Enhancement: Screenshots will now be picked from trunk or tag folders, depending on stable tag
+* Enhancement: Improved handling of download link and version numbers
+
+= 1.0.1 =
+* Enhancement: Added check for malformed README file where there are no carriage returnes
+* Enhancement: Output download version number
+* Bug: Fix bug where download link didn't work if "Stable Tag" meta was excluded
+
+= 1.0 =
+* Initial release

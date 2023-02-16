@@ -1,12 +1,12 @@
 <?php
 /*
 Plugin Name: Plugin README Parser
-Plugin URI: https://wordpress.org/plugins/wp-readme-parser/
-Description: Display a WordPress plugin's README file in XHTML format, for embedding on a post or page.
-Version: 1.3.7
-Author: David Artiss
-Author URI: https://artiss.blog
-Text Domain: wp-readme-parser
+Plugin URI: https://wordpress.org/plugins/parse-plugin-readme/
+Description: Convert a WordPress plugin's README file to XHTML for embedding in a post or page.
+Version: 2.0.0
+Author: Caity Ross, David Artiss
+Author URI: https://pandammonium.org/, https://artiss.blog
+Text Domain: plugin-readme-parser
 */
 
 /**
@@ -14,10 +14,10 @@ Text Domain: wp-readme-parser
 *
 * Main code - include various functions
 *
-* @package	Artiss-README-Parser
+* @package	Pandammonium-README-Parser
 */
 
-define( 'artiss_readme_parser_version', '1.3.7' );
+define( 'pandammonium_readme_parser_version', '1.3.8' );
 
 /**
 * Main Includes
