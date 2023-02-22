@@ -13,14 +13,14 @@
 *
 * Function to output the results of the README
 *
-* @uses     arp_display_links       Show the links section
-* @uses		arp_get_file            Fetch file
-* @uses     arp_get_readme          Fetch the README
-* @uses     arp_get_section_name    Get the name of the current section
-* @uses     arp_get_list            Extract a list
-* @uses     arp_is_it_excluded      Check if the current section is excluded
-* @uses     arp_report_error        Output a formatted error
-* @uses     arp_strip_list          Strip a user or tag list and add links
+* @uses     prp_display_links       Show the links section
+* @uses		prp_get_file            Fetch file
+* @uses     prp_get_readme          Fetch the README
+* @uses     prp_get_section_name    Get the name of the current section
+* @uses     prp_get_list            Extract a list
+* @uses     prp_is_it_excluded      Check if the current section is excluded
+* @uses     prp_report_error        Output a formatted error
+* @uses     prp_strip_list          Strip a user or tag list and add links
 *
 * @param    string      $content    README filename
 * @param	string	    $paras		Parameters
@@ -37,7 +37,7 @@ function readme_parser( $paras = '', $content = '' ) {
 
     $result = false;
     if ( is_numeric( $cache ) ) {
-        $cache_key = 'arp_' . md5( $assets . $exclude . $ext . $hide . $include . $scr_url . $scr_ext . $target . $nofollow . $ignore . $cache . $version . $mirror . $content );
+        $cache_key = 'prp_' . md5( $assets . $exclude . $ext . $hide . $include . $scr_url . $scr_ext . $target . $nofollow . $ignore . $cache . $version . $mirror . $content );
         $result = get_transient( $cache_key );
     }
 
@@ -52,8 +52,8 @@ function readme_parser( $paras = '', $content = '' ) {
         $hide = strtolower( $hide );
         $links = strtolower( $links );
 
-        $ignore = arp_get_list( $ignore, ',,' );
-        $mirror = arp_get_list( $mirror, ',,' );
+        $ignore = prp_get_list( $ignore, ',,' );
+        $mirror = prp_get_list( $mirror, ',,' );
 
         if ( 'yes' == strtolower( $nofollow ) ) { $nofollow = ' rel="nofollow"';}
         if ( 'yes' == strtolower( $assets ) ) { $assets = true; } else { $assets = false; }
@@ -63,20 +63,20 @@ function readme_parser( $paras = '', $content = '' ) {
 
 		$show_links = false;
 		if ( '' != $include ) {
-			if ( arp_is_it_excluded( 'links', $include ) ) { $show_links = true; }
+			if ( prp_is_it_excluded( 'links', $include ) ) { $show_links = true; }
 		} else {
-			if ( !arp_is_it_excluded( 'links', $exclude ) ) { $show_links = true; }
+			if ( !prp_is_it_excluded( 'links', $exclude ) ) { $show_links = true; }
 		}
 
 		// Ensure EXCLUDE and INCLUDE parameters aren't both included
 
 		if ( ( '' != $exclude ) && ( '' != $include ) ) {
-			return arp_report_error( __( 'INCLUDE and EXCLUDE parameters cannot both be specified', 'wp-readme-parser' ), 'Plugin README Parser', false );
+			return prp_report_error( __( 'INCLUDE and EXCLUDE parameters cannot both be specified', 'wp-readme-parser' ), 'Plugin README Parser', false );
 		}
 
         // Work out filename and fetch the contents
 
-        $file_data = arp_get_readme( $plugin_url, $version );
+        $file_data = prp_get_readme( $plugin_url, $version );
 
         // Ensure the file is valid
 
@@ -114,11 +114,11 @@ function readme_parser( $paras = '', $content = '' ) {
 
                 if ( '=== ' == substr( $file_array [$i ], 0, 4 ) ) {
                     $file_array[ $i ] = str_replace( '===', '#', $file_array[ $i ] );
-                    $section = arp_get_section_name( $file_array[ $i ], 1 );
+                    $section = prp_get_section_name( $file_array[ $i ], 1 );
                 } else {
                     if ( '== ' == substr( $file_array[ $i ], 0, 3 ) ) {
                         $file_array[ $i ] = str_replace( '==', '##' , $file_array[ $i ] );
-                        $section = arp_get_section_name( $file_array[ $i ], 2 );
+                        $section = prp_get_section_name( $file_array[ $i ], 2 );
                     } else {
                         if ( '= ' == substr( $file_array[ $i ], 0, 2 ) ) {
                             $file_array[ $i ] = str_replace( '=', '###', $file_array[ $i ] );
@@ -157,7 +157,7 @@ function readme_parser( $paras = '', $content = '' ) {
 
 					// Is this an included section?
 
-	                if ( arp_is_it_excluded( $section, $include ) ) {
+	                if ( prp_is_it_excluded( $section, $include ) ) {
 	                    if ( $section != $prev_section ) {
 	                        if ( $div_written ) { $file_combined .= '</div>' . $crlf; }
 	                        $file_combined .= $crlf . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $section ) ) ) . '">' . $crlf;
@@ -171,7 +171,7 @@ function readme_parser( $paras = '', $content = '' ) {
 
 					// Is this an excluded section?
 
-					if ( arp_is_it_excluded( $section, $exclude ) ) {
+					if ( prp_is_it_excluded( $section, $exclude ) ) {
 						$add_to_output = false;
 					} else {
 						if ( $section != $prev_section ) {
@@ -195,7 +195,7 @@ function readme_parser( $paras = '', $content = '' ) {
                 if ( ( $links == strtolower( $section ) ) && ( $section != $prev_section ) ) {
 
 
-                    if ( $show_links ) { $file_array[ $i ] = arp_display_links( $download, $target, $nofollow, $version, $mirror, $plugin_name ) . $file_array[ $i ]; }
+                    if ( $show_links ) { $file_array[ $i ] = prp_display_links( $download, $target, $nofollow, $version, $mirror, $plugin_name ) . $file_array[ $i ]; }
                 }
 
                 $prev_section = $section;
@@ -224,33 +224,33 @@ function readme_parser( $paras = '', $content = '' ) {
 
                     if ( ( 'Contributors:' == substr( $file_array[ $i ], 0, 13 ) ) or ( 'Donate link:' == substr( $file_array[ $i ], 0, 12 ) ) or ( 'Tags:' == substr( $file_array[ $i ], 0, 5 ) ) or ( 'Requires at least:' == substr( $file_array[ $i ], 0, 18 ) ) or ( 'Tested up to:' == substr( $file_array[ $i ], 0, 13 ) ) or ( 'Stable tag:' == substr( $file_array[ $i ], 0, 11 ) ) or ( 'License URI:' == substr( $file_array[ $i ], 0, 12 ) ) or ( 'License:' == substr( $file_array[ $i ], 0, 8 ) ) ) {
 
-                        if ( arp_is_it_excluded( 'meta', $exclude ) ) { $add_to_output = false; }
+                        if ( prp_is_it_excluded( 'meta', $exclude ) ) { $add_to_output = false; }
 
-                        if ( ( 'Requires at least:' == substr( $file_array[ $i ], 0, 18 ) ) && ( arp_is_it_excluded( 'requires', $exclude ) ) ) { $add_to_output = false; }
+                        if ( ( 'Requires at least:' == substr( $file_array[ $i ], 0, 18 ) ) && ( prp_is_it_excluded( 'requires', $exclude ) ) ) { $add_to_output = false; }
 
-                        if ( ( 'Tested up to:' == substr( $file_array[ $i ], 0, 13 ) ) && ( arp_is_it_excluded( 'tested', $exclude ) ) ) { $add_to_output = false; }
+                        if ( ( 'Tested up to:' == substr( $file_array[ $i ], 0, 13 ) ) && ( prp_is_it_excluded( 'tested', $exclude ) ) ) { $add_to_output = false; }
 
                         // Show contributors and tags using links to WordPress pages
 
                         if ( 'Contributors:' == substr( $file_array[ $i ], 0, 13 ) ) {
-                            if ( arp_is_it_excluded( 'contributors', $exclude ) ) {
+                            if ( prp_is_it_excluded( 'contributors', $exclude ) ) {
                                 $add_to_output = false;
                             } else {
-                                $file_array[ $i ] = substr( $file_array[ $i ], 0, 14 ) . arp_strip_list( substr( $file_array[ $i ], 14 ), 'c', $target, $nofollow );
+                                $file_array[ $i ] = substr( $file_array[ $i ], 0, 14 ) . prp_strip_list( substr( $file_array[ $i ], 14 ), 'c', $target, $nofollow );
                             }
                         }
                         if ( 'Tags:' == substr( $file_array[ $i ], 0, 5 ) ) {
-                            if ( arp_is_it_excluded( 'tags', $exclude ) ) {
+                            if ( prp_is_it_excluded( 'tags', $exclude ) ) {
                                 $add_to_output = false;
                             } else {
-                                $file_array[ $i ] = substr( $file_array[ $i ], 0, 6 ) . arp_strip_list( substr( $file_array[ $i ], 6 ), 't', $target, $nofollow );
+                                $file_array[ $i ] = substr( $file_array[ $i ], 0, 6 ) . prp_strip_list( substr( $file_array[ $i ], 6 ), 't', $target, $nofollow );
                             }
                         }
 
                         // If displaying the donation link, convert it to a hyperlink
 
                         if ( 'Donate link:' == substr( $file_array[ $i ], 0, 12 ) ) {
-                            if ( arp_is_it_excluded( 'donate', $exclude ) ) {
+                            if ( prp_is_it_excluded( 'donate', $exclude ) ) {
                                 $add_to_output = false;
                             } else {
                                 $text = substr( $file_array[ $i ], 13 );
@@ -261,7 +261,7 @@ function readme_parser( $paras = '', $content = '' ) {
                         // If displaying the licence URL, convert it to a hyperlink
 
                         if ( 'License URI:' == substr( $file_array[ $i ], 0, 12 ) ) {
-                            if ( arp_is_it_excluded( 'license uri', $exclude ) ) {
+                            if ( prp_is_it_excluded( 'license uri', $exclude ) ) {
                                 $add_to_output = false;
                             } else {
                                 $text = substr( $file_array[ $i ], 13 );
@@ -272,7 +272,7 @@ function readme_parser( $paras = '', $content = '' ) {
                         // If displaying the latest version, link to download
 
                         if ( 'Stable tag:' == substr( $file_array[ $i ], 0, 11 ) ) {
-                            if ( arp_is_it_excluded( 'stable', $exclude ) ) {
+                            if ( prp_is_it_excluded( 'stable', $exclude ) ) {
                                 $add_to_output = false;
                             } else {
                                 $file_array[ $i ] = substr( $file_array[ $i ], 0, 12 ) . '<a href="' . $download.'" style="max-width: 100%;">' . $version . '</a>';
@@ -293,17 +293,17 @@ function readme_parser( $paras = '', $content = '' ) {
 
                         // Depending on file existence, set the appropriate file extension
 
-                        $ext = arp_check_img_exists( $this_screenshot, 'png' );
-                        if ( !$ext ) { $ext = arp_check_img_exists( $this_screenshot, 'gif' ); }
-                        if ( !$ext ) { $ext = arp_check_img_exists( $this_screenshot, 'jpg' ); }
-                        if ( !$ext ) { $ext = arp_check_img_exists( $this_screenshot, 'jpeg' ); }
+                        $ext = prp_check_img_exists( $this_screenshot, 'png' );
+                        if ( !$ext ) { $ext = prp_check_img_exists( $this_screenshot, 'gif' ); }
+                        if ( !$ext ) { $ext = prp_check_img_exists( $this_screenshot, 'jpg' ); }
+                        if ( !$ext ) { $ext = prp_check_img_exists( $this_screenshot, 'jpeg' ); }
                         $this_screenshot .= $ext;
 
                         // Now put together the image URL
 
                         if ( !$ext ) {
 
-                            $file_array[ $i ] = arp_report_error( sprintf( __( 'Could not find %s image file', 'wp-readme-parser' ), 'screenshot-' . $screenshot ), 'Plugin README Parser', false );
+                            $file_array[ $i ] = prp_report_error( sprintf( __( 'Could not find %s image file', 'wp-readme-parser' ), 'screenshot-' . $screenshot ), 'Plugin README Parser', false );
 
                         } else {
 
@@ -326,7 +326,7 @@ function readme_parser( $paras = '', $content = '' ) {
 
             // Display links section
 
-            if ( ( $show_links ) && ( 'bottom' == $links ) ) { $file_combined .= arp_display_links( $download, $target, $nofollow, $version, $mirror, $plugin_name ); }
+            if ( ( $show_links ) && ( 'bottom' == $links ) ) { $file_combined .= prp_display_links( $download, $target, $nofollow, $version, $mirror, $plugin_name ); }
 
             // Call Markdown code to convert
 
@@ -356,7 +356,7 @@ function readme_parser( $paras = '', $content = '' ) {
                         // Extract title and check if it should be hidden or shown by default
 
                         $title = substr( $file_array[ $i ], 4, strpos( $file_array[ $i ], '</h2>' ) - 4 );
-                        if ( arp_is_it_excluded( strtolower( $title ), $hide ) ) { $state = 'hide'; } else { $state = 'show'; }
+                        if ( prp_is_it_excluded( strtolower( $title ), $hide ) ) { $state = 'hide'; } else { $state = 'show'; }
 
                         // Call Content Reveal with heading details and replace current line
 
@@ -399,15 +399,15 @@ function readme_parser( $paras = '', $content = '' ) {
         } else {
 
             if ( ( 0 < strlen( $file_data[ 'file' ] ) ) && ( 0 == substr_count( $file_data[ 'file' ], "\n" ) ) ) {
-                $my_html = arp_report_error( __( 'Malformed README file - no carriage returns found', 'wp-readme-parser' ), 'Plugin README Parser', false );
+                $my_html = prp_report_error( __( 'Malformed README file - no carriage returns found', 'wp-readme-parser' ), 'Plugin README Parser', false );
             } else {
-                $my_html = arp_report_error( __( 'README file could not be found or is malformed', 'wp-readme-parser' ) . ' - ' . $plugin_url, 'Plugin README Parser', false );
+                $my_html = prp_report_error( __( 'README file could not be found or is malformed', 'wp-readme-parser' ) . ' - ' . $plugin_url, 'Plugin README Parser', false );
             }
         }
 
         // Send the resultant code back, plus encapsulating DIV and version comments
 
-        $content = '<!-- Plugin README Parser v' . artiss_readme_parser_version . " -->\n<div class=\"np-notepad\">" . $my_html . "</div>\n<!-- End of Plugin README Parser code -->\n";
+        $content = '<!-- Plugin README Parser v' . pandammonium_readme_parser_version . " -->\n<div class=\"np-notepad\">" . $my_html . "</div>\n<!-- End of Plugin README Parser code -->\n";
 
         // Cache the results
 
@@ -428,8 +428,8 @@ add_shortcode( 'readme', 'readme_parser' );
 *
 * Function to output a banner associated with a README
 *
-* @uses     arp_check_img_exists    Check if an image exists
-* @uses		arp_report_error        Return a formatted error message
+* @uses     prp_check_img_exists    Check if an image exists
+* @uses		prp_report_error        Return a formatted error message
 *
 * @param    string      $para       Parameters
 * @param	string	    $content    Plugin name or URL
@@ -448,7 +448,7 @@ function readme_banner( $paras = '', $content = '' ) {
 
         // Report error if no name found
 
-        return arp_report_error( __( 'No plugin name was supplied for banner', 'wp-readme-parser' ), 'Plugin README Parser', false );
+        return prp_report_error( __( 'No plugin name was supplied for banner', 'wp-readme-parser' ), 'Plugin README Parser', false );
 
     } else {
 
@@ -465,14 +465,14 @@ function readme_banner( $paras = '', $content = '' ) {
 
         // Check if the PNG banner exists
 
-        $img_check = arp_check_img_exists( $url, $ext );
+        $img_check = prp_check_img_exists( $url, $ext );
 
 		// Check if the JPG banner exists
 
         if ( !$img_check ) {
 
 			$ext = 'jpg';
-			$img_check = arp_check_img_exists( $url, $ext );
+			$img_check = prp_check_img_exists( $url, $ext );
 
 			if ( !$img_check ) {
 
@@ -483,14 +483,14 @@ function readme_banner( $paras = '', $content = '' ) {
 
 				// Check if the PNG banner exists
 
-				$img_check = arp_check_img_exists( $url, $ext );
+				$img_check = prp_check_img_exists( $url, $ext );
 
 				// Check if the JPG banner exists
 
 				if ( !$img_check ) {
 
 					$ext = 'jpg';
-					$img_check = arp_check_img_exists( $url, $ext );
+					$img_check = prp_check_img_exists( $url, $ext );
 
 					if ( !$img_check ) { $file_found = false; }
 
@@ -516,8 +516,8 @@ add_shortcode( 'readme_banner', 'readme_banner' );
 *
 * Function to output a piece of requested README information
 *
-* @uses     arp_get_readme          Fetch the README file
-* @uses		arp_report_error        Return a formatted error message
+* @uses     prp_get_readme          Fetch the README file
+* @uses		prp_report_error        Return a formatted error message
 *
 * @param    string      $para       Parameters
 * @param	string	    $content    Post content
@@ -536,7 +536,7 @@ function readme_info( $paras = '', $content = '' ) {
     // Get the cache
 
     if ( is_numeric( $cache ) ) {
-        $cache_key = 'arp_info_' . md5( $name . $cache );
+        $cache_key = 'prp_info_' . md5( $name . $cache );
         $result = get_transient( $cache_key );
     }
 
@@ -544,7 +544,7 @@ function readme_info( $paras = '', $content = '' ) {
 
         // Get the file
 
-        $file_data = arp_get_readme( $name );
+        $file_data = prp_get_readme( $name );
         $plugin_name = $file_data[ 'name' ];
 
         if ( false !== $file_data ) {
@@ -589,7 +589,7 @@ function readme_info( $paras = '', $content = '' ) {
 
         } else {
 
-            $output = arp_report_error( __( 'README file could not be found or is malformed', 'wp-readme-parser' ) . ' - ' . $name, 'Plugin README Parser', false );
+            $output = prp_report_error( __( 'README file could not be found or is malformed', 'wp-readme-parser' ) . ' - ' . $name, 'Plugin README Parser', false );
         }
     } else {
 
@@ -608,7 +608,7 @@ function readme_info( $paras = '', $content = '' ) {
             if ( ( '' != $plugin_name ) && ( '' != $version ) ) {
                 $output = '<a href="http://downloads.wordpress.org/plugin/' . $plugin_name . '.' . $version . '.zip" target="' . $target . '"' . $nofollow . '>' . $content. '</a>';
             } else {
-                $output = arp_report_error( __( 'The name and/or version number could not be found in the README', 'wp-readme-parser' ), 'Plugin README Parser', false );
+                $output = prp_report_error( __( 'The name and/or version number could not be found in the README', 'wp-readme-parser' ), 'Plugin README Parser', false );
             }
         }
 
@@ -618,7 +618,7 @@ function readme_info( $paras = '', $content = '' ) {
             if ( '' != $version ) {
                 $output = $version;
             } else {
-                $output = arp_report_error( __( 'Version number not found in the README', 'wp-readme-parser' ), 'Plugin README Parser', false );
+                $output = prp_report_error( __( 'Version number not found in the README', 'wp-readme-parser' ), 'Plugin README Parser', false );
             }
         }
 
@@ -628,7 +628,7 @@ function readme_info( $paras = '', $content = '' ) {
             if ( '' != $plugin_name ) {
                 $output = '<a href="http://wordpress.org/tags/' . $plugin_name . '" target="' . $target . '"' . $nofollow . '>' . $content . '</a>';
             } else {
-                $output = arp_report_error( __( 'Plugin name not supplied', 'wp-readme-parser' ), 'Plugin README Parser', false );
+                $output = prp_report_error( __( 'Plugin name not supplied', 'wp-readme-parser' ), 'Plugin README Parser', false );
             }
         }
 
@@ -638,13 +638,13 @@ function readme_info( $paras = '', $content = '' ) {
             if ( '' != $plugin_name ) {
                 $output = '<a href="http://wordpress.org/extend/plugins/' . $plugin_name . '/" target="' . $target . '"' . $nofollow . '>' . $content . '</a>';
             } else {
-                $output = arp_report_error( __( 'Plugin name not supplied', 'wp-readme-parser' ), 'Plugin README Parser', false );
+                $output = prp_report_error( __( 'Plugin name not supplied', 'wp-readme-parser' ), 'Plugin README Parser', false );
             }
         }
 
         // Report an error if the data parameter was invalid or missing
 
-        if ( '' == $output ) { $output = arp_report_error( __( 'The data parameter was invalid or missing', 'wp-readme-parser' ), 'Plugin README Parser', false ); }
+        if ( '' == $output ) { $output = prp_report_error( __( 'The data parameter was invalid or missing', 'wp-readme-parser' ), 'Plugin README Parser', false ); }
 
     }
 
