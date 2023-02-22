@@ -1,10 +1,10 @@
-== Changelog ==ß
+== Changelog ==
 
 = 1.3.7 =
 * Maintenance: Removed donation links
 
 = 1.3.6 =
-* Maintenance: Updated this README to better reflect the new plugin directory format
+* Maintenance: Updated this readme to better reflect the new plugin directory format
 * Maintenance: Plugin now works with a minimum WordPress version of 4.6. This also means that various language changes could be made
 * Enhancement: Using Yoda conditions throughout
 
@@ -29,7 +29,7 @@
 
 = 1.3 =
 * Maintenance: Removed deprecated functionality.
-* Enhancement: Added new INCLUDE parameter to allow you to specify only the README sections that you list.
+* Enhancement: Added new INCLUDE parameter to allow you to specify only the readme sections that you list.
 * Enhancement: Banner function will now return the high DPI banner, if available. It will also check for both PNG and JPG files.
 * Enhancement: Added assets parameter which allows you to force the plugin to look in your assets folder for screenshots.
 * Enhancement: Added license and license URI to meta section.
@@ -43,19 +43,19 @@
 
 = 1.2 =
 * Maintenance: Split out code and improved code quality
-* Maintenance: Major update to README
+* Maintenance: Major update to readme
 * Maintenance: Updated Artiss Content Reveal function names - was using older, deprecated names
 * Enhancement: NOFOLLOW and TARGET information added to tags
 * Enhancement: Changed DIVs to use CLASS instead of ID
-* Enhancement: You may now specify which version of the README you wish to display
+* Enhancement: You may now specify which version of the readme you wish to display
 * Enhancement: Output may now be cached (by default it isn't)
 * Enhancement: Added option to specify download mirrors
 * Enhancement: Code output has a CLASS added that prevents Google translation
 * Enhancement: Added responsive output on screenshots
 * Enhancement: You can specify where the download/links section will appear
 * Enhancement: Added `readme_banner` shortcode to display an assigned banner image
-* Enhancement: Added `readme_info` shortcode to output various useful bits of information about the README separately from the main shortcode
-* Enhancement: Added new `name` parameter. If a filename was specified and the name at the top of the README was not the same as it's held in the WP repository (this plugin is an example) then it would not work. This new parameter allows you to specify a correct plugin name
+* Enhancement: Added `readme_info` shortcode to output various useful bits of information about the readme separately from the main shortcode
+* Enhancement: Added new `name` parameter. If a filename was specified and the name at the top of the readme was not the same as it's held in the WP repository (this plugin is an example) then it would not work. This new parameter allows you to specify a correct plugin name
 * Enhancement: Added internationalization
 * Enhancement: Added additional meta information to the plugin settings
 * Enhancement: `ext` parameter no longer needed - automatic detection of screenshot extension type
@@ -74,7 +74,7 @@
 * Enhancement: Improved handling of download link and version numbers
 
 = 1.0.1 =
-* Enhancement: Added check for malformed README file where there are no carriage returnes
+* Enhancement: Added check for malformed readme file where there are no carriage returnes
 * Enhancement: Output download version number
 * Bug: Fix bug where download link didn't work if "Stable Tag" meta was excluded
 
