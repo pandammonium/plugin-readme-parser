@@ -36,6 +36,7 @@ if ( is_admin() ) {
 
 }
 
+// This converts the markdown to XHTML, although I'm not convinced it can't be HTML5:
 include_once( $functions_dir . 'Michelf/MarkdownExtra.inc.php' );		// PHP Markdown Extra
 
 include_once( $functions_dir . 'functions.php' );					// Various functions
