@@ -144,7 +144,7 @@ function readme_parser( $paras = '', $content = '' ) {
                         if ( '' == $name ) {
                             $plugin_name = str_replace( ' ', '-', strtolower( $section ) );
                         } else {
-                            $plugin_name = name;
+                            $plugin_name = $name;
                         }
                     }
 
