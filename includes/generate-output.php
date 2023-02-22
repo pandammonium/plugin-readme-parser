@@ -407,7 +407,7 @@ function readme_parser( $paras = '', $content = '' ) {
 
         // Send the resultant code back, plus encapsulating DIV and version comments
 
-        $content = '<!-- Plugin README Parser v' . artiss_readme_parser_version . " -->\n<div class=\"np-notepad\">" . $my_html . "</div>\n<!-- End of Plugin README Parser code -->\n";
+        $content = '<!-- Plugin README Parser v' . pandammonium_readme_parser_version . " -->\n<div class=\"np-notepad\">" . $my_html . "</div>\n<!-- End of Plugin README Parser code -->\n";
 
         // Cache the results
 
