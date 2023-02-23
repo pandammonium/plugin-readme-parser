@@ -48,5 +48,5 @@ function prp_set_plugin_meta( $links, $file ) {
   return $links;
 }
 
-add_filter( 'plugin_row_meta', 'prp_set_plugin_meta', 10, 2 );
+// add_filter( 'plugin_row_meta', 'prp_set_plugin_meta', 10, 2 );
 ?>
