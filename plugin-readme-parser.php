@@ -1,12 +1,19 @@
 <?php
-/*
-Plugin Name: Plugin-readme Parser
-Plugin URI: https://pandammonium.org/wordpress/wordpress-dev/plugin-readme-parser/
-Description: Convert a WordPress plugin's readme file to XHTML for embedding in a post or page.
-Version: 2.0.0
-Author: <a href="https://pandammonium.org/">Caity Ross</a>, <a href="https://artiss.blog">David Artiss</a>
-Text Domain: plugin-readme-parser
-*/
+/**
+ * Plugin Name: Plugin-readme Parser
+ * Plugin URI:  https://pandammonium.org/wordpress-dev/plugin-readme-parser/
+ * Description: Converts a WordPress plugin's readme file to XHTML for embedding in a post or page.
+ * Version:     2.0.0
+ * Author:      Caity Ross
+ * Author URI:  http://pandammonium.org/
+ * Text Domain: plugin-readme-parser
+ * @link        https://pandammonium.org/wordpress-dev/plugin-readme-parser/
+ * @since       1.0
+ * @package     Plugin_readme_Parse
+ * @author      pandammonium, dartiss
+ * @license     GPLv2 or later
+ * @wordpress-plugin
+ */
 
 /**
 * Plugin-readme Parser
