@@ -189,12 +189,12 @@ To add your own section to the output (e.g. to provide download links), `exclude
 
 Use the shortcode `[readme_info]` to return one of a number of different pieces of information. Use the required parameter `data` to specify what you need; this can be:
 
-* **download** – Display a download link
-* **version** – Output the current version number
+* **download** – Display a link from where the plugin can be downloaded
+* **version** – Output the latest version number
 * **forum** – Display a link to the forum
 * **wordpress** – Display a link to the plugin in the WordPress.org repository
 
-For links, you must specify text between the opening and closing shortcodes to link to.
+For links, you must specify text between the opening and closing shortcodes to use as the link text.
 
 There are four additional parameters:
 
