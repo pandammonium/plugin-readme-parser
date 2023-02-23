@@ -13,6 +13,8 @@
 /**
  * Prints a message to the debug file that can easily be called by any subclass.
  *
+ * @since 2.0.0
+ *
  * @param mixed $message    an object, array, string, number, or other data to write to the debug log
  * @param bool  $shouldNotDie whether or not the The function should exit after writing to the log
  *
@@ -65,8 +67,8 @@ function prp_get_readme( $plugin_url, $version = '' ) {
   }
 
   $file_data = prp_get_file( $plugin_url );
-  // prp_log( '  file data:   contents of readme file' );
-  prp_log( $file_data, '  file data:' );
+  prp_log( '  file data:   contents of readme file' );
+  // prp_log( $file_data, '  file data:' );
 
   // Ensure the file is valid
 
@@ -497,7 +499,7 @@ function prp_report_error( $error, $plugin_name, $echo = true ) {
   prp_log( 'plugin name: ' . $plugin_name );
   prp_log( 'error:       \'' . $error . '\'' );
 
-  $output = '<p class="error">' . $plugin_name . ': ' . $error . "</p>\n";
+  $output = '<p style="color: #990000;">' . $plugin_name . ': ' . $error . "</p>\n";
 
   if ( $echo ) {
     echo $output;

@@ -19,7 +19,7 @@
  * @return string  Links, now with settings added
  */
 
-if (!function_exists('prp_add_settings_link')) {
+if ( !function_exists('prp_add_settings_link' ) ) {
 /**
   * Add a link to the Plugin-readme Parser settings page from the installed
   * plugins list.
