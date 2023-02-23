@@ -21,7 +21,9 @@
 
 function prp_set_plugin_meta( $links, $file ) {
 
-  if ( strpos( $file, 'plugin-readme-parser.php' ) !== false ) { $links = array_merge( $links, array( '<a href="https://wordpress.org/support/plugin/plugin-readme-parser">' . __( 'Support','plugin-readme-parser' ) . '</a>' ) ); }
+  if ( strpos( $file, 'plugin-readme-parser.php' ) !== false ) {
+    $links = array_merge( $links, array( '<a href="https://wordpress.org/support/plugin/plugin-readme-parser">' . __( 'Support','plugin-readme-parser' ) . '</a>' ) );
+  }
 
   return $links;
 }
