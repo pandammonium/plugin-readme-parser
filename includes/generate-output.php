@@ -29,6 +29,9 @@
 
 function readme_parser( $paras = '', $content = '' ) {
 
+  prp_log( 'Readme parser:' );
+
+  prp_toggle_global_shortcodes( $content );
 
   // Extract parameters
 
@@ -543,6 +546,8 @@ function readme_parser( $paras = '', $content = '' ) {
     $content = $result;
   }
 
+  prp_toggle_global_shortcodes( $content );
+
   return $content;
 }
 
@@ -562,6 +567,10 @@ add_shortcode( 'readme', 'readme_parser' );
  */
 
 function readme_banner( $paras = '', $content = '' ) {
+
+  prp_log( 'Readme banner:' );
+
+  prp_toggle_global_shortcodes( $content );
 
   extract( shortcode_atts( array( 'nofollow' => '' ), $paras ) );
 
@@ -633,6 +642,7 @@ function readme_banner( $paras = '', $content = '' ) {
     }
   }
 
+  prp_toggle_global_shortcodes( $content );
   return $output;
 }
 
@@ -652,6 +662,10 @@ add_shortcode( 'readme_banner', 'readme_banner' );
  */
 
 function readme_info( $paras = '', $content = '' ) {
+
+  prp_log( 'Readme Info' );
+
+  prp_toggle_global_shortcodes( $content );
 
   extract( shortcode_atts( array( 'name' => '', 'target' => '_blank', 'nofollow' => '', 'data' => '', 'cache' => '5' ), $paras ) );
 
@@ -779,6 +793,8 @@ function readme_info( $paras = '', $content = '' ) {
     if ( '' == $output ) { $output = prp_report_error( __( 'The data parameter was invalid or missing', 'plugin-readme-parser' ), 'Plugin-readme Parser', false ); }
 
   }
+
+  prp_toggle_global_shortcodes( $content );
 
   return do_shortcode( $output );
 

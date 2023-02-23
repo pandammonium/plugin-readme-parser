@@ -399,6 +399,85 @@ function prp_get_list( $input, $separator = '', $type = '' ) {   // Version 1.2
   return $content;
 }
 
+if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
+/**
+ * Toggle the shortcodes so that any shortcodes in the readme file
+ * aren't expanded. Expanded shortcodes in the readme files cause problems if
+ * they're used to provide examples of use of the plugin's shortcode.
+ *
+ * Some plugins change this filter’s priority, so clear the global list of
+ * registered shortcodes temporarily, except for this plugin's readme_info
+ * and readme_banner, which are needed.
+ *
+ * @since  2.0.0
+ * @link   https://wordpress.stackexchange.com/a/115176
+ *
+ * @param  $content     array  The readme file content
+ * @param  $exceptions  array  The shortcodes to keep active
+ * @return array  The readme file content
+ */
+  function prp_toggle_global_shortcodes( $content ) {
+
+    prp_log( 'Shortcode content: ' . $content );
+
+    static $original_shortcodes = array();
+
+    prp_log( '# original shortcodes: ' . count ( $original_shortcodes ) );
+
+    if ( count ( $original_shortcodes ) <= 2 ) {
+
+      $original_shortcodes = $GLOBALS['shortcode_tags'];
+      $GLOBALS['shortcode_tags'] = array();
+
+      // Need to put some of this plugin's ones back, otherwise it all breaks; it's unclear as to why this combination works:
+
+      if ( ( str_contains( $content, '[readme ' ) === true ) ||
+           ( str_contains( $content, '[readme]' ) === true ) ) {
+
+        $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
+        $GLOBALS['shortcode_tags']['readme_banner'] = 'readme_banner';
+
+      } else if  ( str_contains( $content, '[readme_info' ) === true ) {
+
+        $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
+
+      } else if  ( str_contains( $content, '[readme_banner' ) === true ) {
+
+        // Need to check this combo once banner display is working.
+
+        $GLOBALS['shortcode_tags']['readme'] = 'readme_parser';
+        $GLOBALS['shortcode_tags']['readme_banner'] = 'readme_banner';
+        $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
+
+      } else {
+
+        prp_log( 'Failed to find Plugin-readme Parser shortcode' );
+        // We're in the wild, not writing out a readme with this plugin, so all the shortcodes need to be functional:
+        prp_log( 'Toggling ALL global shortcodes ON' );
+        $GLOBALS['shortcode_tags'] = $original_shortcodes;
+        return $content;
+
+      }
+
+      prp_log( 'Toggling global shortcodes OFF except for:' );
+      prp_log( $GLOBALS['shortcode_tags'], 'Global shortcodes:' );
+
+    } else {
+
+      prp_log( 'Toggling global shortcodes ON' );
+
+      $GLOBALS['shortcode_tags'] = $original_shortcodes;
+      // prp_log( 'Repopulating GLOBAL shortcodes with original shortcodes' );
+
+    }
+
+    return $content;
+  }
+
+  add_filter( 'the_content', 'prp_toggle_global_shortcodes', -1 );
+  add_filter( 'the_content', 'prp_toggle_global_shortcodes', PHP_INT_MAX );
+}
+
 /**
  * Report an error (1.4)
  *
