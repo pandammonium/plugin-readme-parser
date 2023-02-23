@@ -187,21 +187,21 @@ If no banner image exists then nothing will be output.
 
 To add your own section to the output (e.g. to provide download links), `exclude` the relevant section, then use an additional shortcode to retrieve the information that you need.
 
-Use the shortcode `[readme_info]` to return one of a number of different pieces of information. Use the required parameter `data` to specify what you need - this can b:
+Use the shortcode `[readme_info]` to return one of a number of different pieces of information. Use the required parameter `data` to specify what you need; this can be:
 
-* **download** - Display a download link
-* **version** - Output the current version number
-* **forum** - Display a link to the forum
-* **wordpress** - Display a link to the plugin in the WordPress.org repository
+* **download** – Display a download link
+* **version** – Output the current version number
+* **forum** – Display a link to the forum
+* **wordpress** – Display a link to the plugin in the WordPress.org repository
 
 For links, you must specify text between the opening and closing shortcodes to link to.
 
 There are four additional parameters:
 
-* **name** - Specifies the plugin name. This is required
-* **target** - If outputting a link, this will assign a target to the output (default is `_blank`)
-* **nofollow** - If `yes`, this will be a `nofollow` link. By default, it won't be
-* **cache** - By default, any output will be cached for five minutes so that if this shortcode is used multiple times on a page, the data will only be fetched once. Specify a different number (in minutes) to adjust this. Set to `no` to switch off caching
+* **name** – Specifies the plugin name. This is required
+* **target** – If outputting a link, this will assign a target to the output (default is `_blank`)
+* **nofollow** – If `yes`, this will be a `nofollow` link. By default, it won't be
+* **cache** – By default, any output will be cached for five minutes so that if this shortcode is used multiple times on a page, the data will only be fetched once. Specify a different number (in minutes) to adjust this. Set to `no` to switch off caching
 
 For example:
 
