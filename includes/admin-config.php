@@ -21,8 +21,8 @@
 
 if (!function_exists('prp_add_settings_link')) {
 /**
-  * Add a link to the Blipper Widget settings page from the installed plugins
-  * list.
+  * Add a link to the Plugin-readme Parser settings page from the installed
+  * plugins list.
   *
   * @since 2.0.0
   */
