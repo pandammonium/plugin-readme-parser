@@ -19,6 +19,30 @@
  * @return string  Links, now with settings added
  */
 
+if (!function_exists('prp_add_settings_link')) {
+/**
+  * Add a link to the Blipper Widget settings page from the installed plugins
+  * list.
+  *
+  * @since 2.0.0
+  */
+  function prp_add_settings_link( $links, $file ) {
+
+    if ( strpos( $file, 'plugin-readme-parser.php' ) !== false ) {
+
+      if ( file_exists( admin_url( 'options-general.php?page=plugin-readme-parser' ) ) ) {
+        $links = array_merge( $links, array( '<a href="' . esc_url( admin_url( 'options-general.php?page=plugin-readme-parser' ) ) . '">' . __('Settings', 'plugin-readme-parser') . '</a>' ) );
+      } else {
+        prp_log( 'Settings file does not exist' );
+      }
+    }
+
+    return $links;
+  }
+  add_filter( 'plugin_action_links', 'prp_add_settings_link', 10, 2 );
+}
+
+
 function prp_set_plugin_meta( $links, $file ) {
 
   if ( strpos( $file, 'plugin-readme-parser.php' ) !== false ) {
