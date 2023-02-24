@@ -298,7 +298,11 @@ function prp_strip_list( $list, $type, $target, $nofollow ) {
   prp_log( '  target:   \'' . $target . '\'' );
   prp_log( '  nofollow: \'' . $nofollow . '\'' );
 
-  if ( $type == 'c' ) { $url = 'http://profiles.wordpress.org/users/'; } else { $url = 'http://wordpress.org/extend/plugins/tags/'; }
+  if ( $type == 'c' ) {
+    $url = 'http://profiles.wordpress.org/users/';
+  } else {
+    $url = 'http://wordpress.org/extend/plugins/tags/';
+  }
 
   $startpos = 0;
   $number = 0;
