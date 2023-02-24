@@ -11,15 +11,35 @@
 
 
 /**
- * Prints a message to the debug file that can easily be called by any subclass.
+ * Prints a message to the debug log file.
  *
  * @since 2.0.0
  *
- * @param mixed $message    an object, array, string, number, or other data to write to the debug log
- * @param bool  $shouldNotDie whether or not the The function should exit after writing to the log
+ * @param string / array $message    The message to be logged.
+ * @param string  (optional) A name to associate with the message. This is useful if logging multiple messages.
+ * @param bool  $echo whether or not the The function should exit after writing to the log
  *
  */
-function prp_log( $message, $message_name = '', $shouldNotDie = false ) {
+function prp_log( $message, $message_name = '', $echo = true ) {
+  // if ( true === defined( 'WP_DEBUG' ) ) {
+  //   if ( false === defined( 'WP_DEBUG_LOG' ) ) {
+  //     $echo = false;
+  //   } else if ( true === defined( 'WP_DEBUG_DISPLAY' ) ) {
+  //     $echo = true;
+  //   }
+  //   if ( is_array( $message ) ) {
+  //     if ( '' !== $message_name ) {
+  //       error_log( print_r( 'PRP | ' . $message_name, $echo ) );
+  //     }
+  //     error_log( print_r( $message, $echo ) );
+  //   } else {
+  //     if ( '' !== $message_name ) {
+  //       error_log( print_r( 'PRP | ' . $message_name . ': ' . $message, $echo ) );
+  //     } else {
+  //       error_log( print_r( 'PRP | ' . $message, $echo ) );
+  //     }
+  //   }
+  // }
   if ( true === defined( 'WP_DEBUG' ) && true === defined( 'WP_DEBUG_LOG' ) ) {
     if ( is_array( $message ) ) {
       error_log( print_r( 'PRP | ' . $message_name, true ) );
@@ -27,9 +47,9 @@ function prp_log( $message, $message_name = '', $shouldNotDie = false ) {
     } else {
       error_log( print_r( 'PRP | ' . $message, true ) );
     }
-    if ( $shouldNotDie ) {
-      exit;
-    }
+    // if ( $shouldNotDie ) {
+    //   exit;
+    // }
   }
 }
 
@@ -368,10 +388,11 @@ function prp_get_file( $filein, $header = false ) {
  *
  * @since  1.0
  *
- * @param  $input    string  Input string
- * @param  $separator  string  separator
- * @param  $type       string  Indicates the type of list; only used for debug
- * @return     string  Array of parameters
+ * @param  $input    string  The input string that needs to be split.
+ * @param  $separator  string  The separator character used to split
+ * the input string. If not specified, it defaults to a comma (,).
+ * @param  $type       string  Indicates the type of list; only used for debug purposes.
+ * @return     string  Array of parameters.
  */
 
 function prp_get_list( $input, $separator = '', $type = '' ) {   // Version 1.2
@@ -491,14 +512,18 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
 /**
  * Report an error (1.4)
  *
- * Function to report an error
+ * Logs an error message along with the plugin name and the error text, and
+ * returns an HTML-formatted error message.
  *
  * @since  1.0
  *
- * @param  $error    string  Error message
- * @param  $plugin_name  string  The name of the plugin
- * @param  $echo   string  true or false, depending on whether you wish to return or echo the results
- * @return     string  true
+ * @param  $error    string  The error message to report.
+ * @param  $plugin_name  string  The name of the plugin where the error
+ * occurred.
+ * @param  $echo   string  A boolean value indicating whether to output the
+ * error message immediately using echo. If false, the function returns the
+ * formatted error message instead of echoing it.
+ * @return     string / true  If $echo === true, the function outputs the error message using echo and returns true. If $echo is false, the function returns the formatted error message instead of echoing it.
  */
 
 function prp_report_error( $error, $plugin_name, $echo = true ) {
