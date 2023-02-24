@@ -562,7 +562,7 @@ function readme_parser( $paras = '', $content = '' ) {
   }
 
   prp_toggle_global_shortcodes( $content );
-  define( 'can_toggle_shortcodes', false );
+
 
   return $content;
 }
@@ -660,7 +660,7 @@ function readme_banner( $paras = '', $content = '' ) {
   }
 
   prp_toggle_global_shortcodes( $content );
-  define( 'can_toggle_shortcodes', false );
+
   return $output;
 }
 
@@ -815,7 +815,7 @@ function readme_info( $paras = '', $content = '' ) {
   }
 
   prp_toggle_global_shortcodes( $content );
-  define( 'can_toggle_shortcodes', false );
+
 
   return do_shortcode( $output );
 
