@@ -26,6 +26,8 @@
 define( 'pandammonium_readme_parser_version', '2.0.0' );
 define( 'pandammonium_readme_parser_filename', 'plugin-readme-parser' );
 
+define( 'can_toggle_shortcodes', false );
+
 /**
 * Main Includes
 *

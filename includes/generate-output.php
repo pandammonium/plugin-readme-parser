@@ -32,9 +32,13 @@ function readme_parser( $paras = '', $content = '' ) {
 
   prp_log( 'Readme parser:' );
 
+  define( 'can_toggle_shortcodes', true );
+
   prp_toggle_global_shortcodes( $content );
 
   // Extract parameters
+
+  prp_log( $paras );
 
   extract( shortcode_atts( array( 'assets' => '', 'exclude' => '', 'ext' => '', 'hide' => '', 'include' => '', 'scr_url' => '', 'scr_ext' => '' , 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $paras ) );
 
@@ -217,7 +221,7 @@ function readme_parser( $paras = '', $content = '' ) {
 
           if ( prp_is_it_excluded( $section, $include ) ) {
 
-            prp_log( '  \'' . $section . '\' is excluded' );
+            // prp_log( '  \'' . $section . '\' is excluded' );
 
             if ( $section != $prev_section ) {
               if ( $div_written ) {
@@ -227,7 +231,7 @@ function readme_parser( $paras = '', $content = '' ) {
               $div_written = true;
             }
           } else {
-            prp_log( '  \'' . $section . '\' is included' );
+            // prp_log( '  \'' . $section . '\' is included' );
             $add_to_output = false;
           }
 
@@ -556,6 +560,7 @@ function readme_parser( $paras = '', $content = '' ) {
   }
 
   prp_toggle_global_shortcodes( $content );
+  define( 'can_toggle_shortcodes', false );
 
   return $content;
 }
@@ -579,6 +584,7 @@ function readme_banner( $paras = '', $content = '' ) {
 
   prp_log( 'Readme banner:' );
 
+  define( 'can_toggle_shortcodes', true );
   prp_toggle_global_shortcodes( $content );
 
   extract( shortcode_atts( array( 'nofollow' => '' ), $paras ) );
@@ -652,6 +658,7 @@ function readme_banner( $paras = '', $content = '' ) {
   }
 
   prp_toggle_global_shortcodes( $content );
+  define( 'can_toggle_shortcodes', false );
   return $output;
 }
 
@@ -674,6 +681,7 @@ function readme_info( $paras = '', $content = '' ) {
 
   prp_log( 'Readme Info' );
 
+  define( 'can_toggle_shortcodes', true );
   prp_toggle_global_shortcodes( $content );
 
   extract( shortcode_atts( array( 'name' => '', 'target' => '_blank', 'nofollow' => '', 'data' => '', 'cache' => '5' ), $paras ) );
@@ -805,6 +813,7 @@ function readme_info( $paras = '', $content = '' ) {
   }
 
   prp_toggle_global_shortcodes( $content );
+  define( 'can_toggle_shortcodes', false );
 
   return do_shortcode( $output );
 
