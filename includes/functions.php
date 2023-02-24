@@ -508,43 +508,51 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
         $original_shortcodes = $GLOBALS['shortcode_tags'];
         $GLOBALS['shortcode_tags'] = array();
 
-        // Need to put some of this plugin's ones back, otherwise it all breaks; it's unclear as to why this combination works:
-
-        if ( ( str_contains( $content, '[readme ' ) ) ||
-             ( str_contains( $content, '[readme]' ) ) ) {
-          prp_log( 'Content contains \'[readme \' or \'[readme]\'' );
-
-          $GLOBALS['shortcode_tags']['readme'] = 'readme_parser';
-          $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
-          $GLOBALS['shortcode_tags']['readme_banner'] = 'readme_banner';
-
-        } else if  ( str_contains( $content, '[readme_info' ) ) {
-          prp_log( 'Content contains \'[readme_info\'' );
-
-          $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
-
-        } else if  ( str_contains( $content, '[readme_banner' ) ) {
-          prp_log( 'Content contains \'[readme_banner\'' );
-
-          // Need to check this combo once banner display is working.
-
-          $GLOBALS['shortcode_tags']['readme'] = 'readme_parser';
-          $GLOBALS['shortcode_tags']['readme_banner'] = 'readme_banner';
-          $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
-
+        if ( current_theme_supports( 'block_templates' ) ) {
+          prp_log( 'Blocks are supported by this theme' );
+          prp_log( 'Toggling ALL global shortcodes OFF' );
 
         } else {
+          prp_log( 'Blocks are not supported by this theme' );
 
-          prp_log( 'Failed to find Plugin-readme Parser shortcode' );
-          // We're in the wild, not writing out a readme with this plugin, so all the shortcodes need to be functional:
-          prp_log( 'Toggling ALL global shortcodes ON' );
-          $GLOBALS['shortcode_tags'] = $original_shortcodes;
-          return $content;
+          // Need to put some of this plugin's ones back, otherwise it all breaks; it's unclear as to why and as to why these combinations work:
 
+          if ( ( str_contains( $content, '[readme ' ) ) ||
+               ( str_contains( $content, '[readme]' ) ) ) {
+            prp_log( 'Content contains \'[readme \' or \'[readme]\'' );
+
+            $GLOBALS['shortcode_tags']['readme'] = 'readme_parser';
+            $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
+            $GLOBALS['shortcode_tags']['readme_banner'] = 'readme_banner';
+
+          } else if  ( str_contains( $content, '[readme_info' ) ) {
+            prp_log( 'Content contains \'[readme_info\'' );
+
+            $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
+
+          } else if  ( str_contains( $content, '[readme_banner' ) ) {
+            prp_log( 'Content contains \'[readme_banner\'' );
+
+            // Need to check this combo once banner display is working.
+
+            $GLOBALS['shortcode_tags']['readme'] = 'readme_parser';
+            $GLOBALS['shortcode_tags']['readme_banner'] = 'readme_banner';
+            $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
+
+
+          } else {
+
+            prp_log( 'Failed to find Plugin-readme Parser shortcode' );
+            // We're in the wild, not writing out a readme with this plugin, so all the shortcodes need to be functional:
+            prp_log( 'Toggling ALL global shortcodes ON' );
+            $GLOBALS['shortcode_tags'] = $original_shortcodes;
+            return $content;
+
+          }
+
+          prp_log( 'Toggling global shortcodes OFF except for:' );
+          prp_log( $GLOBALS['shortcode_tags'], 'Global shortcodes:' );
         }
-
-        prp_log( 'Toggling global shortcodes OFF except for:' );
-        prp_log( $GLOBALS['shortcode_tags'], 'Global shortcodes:' );
 
       } else {
 
