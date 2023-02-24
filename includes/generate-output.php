@@ -32,13 +32,15 @@ function readme_parser( $paras = '', $content = '' ) {
 
   prp_log( 'Readme parser:' );
 
-  define( 'can_toggle_shortcodes', true );
+
 
   prp_toggle_global_shortcodes( $content );
 
   // Extract parameters
 
-  prp_log( $paras );
+  prp_log( $paras, 'Parameters (raw):' );
+  $paras = prp_normalise_parameters( $paras );
+  prp_log( $paras, 'Parameters (normalised):' );
 
   extract( shortcode_atts( array( 'assets' => '', 'exclude' => '', 'ext' => '', 'hide' => '', 'include' => '', 'scr_url' => '', 'scr_ext' => '' , 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $paras ) );
 
@@ -584,7 +586,7 @@ function readme_banner( $paras = '', $content = '' ) {
 
   prp_log( 'Readme banner:' );
 
-  define( 'can_toggle_shortcodes', true );
+
   prp_toggle_global_shortcodes( $content );
 
   extract( shortcode_atts( array( 'nofollow' => '' ), $paras ) );
@@ -681,7 +683,7 @@ function readme_info( $paras = '', $content = '' ) {
 
   prp_log( 'Readme Info' );
 
-  define( 'can_toggle_shortcodes', true );
+
   prp_toggle_global_shortcodes( $content );
 
   extract( shortcode_atts( array( 'name' => '', 'target' => '_blank', 'nofollow' => '', 'data' => '', 'cache' => '5' ), $paras ) );

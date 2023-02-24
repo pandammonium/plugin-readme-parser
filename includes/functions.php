@@ -42,14 +42,15 @@ function prp_log( $message, $message_name = '', $echo = true ) {
   // }
   if ( true === defined( 'WP_DEBUG' ) && true === defined( 'WP_DEBUG_LOG' ) ) {
     if ( is_array( $message ) ) {
-      error_log( print_r( 'PRP | ' . $message_name, true ) );
+      error_log( print_r( 'PRP | ' . $message_name, $echo ) );
       error_log( print_r( $message, true ) );
     } else {
-      error_log( print_r( 'PRP | ' . $message, true ) );
+      if ( '' !== $message_name ) {
+        error_log( print_r( 'PRP | ' . $message_name . ': ' . $message, $echo ) );
+      } else {
+        error_log( print_r( 'PRP | ' . $message, $echo ) );
+      }
     }
-    // if ( $shouldNotDie ) {
-    //   exit;
-    // }
   }
 }
 
@@ -425,6 +426,53 @@ function prp_get_list( $input, $separator = '', $type = '' ) {   // Version 1.2
   return $content;
 }
 
+if ( !function_exists( 'prp_normalise_parameters' ) ) {
+/**
+ * Normalises the quotation marks to straight ones from curly ones.
+ *
+ * @param  $text  string  The text to normalise the quotation marks in.
+ * @return        string  The text containing normalised quotation marks.
+ */
+  define( 'QUOTES', array(
+   '“' => '"',
+   '”' => '"',
+   '‘' => '\'',
+   '’' => '\''
+  ) );
+  function prp_normalise_parameters( $text ) {
+
+    if ( is_string( $text ) ) {
+      $normalised_text = str_replace(array_keys(QUOTES), array_values(QUOTES), $text);
+      prp_log( 'Normalised ' . $text );
+      prp_log( '        to ' . $normalised_text  );
+      return $normalised_text;
+
+    } else if ( is_array($text ) ) {
+      $normalised_text = array();
+      foreach ( $text as $key => $value ) {
+        prp_log( $key . ': ' . $value );
+        $normalised_text[$key] = str_replace(array("“", "”"), array('', ''), $value);
+        $normalised_text[$key] = str_replace(array("‘", "’"), array('', ''), $normalised_text[$key]);
+        prp_log( $key . ': ' . $normalised_text[$key] );
+      }
+      if ( isset( $normalised_text[0] ) ) {
+        if ( isset( $normalised_text[ 'exclude' ] ) ) {
+          $normalised_text['exclude'] .= ' ' . $normalised_text[0];
+        } else if ( isset( $normalised_text[ 'include' ] ) ) {
+          $normalised_text['include'] .= ' ' . $normalised_text[0];
+        }
+        unset( $normalised_text[0] );
+      }
+      return $normalised_text;
+
+    } else {
+      prp_log( $text, 'Normalise: wanted a string or an array; got \'' . gettype( $text ) . '\':'  );
+      return $text;
+    }
+
+  }
+}
+
 if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
 /**
  * Toggle the shortcodes so that any shortcodes in the readme file
@@ -446,8 +494,7 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
 
     $file = plugin_dir_path( __DIR__ );
     prp_log( 'Plugin directory: ' . $file );
-    if ( defined( 'can_toggle_shortcodes' ) &&
-         str_contains( $file, pandammonium_readme_parser_filename ) ) {
+    if ( str_contains( $file, pandammonium_readme_parser_filename ) ) {
 
       static $original_shortcodes = array();
 
