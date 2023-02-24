@@ -381,7 +381,9 @@ function prp_get_list( $input, $separator = '', $type = '' ) {   // Version 1.2
   prp_log( '  separator: \'' . $separator . '\'' );
   prp_log( '  type:      \'' . $type . '\'' );
 
-  if ( $separator == '' ) { $separator = ','; }
+  if ( $separator == '' ) {
+    $separator = ',';
+  }
   $comma = strpos( strtolower( $input ), $separator );
 
   $item = 0;
