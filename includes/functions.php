@@ -379,6 +379,7 @@ function prp_get_list( $input, $separator = '', $type = '' ) {   // Version 1.2
   prp_log( '  Get \'' . $type . '\' list:' );
   prp_log( '  input:     \'' . $input . '\'' );
   prp_log( '  separator: \'' . $separator . '\'' );
+  prp_log( '  type:      \'' . $type . '\'' );
 
   if ( $separator == '' ) { $separator = ','; }
   $comma = strpos( strtolower( $input ), $separator );
@@ -420,13 +421,13 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
  */
   function prp_toggle_global_shortcodes( $content ) {
 
-    prp_log( 'Shortcode content: ' . $content );
-
     static $original_shortcodes = array();
 
     prp_log( '# original shortcodes: ' . count ( $original_shortcodes ) );
 
-    if ( count ( $original_shortcodes ) <= 2 ) {
+    // prp_log( 'Shortcode content: ' . $content );
+
+    if ( count ( $original_shortcodes ) === 0 ) {
 
       $original_shortcodes = $GLOBALS['shortcode_tags'];
       $GLOBALS['shortcode_tags'] = array();
@@ -435,21 +436,26 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
 
       if ( ( str_contains( $content, '[readme ' ) === true ) ||
            ( str_contains( $content, '[readme]' ) === true ) ) {
+        prp_log( 'Content contains \'[readme \' or \'[readme]\'' );
 
+        $GLOBALS['shortcode_tags']['readme'] = 'readme_parser';
         $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
         $GLOBALS['shortcode_tags']['readme_banner'] = 'readme_banner';
 
       } else if  ( str_contains( $content, '[readme_info' ) === true ) {
+        prp_log( 'Content contains \'[readme_info\'' );
 
         $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
 
       } else if  ( str_contains( $content, '[readme_banner' ) === true ) {
+        prp_log( 'Content contains \'[readme_banner\'' );
 
         // Need to check this combo once banner display is working.
 
         $GLOBALS['shortcode_tags']['readme'] = 'readme_parser';
         $GLOBALS['shortcode_tags']['readme_banner'] = 'readme_banner';
         $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
+
 
       } else {
 
