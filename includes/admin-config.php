@@ -28,7 +28,7 @@ if ( !function_exists('prp_add_settings_link' ) ) {
   */
   function prp_add_settings_link( $links, $file ) {
 
-    if ( strpos( $file, 'plugin-readme-parser.php' ) !== false ) {
+    if ( str_contains( $file, pandammonium_readme_parser_filename ) ) {
 
       $links = array_merge( $links, array( '<a href="' . esc_url( admin_url( 'options-general.php?page=plugin-readme-parser' ) ) . '">' . __('Settings', 'plugin-readme-parser') . '</a>' ) );
     }
@@ -41,7 +41,7 @@ if ( !function_exists('prp_add_settings_link' ) ) {
 
 function prp_set_plugin_meta( $links, $file ) {
 
-  if ( strpos( $file, 'plugin-readme-parser.php' ) !== false ) {
+  if ( str_contains( $file, pandammonium_readme_parser_filename ) ) {
     $links = array_merge( $links, array( '<a href="https://wordpress.org/support/plugin/plugin-readme-parser">' . __( 'Support','plugin-readme-parser' ) . '</a>' ) );
   }
 
