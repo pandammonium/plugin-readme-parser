@@ -88,7 +88,7 @@ function prp_get_readme( $plugin_url, $version = '' ) {
 
   $file_data = prp_get_file( $plugin_url );
   prp_log( '  file data:   contents of readme file' );
-  // prp_log( $file_data, '  file data:' );
+  prp_log( $file_data, '  file data:' );
 
   // Ensure the file is valid
 
@@ -127,8 +127,8 @@ function prp_get_readme( $plugin_url, $version = '' ) {
 
 function prp_is_it_excluded( $tofind, $exclude ) {
 
-  // prp_log( '  Is \'' . strtolower( $tofind ) . '\' excluded?' );
-  // prp_log( '  exclusion list: \'' . $exclude . '\'' );
+  prp_log( '  Is \'' . strtolower( $tofind ) . '\' excluded?' );
+  prp_log( '  exclusion list: \'' . $exclude . '\'' );
 
   $tofind = strtolower( $tofind );
   $return = true;
@@ -154,7 +154,7 @@ function prp_is_it_excluded( $tofind, $exclude ) {
       }
     }
   }
-  // prp_log( '  \'' . $tofind . '\' is ' . ( $return ? 'excluded' : 'included' ) );
+  prp_log( '  \'' . $tofind . '\' is ' . ( $return ? 'excluded' : 'included' ) );
   return $return;
 }
 
@@ -373,9 +373,9 @@ function prp_get_file( $filein, $header = false ) {
   }
 
   prp_log( '  file out:    contents of readme file' );
-  // prp_log( $fileout, '  file out:' );
+  prp_log( $fileout, '  file out:' );
   prp_log( '  file return: contents of readme file' );
-  // prp_log( $file_return, '  file return:' );
+  prp_log( $file_return, '  file return:' );
 
   return $file_return;
 }
@@ -450,9 +450,9 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
     prp_log( '# global shortcodes:   ' . count ( $GLOBALS['shortcode_tags'] ) );
 
     $file = plugin_dir_path( __DIR__ );
-    prp_log( 'Plugin file: ' . $file );
+    prp_log( 'Plugin directory: ' . $file );
     if ( str_contains( $file, pandammonium_readme_parser_filename ) ) {
-      // prp_log( 'Shortcode content: ' . $content );
+      prp_log( 'Shortcode content: ' . $content );
 
       if ( count ( $original_shortcodes ) === 0 ) {
 
@@ -502,7 +502,7 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
         prp_log( 'Toggling global shortcodes ON' );
 
         $GLOBALS['shortcode_tags'] = $original_shortcodes;
-        // prp_log( 'Repopulating GLOBAL shortcodes with original shortcodes' );
+        prp_log( 'Repopulating GLOBAL shortcodes with original shortcodes' );
 
       }
     } else {
