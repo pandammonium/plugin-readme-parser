@@ -30,7 +30,7 @@
 
 function readme_parser( $paras = '', $content = '' ) {
 
-  // prp_log( 'Readme parser:' );
+  prp_log( 'Readme parser:' );
 
 
 
