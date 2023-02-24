@@ -39,6 +39,8 @@ function readme_parser( $paras = '', $content = '' ) {
   // Extract parameters
 
   prp_log( $paras );
+  $paras = prp_normalise_quotation_marks( $paras );
+  prp_log( $paras );
 
   extract( shortcode_atts( array( 'assets' => '', 'exclude' => '', 'ext' => '', 'hide' => '', 'include' => '', 'scr_url' => '', 'scr_ext' => '' , 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $paras ) );
 

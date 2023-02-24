@@ -425,6 +425,30 @@ function prp_get_list( $input, $separator = '', $type = '' ) {   // Version 1.2
   return $content;
 }
 
+if ( !function_exists( 'prp_normalise_quotation_marks' ) ) {
+/**
+ * Normalises the quotation marks to straight ones from curly ones.
+ *
+ * @param  $text  string  The text to normalise the quotation marks in.
+ * @return        string  The text containing normalised quotation marks.
+ */
+  function prp_normalise_quotation_marks( $text ) {
+
+    if ( is_string( $text ) ) {
+      $normalised_text = str_replace(array("“", "”"), array('"', '"'), $text);
+      $normalised_text = str_replace(array("‘", "’"), array('\'', '\''), $normalised_text);
+
+      prp_log( 'Normalised ' . $text );
+      prp_log( '        to ' . $normalised_text  );
+      return $normalised_text;
+    } else {
+      prp_log( 'Wanted a string; got a ' . gettype( $text ) );
+      return $text;
+    }
+
+  }
+}
+
 if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
 /**
  * Toggle the shortcodes so that any shortcodes in the readme file
