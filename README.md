@@ -22,4 +22,4 @@ Plugin-readme Parser uses [PHP Markdown Extra](https://michelf.ca/projects/php-m
 Iconography is courtesy of the very talented [Janki Rathod](https://www.fiverr.com/jankirathore) ♥️
 
 
-<p align="right"><a href="https://wordpress.org/plugins/plugin-readme-parser/"><img src="https://img.shields.io/wordpress/plugin/dt/plugin-readme-parser?label=wp.org%20downloads&style=for-the-badge">&nbsp;<img src="https://img.shields.io/wordpress/plugin/stars/plugin-readme-parser?color=orange&style=for-the-badge"></a></p>
+<!-- <p align="right"><a href="https://wordpress.org/plugins/plugin-readme-parser/"><img src="https://img.shields.io/wordpress/plugin/dt/plugin-readme-parser?label=wp.org%20downloads&style=for-the-badge">&nbsp;<img src="https://img.shields.io/wordpress/plugin/stars/plugin-readme-parser?color=orange&style=for-the-badge"></a></p> -->

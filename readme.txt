@@ -218,7 +218,7 @@ Plugin-readme Parser can be found and installed via the Plugin menu within WordP
 1. Upload the entire `plugin-readme-parser` folder to your `wp-content/plugins/` directory.
 2. Activate the plugin through the 'Plugins' menu in WordPress administration.
 
-Voila! It's ready to go.
+Voilà, it's ready to go.
 
 == Screenshots ==
 
@@ -243,13 +243,19 @@ Each of these `div`'s can therefore be styled using your theme stylesheet.
 Semantic versioning is used, with the first release being 1.0.
 
 = 2.0.0 =
-* Bug: Updated markdown library.
-* Now maintained by [Caity Ross](https://pandammonium.org/).
+
+* Bug: updated markdown library; the old version broke the plugin when running on more recent versions of PHP.
+* Bug: corrected variable name; a typo led to a broken plugin in certain circumstances.
+* Maintenance: forked and maintained by [Caity Ross](https://pandammonium.org/).
 
 [Previous version history](https://plugins.trac.wordpress.org/browser/plugin-readme-parser/trunk/changelog.txt)
 
-
 == Upgrade Notice ==
 
+= 2.0.0 =
+
+This reworking of WP README Parser has a new name and works with more recent versions of PHP.
+
 = 1.3.7 =
-* Minor maintenance change
+
+Minor maintenance change.
