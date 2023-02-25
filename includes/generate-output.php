@@ -30,17 +30,15 @@
 
 function readme_parser( $paras = '', $content = '' ) {
 
-  prp_log( 'Readme parser:' );
+  // prp_log( 'Readme parser:' );
 
-
-
-  prp_toggle_global_shortcodes( $content );
+  // prp_toggle_global_shortcodes( $content );
 
   // Extract parameters
 
-  // prp_log( $paras, 'Parameters (raw):' );
+  // // prp_log( 'Parameters (raw)', $paras );
   $paras = prp_normalise_parameters( $paras );
-  // prp_log( $paras, 'Parameters (normalised):' );
+  // // prp_log( 'Parameters (normalised)', $paras );
 
   extract( shortcode_atts( array( 'assets' => '', 'exclude' => '', 'ext' => '', 'hide' => '', 'include' => '', 'scr_url' => '', 'scr_ext' => '' , 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $paras ) );
 
@@ -52,8 +50,8 @@ function readme_parser( $paras = '', $content = '' ) {
     $result = get_transient( $cache_key );
   }
 
-  // prp_log( 'shortcode content: \'' . $content .'\'' );
-  // prp_log( $paras, 'shortcode parameters:' );
+  // prp_log( 'shortcode content', $content );
+  // prp_log( 'shortcode parameters', $paras );
 
   if ( !$result ) {
 
@@ -88,16 +86,16 @@ function readme_parser( $paras = '', $content = '' ) {
     }
 
     // prp_log( 'shortcode parameter values:' );
-    // prp_log( '  plugin url: \'' . $plugin_url . '\'' );
-    // prp_log( '  exclude:    \'' . $exclude . '\'' );
-    // prp_log( '  include:    \'' . $include . '\'' );
-    // prp_log( '  hide:       \'' . $hide . '\'' );
-    // prp_log( '  links:      \'' . $links . '\'' );
-    // prp_log( '  nofollow:   \'' . $nofollow . '\'' );
-    // prp_log( '  assets:     \'' . $assets . '\'' );
-    // prp_log( '  extension:  \'' . $ext . '\'' );
-    // prp_log( $ignore, '  ignore:' );
-    // prp_log( $mirror, '  mirror:' );
+    // prp_log( '  plugin url', $plugin_url );
+    // prp_log( '  exclude', $exclude );
+    // prp_log( '  include', $include );
+    // prp_log( '  hide', $hide );
+    // prp_log( '  links', $links );
+    // prp_log( '  nofollow', $nofollow );
+    // prp_log( '  assets', $assets );
+    // prp_log( '  extension', $ext );
+    // prp_log( '  ignore', $ignore );
+    // prp_log( '  mirror', $mirror );
     // prp_log( 'end of shortcode parameter values' );
 
     // Work out in advance whether links should be shown
@@ -112,13 +110,13 @@ function readme_parser( $paras = '', $content = '' ) {
         $show_links = true;
       }
     }
-    // prp_log( 'show links:  ' . $show_links );
+    // prp_log( 'show links', $show_links );
 
     // Ensure EXCLUDE and INCLUDE parameters aren't both included
 
     if ( ( '' != $exclude ) &&
          ( '' != $include ) ) {
-      return prp_report_error( __( 'INCLUDE and EXCLUDE parameters cannot both be specified', 'plugin-readme-parser' ), 'Plugin-readme Parser', false );
+      return prp_report_error( __( '\'include\' and \'exclude\' parameters cannot both be specified', 'plugin-readme-parser' ), 'Plugin-readme Parser', false );
     }
 
     // Work out filename and fetch the contents
@@ -129,16 +127,19 @@ function readme_parser( $paras = '', $content = '' ) {
 
     if ( false !== $file_data ) {
 
+      // prp_log( 'file_data', $file_data );
+
       if ( isset( $file_data[ 'name' ] ) ) {
         $plugin_name = $file_data[ 'name' ];
       } else {
         $plugin_name = '';
       }
-      // prp_log( 'plugin name:      \'' . $plugin_name . '\'' );
+      // prp_log( 'plugin name', $plugin_name );
 
       // Split file into array based on CRLF
 
       $file_array = preg_split( "/((\r(?!\n))|((?<!\r)\n)|(\r\n))/", $file_data[ 'file' ] );
+      // prp_log( 'file_array', $file_array, false, true );
 
       // Set initial variables
 
@@ -156,7 +157,7 @@ function readme_parser( $paras = '', $content = '' ) {
       $count = count( $file_array );
       // prp_log( 'readme file has ' . $count . ' lines' );
       for ( $i = 0; $i < $count; $i++ ) {
-        // // prp_log( '  line ' . $i + 1 );
+        // // prp_log( '  line', $i + 1 );
         $add_to_output = true;
 
         // Remove non-visible character from input - various characters can sneak into
@@ -169,12 +170,12 @@ function readme_parser( $paras = '', $content = '' ) {
         if ( '=== ' == substr( $file_array [$i ], 0, 4 ) ) {
           $file_array[ $i ] = str_replace( '===', '#', $file_array[ $i ] );
           $section = prp_get_section_name( $file_array[ $i ], 1 );
-          // prp_log( 'section: ' . $section );
+          // // prp_log( 'section', $section );
         } else {
           if ( '== ' == substr( $file_array[ $i ], 0, 3 ) ) {
             $file_array[ $i ] = str_replace( '==', '##' , $file_array[ $i ] );
             $section = prp_get_section_name( $file_array[ $i ], 2 );
-            // prp_log( 'section: ' . $section );
+            // // prp_log( 'section', $section );
           } else {
             if ( '= ' == substr( $file_array[ $i ], 0, 2 ) ) {
               $file_array[ $i ] = str_replace( '=', '###', $file_array[ $i ] );
@@ -199,7 +200,7 @@ function readme_parser( $paras = '', $content = '' ) {
           // If a plugin name was not specified attempt to use the name parameter. If that's not set, assume
           // it's the one in the readme header
 
-          // prp_log( 'name (from args): \'' . $name . '\'' );
+          // // prp_log( 'name (from args)', $name );
 
           if ( '' == $plugin_name ) {
             if ( '' == $name ) {
@@ -212,7 +213,7 @@ function readme_parser( $paras = '', $content = '' ) {
           $plugin_title = $section;
           $add_to_output = false;
           $section = 'head';
-          // prp_log( 'section: ' . $section );
+          // // prp_log( 'section', $section );
 
         }
 
@@ -222,17 +223,15 @@ function readme_parser( $paras = '', $content = '' ) {
 
           if ( prp_is_it_excluded( $section, $include ) ) {
 
-            // // prp_log( '  \'' . $section . '\' is excluded' );
-
             if ( $section != $prev_section ) {
               if ( $div_written ) {
+                // prp_log( 'section ' . '\'' . $section . '\'', 'is excluded' );
                 $file_combined .= '</div>' . $crlf;
               }
               $file_combined .= $crlf . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $section ) ) ) . '">' . $crlf;
               $div_written = true;
             }
           } else {
-            // // prp_log( '  \'' . $section . '\' is included' );
             $add_to_output = false;
           }
 
@@ -245,6 +244,7 @@ function readme_parser( $paras = '', $content = '' ) {
           } else {
             if ( $section != $prev_section ) {
               if ( $div_written ) {
+                // prp_log( 'section ' . '\'' . $section . '\'', 'is included' );
                 $file_combined .= '</div>' . $crlf;
               }
               $file_combined .= $crlf . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $section ) ) ) . '">' . $crlf;
@@ -281,21 +281,21 @@ function readme_parser( $paras = '', $content = '' ) {
         if ( 'Stable tag:' == substr( $file_array[ $i ], 0, 11 ) ) {
 
           $version = substr( $file_array[ $i ], 12 );
-          // prp_log( 'version: \'' . $version . '\'' );
-          // prp_log( 'download link: \'' . $download . '\'' );
+          // prp_log( 'version', $version );
           $download = 'https://downloads.wordpress.org/plugin/' . $plugin_name . '.' . $version . '.zip';
+          // // prp_log( 'download link', $download );
 
-          // prp_log( 'No screenshots to be displayed' );
+          // // prp_log( 'No screenshots to be displayed' );
           if ( $assets ) {
-            // prp_log( 'screenshot url (assets): \'' . $screenshot_url . '\'' );
             $screenshot_url = 'https://plugins.svn.wordpress.org/' . $plugin_name . '/assets/';
+            // // prp_log( 'screenshot url (assets)', $screenshot_url );
           } else {
             if ( 'trunk' == strtolower( $version ) ) {
-              // prp_log( 'screenshot url (trunk): \'' . $screenshot_url . '\'' );
               $screenshot_url = 'https://plugins.svn.wordpress.org/' . $plugin_name . '/trunk/';
+              // // prp_log( 'screenshot url (trunk)', $screenshot_url );
             } else {
-              // prp_log( 'screenshot url (tags): \'' . $screenshot_url . '\'' );
               $screenshot_url = 'https://plugins.svn.wordpress.org/' . $plugin_name . '/tags/' . $version . '/';
+              // // prp_log( 'screenshot url (tags)', $screenshot_url );
             }
           }
         }
@@ -314,7 +314,10 @@ function readme_parser( $paras = '', $content = '' ) {
                ( 'License:' == substr( $file_array[ $i ], 0, 8 ) ) ) {
 
             if ( prp_is_it_excluded( 'meta', $exclude ) ) {
+              // prp_log( '\'meta\' is excluded (' . $exclude . ')' );
               $add_to_output = false;
+            } else {
+              // prp_log( '\'meta\' is included (' . $exclude . ')' );
             }
 
             if ( ( 'Requires at least:' == substr( $file_array[ $i ], 0, 18 ) ) &&
@@ -386,12 +389,12 @@ function readme_parser( $paras = '', $content = '' ) {
 
         if ( ( 'Screenshots' == $section ) && ( $add_to_output ) &&
              ( '' != $screenshot_url ) ) {
-          // prp_log( 'Screenshot: ' . $screenshot );
-          // prp_log( 'Screenshot url: ' . $screenshot_url );
-          // prp_log( 'File array['. $i .']: \'' . $file_array[ $i ] . '\'' );
+          // // prp_log( 'Screenshot', $screenshot );
+          // // prp_log( 'Screenshot url', $screenshot_url );
+          // // prp_log( 'File array['. $i .']', $file_array[ $i ] );
           if ( substr( $file_array[ $i ], 0, strlen( $screenshot ) + 2 ) == $screenshot . '. ' ) {
             $this_screenshot = $screenshot_url . 'screenshot-' . $screenshot . '.';
-            // prp_log( 'This screenshot: \'' . $this_screenshot . '\'' );
+            // // prp_log( 'This screenshot', $this_screenshot );
 
             // Depending on file existence, set the appropriate file extension
 
@@ -435,14 +438,14 @@ function readme_parser( $paras = '', $content = '' ) {
         }
 
         // // prp_log( '  variables after line ' . $i + 1 . ':' );
-        // // prp_log( '    section:          \'' . $section . '\'' );
-        // // prp_log( '    previous section: \'' . $prev_section . '\'' );
-        // // prp_log( '    last line blank:  \'' . $last_line_blank . '\'' );
-        // // prp_log( '    <div> written:    \'' . $div_written . '\'' );
-        // // prp_log( '    screenshot:       \'' . $screenshot . '\'' );
-        // // prp_log( '    code:             \'' . $code . '\'' );
-        // // // prp_log( '    crlf:             \'' . $crlf . '\'' );
-        // // // prp_log( '  file combined:    \'' . $file_combined . '\'' );
+        // // prp_log( '    section', $section );
+        // // prp_log( '    previous section', $prev_section );
+        // // prp_log( '    last line blank', $last_line_blank );
+        // // prp_log( '    <div> written', $div_written );
+        // // prp_log( '    screenshot', $screenshot );
+        // // prp_log( '    code', $code );
+        // // prp_log( '    crlf', $crlf );
+        // // prp_log( '  file combined', $file_combined );
       }
 
       $file_combined .= '</div>' . $crlf;
@@ -528,16 +531,17 @@ function readme_parser( $paras = '', $content = '' ) {
 
       $my_html = str_replace( '<code>', '<code class="notranslate">', str_replace( '<pre>', '<pre class="notranslate">', $my_html ) );
 
+
     } else {
 
       if ( ( 0 < strlen( $file_data[ 'file' ] ) ) &&
            ( 0 == substr_count( $file_data[ 'file' ], "\n" ) ) ) {
 
-        $my_html = prp_report_error( __( 'Malformed readme file - no carriage returns found', 'plugin-readme-parser' ), 'Plugin-readme Parser', false );
+        $my_html = prp_report_error( __( 'invalid readme file: no carriage returns found', 'plugin-readme-parser' ), 'Plugin-readme Parser', false );
 
       } else {
 
-        $my_html = prp_report_error( __( 'readme file could not be found or is malformed; file: \'' . $file_data[ 'file' ] . '\'', 'plugin-readme-parser' ) . ' - ' . $plugin_url, 'Plugin-readme Parser', false );
+        $my_html = prp_report_error( __( 'the readme file for the ' . $plugin_url . ' plugin is either missing or invalid: \'' . $file_data[ 'file' ] . '\'', 'plugin-readme-parser' ), 'Plugin-readme Parser', false );
 
       }
     }
@@ -549,18 +553,18 @@ function readme_parser( $paras = '', $content = '' ) {
     // Cache the results
 
     if ( is_numeric( $cache ) ) {
-      // prp_log( 'caching transient' );
+      // // prp_log( 'caching transient' );
       set_transient( $cache_key, $content, 3600 * $cache );
     }
 
   } else {
 
-    // prp_log( 'transient already cached' );
+    // // prp_log( 'transient already cached' );
 
     $content = $result;
   }
 
-  prp_toggle_global_shortcodes( $content );
+  // prp_toggle_global_shortcodes( $content );
 
 
   return $content;
@@ -583,10 +587,10 @@ add_shortcode( 'readme', 'readme_parser' );
 
 function readme_banner( $paras = '', $content = '' ) {
 
-  prp_log( 'Readme banner:' );
+  // prp_log( 'Readme banner:' );
 
 
-  prp_toggle_global_shortcodes( $content );
+  // prp_toggle_global_shortcodes( $content );
 
   extract( shortcode_atts( array( 'nofollow' => '' ), $paras ) );
 
@@ -658,7 +662,7 @@ function readme_banner( $paras = '', $content = '' ) {
     }
   }
 
-  prp_toggle_global_shortcodes( $content );
+  // prp_toggle_global_shortcodes( $content );
 
   return $output;
 }
@@ -680,10 +684,10 @@ add_shortcode( 'readme_banner', 'readme_banner' );
 
 function readme_info( $paras = '', $content = '' ) {
 
-  prp_log( 'Readme Info' );
+  // prp_log( 'Readme Info' );
 
 
-  prp_toggle_global_shortcodes( $content );
+  // prp_toggle_global_shortcodes( $content );
 
   extract( shortcode_atts( array( 'name' => '', 'target' => '_blank', 'nofollow' => '', 'data' => '', 'cache' => '5' ), $paras ) );
 
@@ -752,7 +756,7 @@ function readme_info( $paras = '', $content = '' ) {
       }
 
     } else {
-      prp_log( '*** PLUGIN URL (error): ' . $plugin_url );
+      // prp_log( '*** PLUGIN URL', $plugin_url, true );
 
       $output = prp_report_error( __( 'readme file could not be found or is malformed; name: \'' . $file_data[ 'name' ] . '\'', 'plugin-readme-parser' ) . ' - ' . $name, 'Plugin-readme Parser', false );
     }

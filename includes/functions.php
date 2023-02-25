@@ -8,50 +8,70 @@
  * @since  1.2
  */
 
-
-
 /**
  * Prints a message to the debug log file.
  *
  * @since 2.0.0
  *
+ * @param string  message_name  (optional)  A name to associate with the
+ * message. This is useful if logging multiple messages.
  * @param string / array $message    The message to be logged.
- * @param string  (optional) A name to associate with the message. This is useful if logging multiple messages.
- * @param bool  $echo whether or not the The function should exit after writing to the log
+ * @param bool  $error  Whether the message is about an error or not.
  *
  */
-function prp_log( $message, $message_name = '', $echo = true ) {
-  // if ( true === defined( 'WP_DEBUG' ) ) {
-  //   if ( false === defined( 'WP_DEBUG_LOG' ) ) {
-  //     $echo = false;
-  //   } else if ( true === defined( 'WP_DEBUG_DISPLAY' ) ) {
-  //     $echo = true;
-  //   }
-  //   if ( is_array( $message ) ) {
-  //     if ( '' !== $message_name ) {
-  //       error_log( print_r( 'PRP | ' . $message_name, $echo ) );
-  //     }
-  //     error_log( print_r( $message, $echo ) );
-  //   } else {
-  //     if ( '' !== $message_name ) {
-  //       error_log( print_r( 'PRP | ' . $message_name . ': ' . $message, $echo ) );
-  //     } else {
-  //       error_log( print_r( 'PRP | ' . $message, $echo ) );
-  //     }
-  //   }
-  // }
-  if ( true === defined( 'WP_DEBUG' ) && true === defined( 'WP_DEBUG_LOG' ) ) {
-    if ( is_array( $message ) ) {
-      error_log( print_r( 'PRP | ' . $message_name, $echo ) );
-      error_log( print_r( $message, true ) );
-    } else {
-      if ( '' !== $message_name ) {
-        error_log( print_r( 'PRP | ' . $message_name . ': ' . $message, $echo ) );
+function prp_log( $message_name, $message = '', $error = false, $echo = true ) {
+
+  $debugging = defined( 'WP_DEBUG' ) && WP_DEBUG;
+  $log_file = defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG;
+  $log_display = defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
+
+  // error_log( print_r( '  WP_DEBUG:         ' . ($debugging ? 'true' : 'false' ), true ) );
+  // error_log( print_r( '  WP_DEBUG_LOG:     ' . ($log_file ? 'true' : 'false' ), true ) );
+  // error_log( print_r( '  WP_DEBUG_DISPLAY: ' . ($log_display ? 'true' : 'false' ), true ) );
+  // error_log( print_r( '  error:            ' . ($error ? 'true' : 'false' ), true ) );
+  // error_log( print_r( '  echo:             ' . ($echo ? 'true' : 'false' ), true ) );
+
+  // echo '<pre>' .
+  //   print_r( 'WP_DEBUG:         ' . ($debugging ? 'true' : 'false' ), true ) . '<br>' .
+  //   print_r( 'WP_DEBUG_LOG:     ' . ($log_file ? 'true' : 'false' ), true ) . '<br>' .
+  //   print_r( 'WP_DEBUG_DISPLAY: ' . ($log_display ? 'true' : 'false' ), true ) . '<hr>' .
+  //   print_r( '$error:           ' . ($error ? 'true' : 'false' ), true ) . '<br>' .
+  //   print_r( '$echo:            ' . ($echo ? 'true' : 'false' ), true ) .
+  //  '</pre>';
+
+  $prefix = 'PRP | ';
+  $header = ( '' === $message_name ) ? '' : $message_name;
+  $error_style = $error ? ' class="error"' : '';
+  $divider = ( '' === $message ) ? '' : ': ';
+  $message_type = gettype( $message );
+  $output = '';
+  switch ( $message_type ) {
+    case 'array':
+      $output = print_r( $header, true ) . $divider . print_r( $message, true );
+    break;
+    default:
+      $output = $header . $divider . $message;
+    break;
+  }
+
+  if ( $debugging ) {
+    if ( $log_file ) {
+      error_log( $prefix . $output );
+    }
+    if ( $error && $echo ||
+         $log_display ) {
+      if ( '' !== $message ) {
+        // Embolden the message name:
+        $output = str_replace( $message_name, '<b>' . $message_name . '</b>', $output );
+      }
+      if ( 'array' === $message_type ) {
+        echo '<pre' . $error_style . '>' . $output . '</pre>';
       } else {
-        error_log( print_r( 'PRP | ' . $message, $echo ) );
+        echo '<p' . $error_style . '>' . $output . '</p>';
       }
     }
   }
+
 }
 
 /**
@@ -237,7 +257,12 @@ function prp_display_links( $download, $target, $nofollow, $version, $mirror, $p
 
     // prp_log( '  no version, therefore no download link' );
 
-    $output .= '<span class="np-download-link" style="color: #f00;">No download link is available as the version number could not be found</span><br /><br />' . $crlf;
+    $output .= '<span class="np-download-link error">No download link is available as the version number could not be found</span><br /><br />' . $crlf;
+
+    // $output .= prp_report_error( __( '', '' ), '', false );
+
+    // $output .= prp_report_error( __( '<span class="np-download-link>No download link is available as the version number could not be found</span>', 'plugin-readme-parser' ), 'Plugin-readme Parser', false );
+
   }
 
   $output .= '<a href="https://wordpress.org/extend/plugins/' . $plugin_name . '/" target="' . $target . '"' . $nofollow . '>Visit the official WordPress plugin page</a><br />' . $crlf;
@@ -522,7 +547,7 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
         $current_theme_supports_blocks = wp_is_block_theme();
 
         if ( $current_theme_supports_blocks ) {
-          prp_log( '*****    This theme supports blocks     *****' );
+          prp_log( 'This theme DOES support blocks' );
           //   prp_log( 'Toggling ALL global shortcodes OFF' );
           if  ( str_contains( $content, '[readme_info' ) ) {
             // prp_log( 'Content contains \'[readme_info\'' );
@@ -532,7 +557,7 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
           }
 
         } else {
-          prp_log( '***** This theme does not support blocks *****' );
+          prp_log( 'This theme DOES NOT support blocks' );
 
           // Need to put some of this plugin's ones back, otherwise it all breaks; it's unclear as to why and as to why these combinations work:
 
@@ -585,13 +610,14 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
 
       }
     } else {
-      prp_log( '***** Wrong plugin supplied *****' );
+      prp_report_error( __( 'wrong plugin supplied', 'plugin-readme-parser'), pandammonium_readme_parser_name );
+      // prp_log( '***** Wrong plugin supplied *****' );
     }
     return $content;
   }
 
-  add_filter( 'the_content', 'prp_toggle_global_shortcodes', -1 );
-  add_filter( 'the_content', 'prp_toggle_global_shortcodes', PHP_INT_MAX );
+  // add_filter( 'the_content', 'prp_toggle_global_shortcodes', -1 );
+  // add_filter( 'the_content', 'prp_toggle_global_shortcodes', PHP_INT_MAX );
 }
 
 /**
@@ -602,29 +628,27 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
  *
  * @since  1.0
  *
- * @param  $error    string  The error message to report.
  * @param  $plugin_name  string  The name of the plugin where the error
  * occurred.
+ * @param  $error    string  The error message to report.
  * @param  $echo   string  A boolean value indicating whether to output the
  * error message immediately using echo. If false, the function returns the
  * formatted error message instead of echoing it.
  * @return     string / true  If $echo === true, the function outputs the error message using echo and returns true. If $echo is false, the function returns the formatted error message instead of echoing it.
  */
 
-function prp_report_error( $error, $plugin_name, $echo = true ) {
+function prp_report_error( $plugin_name, $error, $echo = true ) {
 
-  prp_log( 'Error:' );
-  prp_log( 'plugin name: ' . $plugin_name );
-  prp_log( 'error:       \'' . $error . '\'' );
+  prp_log( $error, $plugin_name, true, $echo );
 
-  $output = '<p style="color: #990000;">' . $plugin_name . ': ' . $error . "</p>\n";
+  // $output = '<p class="error">' . $plugin_name . ': ' . $error . '</p>';
 
-  if ( $echo ) {
-    echo $output;
-    return true;
-  } else {
-    return $output;
-  }
+  // if ( $echo ) {
+  //   echo $output;
+  //   return true;
+  // } else {
+  //   return $output;
+  // }
 
 }
 ?>
