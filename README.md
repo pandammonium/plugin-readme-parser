@@ -17,7 +17,7 @@ Features include:
 * Extra shortcodes available to display plugin banners and to return specific plugin data (e.g. download link, version number)
 * Google Translation suppressed on code output
 
-Plugin-readme Parser uses [PHP Markdown Extra](http://michelf.com/projects/php-markdown/extra/ "PHP Markdown Extra") by Michel Fortin.
+Plugin-readme Parser uses [PHP Markdown Extra](https://michelf.ca/projects/php-markdown/ "PHP Markdown") by Michel Fortin.
 
 Iconography is courtesy of the very talented [Janki Rathod](https://www.fiverr.com/jankirathore) ♥️
 

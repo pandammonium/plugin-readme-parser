@@ -282,20 +282,20 @@ function readme_parser( $paras = '', $content = '' ) {
 
           $version = substr( $file_array[ $i ], 12 );
           // prp_log( 'version: \'' . $version . '\'' );
-          $download = 'http://downloads.wordpress.org/plugin/' . $plugin_name . '.' . $version . '.zip';
           // prp_log( 'download link: \'' . $download . '\'' );
+          $download = 'https://downloads.wordpress.org/plugin/' . $plugin_name . '.' . $version . '.zip';
 
           // prp_log( 'No screenshots to be displayed' );
           if ( $assets ) {
-            $screenshot_url = 'http://plugins.svn.wordpress.org/' . $plugin_name . '/assets/';
             // prp_log( 'screenshot url (assets): \'' . $screenshot_url . '\'' );
+            $screenshot_url = 'https://plugins.svn.wordpress.org/' . $plugin_name . '/assets/';
           } else {
             if ( 'trunk' == strtolower( $version ) ) {
-              $screenshot_url = 'http://plugins.svn.wordpress.org/' . $plugin_name . '/trunk/';
               // prp_log( 'screenshot url (trunk): \'' . $screenshot_url . '\'' );
+              $screenshot_url = 'https://plugins.svn.wordpress.org/' . $plugin_name . '/trunk/';
             } else {
-              $screenshot_url = 'http://plugins.svn.wordpress.org/' . $plugin_name . '/tags/' . $version . '/';
               // prp_log( 'screenshot url (tags): \'' . $screenshot_url . '\'' );
+              $screenshot_url = 'https://plugins.svn.wordpress.org/' . $plugin_name . '/tags/' . $version . '/';
             }
           }
         }
@@ -610,7 +610,7 @@ function readme_banner( $paras = '', $content = '' ) {
 
     // Build the 1544 banner URL
 
-    $url = 'http://plugins.svn.wordpress.org/' . $name . '/assets/banner-1544x500.';
+    $url = 'https://plugins.svn.wordpress.org/' . $name . '/assets/banner-1544x500.';
     $ext = 'png';
 
     // Check if the PNG banner exists
@@ -628,7 +628,7 @@ function readme_banner( $paras = '', $content = '' ) {
 
         // Build the banner 772 URL
 
-        $url = 'http://plugins.svn.wordpress.org/' . $name . '/assets/banner-772x250.';
+        $url = 'https://plugins.svn.wordpress.org/' . $name . '/assets/banner-772x250.';
         $ext = 'png';
 
         // Check if the PNG banner exists
@@ -771,7 +771,7 @@ function readme_info( $paras = '', $content = '' ) {
 
     if ( 'download' == $data ) {
       if ( ( '' != $plugin_name ) && ( '' != $version ) ) {
-        $output = '<a href="http://downloads.wordpress.org/plugin/' . $plugin_name . '.' . $version . '.zip" target="' . $target . '"' . $nofollow . '>' . $content. '</a>';
+        $output = '<a href="https://downloads.wordpress.org/plugin/' . $plugin_name . '.' . $version . '.zip" target="' . $target . '"' . $nofollow . '>' . $content. '</a>';
       } else {
         $output = prp_report_error( __( 'The name and/or version number could not be found in the readme', 'plugin-readme-parser' ), 'Plugin-readme Parser', false );
       }
@@ -791,7 +791,7 @@ function readme_info( $paras = '', $content = '' ) {
 
     if ( 'forum' == $data ) {
       if ( '' != $plugin_name ) {
-        $output = '<a href="http://wordpress.org/tags/' . $plugin_name . '" target="' . $target . '"' . $nofollow . '>' . $content . '</a>';
+        $output = '<a href="https://wordpress.org/tags/' . $plugin_name . '" target="' . $target . '"' . $nofollow . '>' . $content . '</a>';
       } else {
         $output = prp_report_error( __( 'Plugin name not supplied', 'plugin-readme-parser' ), 'Plugin-readme Parser', false );
       }
@@ -801,7 +801,7 @@ function readme_info( $paras = '', $content = '' ) {
 
     if ( 'wordpress' == $data ) {
       if ( '' != $plugin_name ) {
-        $output = '<a href="http://wordpress.org/extend/plugins/' . $plugin_name . '/" target="' . $target . '"' . $nofollow . '>' . $content . '</a>';
+        $output = '<a href="https://wordpress.org/extend/plugins/' . $plugin_name . '/" target="' . $target . '"' . $nofollow . '>' . $content . '</a>';
       } else {
         $output = prp_report_error( __( 'Plugin name not supplied', 'plugin-readme-parser' ), 'Plugin-readme Parser', false );
       }
@@ -813,7 +813,7 @@ function readme_info( $paras = '', $content = '' ) {
 
   }
 
-  prp_toggle_global_shortcodes( $content );
+  // prp_toggle_global_shortcodes( $content );
 
 
   return do_shortcode( $output );

@@ -1589,8 +1589,8 @@ class Markdown implements MarkdownInterface {
     if ($this->no_entities) {
       $text = str_replace('&', '&amp;', $text);
     } else {
-      // Ampersand-encoding based entirely on Nat Irons's Amputator
-      // MT plugin: <http://bumppo.net/projects/amputator/>
+      // Ampersand-encoding based entirely on Nat Irons's Amputator for
+      // Movable Type and Blosxom <http://bumppo.net/projects/amputator/> (really is HTTP as of 25-Feb-2023)
       $text = preg_replace('/&(?!#?[xX]?(?:[0-9a-fA-F]+|\w+);)/',
                 '&amp;', $text);
     }

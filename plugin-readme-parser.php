@@ -5,7 +5,7 @@
  * Description: Converts a WordPress plugin's readme file to XHTML for embedding in a post or page.
  * Version:     2.0.0
  * Author:      Caity Ross
- * Author URI:  http://pandammonium.org/
+ * Author URI:  https://pandammonium.org/
  * Text Domain: plugin-readme-parser
  * @link        https://pandammonium.org/wordpress-dev/plugin-readme-parser/
  * @since       1.0

@@ -6,7 +6,7 @@ Tested up to: 6.1.1
 Requires PHP: 7.4
 Stable tag: 2.0.0
 License: GPLv3 or later
-License URI: http://www.gnu.org/licenses/gpl-3.0.html
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 📑 Embed readme content into posts
 
@@ -106,7 +106,7 @@ To display a specific version of the readme, use th `version` parameter to reque
 
 If your plugin is hosted at a number of other locations, you can use `mirror` to specify download URLs other than the WordPress repository. Simply separate multiple URLs with double commas (i.e. `,,`). For example:
 
-`[readme mirror="http://www.example1.com,,http://www.example2.com"]WP readme Parser[/readme]`
+`[readme mirror="https://www.example1.com,,https://www.example2.com"]WP readme Parser[/readme]`
 
 **links**
 
@@ -118,7 +118,7 @@ By default, download and other links will be added to the bottom of the readme o
 
 If you specify a readme filename instead of a name, the plugin name at the top of the readme will be assumed to be the correct name. This might not be the case if you've renamed your plugin (as is the case for this plugin). The `name` parameter overrides this:
 
-`[readme name="WP readme Parser"]http://plugins.svn.wordpress.org/plugin-readme-parser/trunk/readme.txt[/readme]`
+`[readme name="WP readme Parser"]https://plugins.svn.wordpress.org/plugin-readme-parser/trunk/readme.txt[/readme]`
 
 **ext**
 
@@ -209,7 +209,7 @@ For example:
 
 == Acknowledgements ==
 
-Plugin-readme Parser uses [PHP Markdown Extra](http://michelf.com/projects/php-markdown/extra/ "PHP Markdown Extra") by Michel Fortin.
+Plugin-readme Parser uses [PHP Markdown Extra](https://michelf.ca/projects/php-markdown/ "PHP Markdown") by Michel Fortin.
 
 == Installation ==
 

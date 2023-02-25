@@ -74,7 +74,7 @@ function prp_get_readme( $plugin_url, $version = '' ) {
 
   if ( strpos( $plugin_url, '://' ) === false ) {
     $array[ 'name' ] = str_replace( ' ', '-', strtolower( $plugin_url ) );
-    $plugin_url = 'http://plugins.svn.wordpress.org/' . $array[ 'name' ] . '/';
+    $plugin_url = 'https://plugins.svn.wordpress.org/' . $array[ 'name' ] . '/';
     // prp_log( '  url:        \'' . $plugin_url . '\'' );
   if ( is_numeric( $version ) ) {
     $plugin_url .= 'tags/' . $version;
@@ -240,8 +240,8 @@ function prp_display_links( $download, $target, $nofollow, $version, $mirror, $p
     $output .= '<span class="np-download-link" style="color: #f00;">No download link is available as the version number could not be found</span><br /><br />' . $crlf;
   }
 
-  $output .= '<a href="http://wordpress.org/extend/plugins/' . $plugin_name . '/" target="' . $target . '"' . $nofollow . '>Visit the official WordPress plugin page</a><br />' . $crlf;
-  $output .= '<a href="http://wordpress.org/support/plugin/' . $plugin_name . '" target="' . $target . '"' . $nofollow . '>View for WordPress forum for this plugin</a><br />' . $crlf . '</div>' . $crlf;
+  $output .= '<a href="https://wordpress.org/extend/plugins/' . $plugin_name . '/" target="' . $target . '"' . $nofollow . '>Visit the official WordPress plugin page</a><br />' . $crlf;
+  $output .= '<a href="https://wordpress.org/support/plugin/' . $plugin_name . '" target="' . $target . '"' . $nofollow . '>View for WordPress forum for this plugin</a><br />' . $crlf . '</div>' . $crlf;
 
   return $output;
 }
@@ -299,9 +299,9 @@ function prp_strip_list( $list, $type, $target, $nofollow ) {
   // prp_log( '  nofollow: \'' . $nofollow . '\'' );
 
   if ( $type == 'c' ) {
-    $url = 'http://profiles.wordpress.org/users/';
+    $url = 'https://profiles.wordpress.org/users/';
   } else if ( $type == 't' ) {
-    $url = 'http://wordpress.org/extend/plugins/tags/';
+    $url = 'https://wordpress.org/extend/plugins/tags/';
   } else {
     prp_log( 'Invalid type found.' );
     $url = '';
