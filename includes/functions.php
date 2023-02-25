@@ -241,7 +241,7 @@ function prp_display_links( $download, $target, $nofollow, $version, $mirror, $p
   }
 
   $output .= '<a href="http://wordpress.org/extend/plugins/' . $plugin_name . '/" target="' . $target . '"' . $nofollow . '>Visit the official WordPress plugin page</a><br />' . $crlf;
-  $output .= '<a href="http://wordpress.org/tags/' . $plugin_name . '" target="' . $target . '"' . $nofollow . '>View for WordPress forum for this plugin</a><br />' . $crlf . '</div>' . $crlf;
+  $output .= '<a href="http://wordpress.org/support/plugin/' . $plugin_name . '" target="' . $target . '"' . $nofollow . '>View for WordPress forum for this plugin</a><br />' . $crlf . '</div>' . $crlf;
 
   return $output;
 }
