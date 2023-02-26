@@ -163,7 +163,9 @@ if ( !function_exists( 'prp_is_it_excluded' ) ) {
 
     if ( 'screenshots' == $tofind ||
          'screenshot' == $tofind ) {
-      $return = false;
+
+      $return = true;
+
     } else {
 
       if ( $tofind != $exclude ) {
