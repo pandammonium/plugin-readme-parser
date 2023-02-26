@@ -8,7 +8,6 @@ Features include:
 
 * Convert your markdown readme to XHTML and display in any post or page
 * Use shortcodes or a direct PHP function call
-* Responsive output of screenshots
 * Output is cached for maximum performance
 * Links automatically added to author and tag information
 * Download links added

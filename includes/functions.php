@@ -143,7 +143,9 @@ if ( !function_exists( 'prp_is_it_excluded' ) ) {
   /**
    * Is It Excluded?
    *
-   * Function to check if the current section is excluded or not
+   * Function to check if the current section is excluded or not.
+   * The screenshots section is always excluded because this type of access to
+   *  the WordPress SVN server is forbidden.
    *
    * @since  1.0
    *
@@ -153,29 +155,35 @@ if ( !function_exists( 'prp_is_it_excluded' ) ) {
    */
   function prp_is_it_excluded( $tofind, $exclude ) {
 
-    // prp_log( __( '  Is \'' . strtolower( $tofind ) . '\' excluded?', plugin_readme_parser_domain ) );
-    // prp_log( __( '  exclusion list: \'' . $exclude . '\'', plugin_readme_parser_domain ) );
+    prp_log( __( '  Is \'' . strtolower( $tofind ) . '\' excluded?', plugin_readme_parser_domain ) );
+    prp_log( __( '  exclusion list: \'' . $exclude . '\'', plugin_readme_parser_domain ) );
 
     $tofind = strtolower( $tofind );
     $return = true;
 
-    if ( $tofind != $exclude ) {
+    if ( 'screenshots' == $tofind ||
+         'screenshot' == $tofind ) {
+      $return = false;
+    } else {
 
-      // Search in the middle
+      if ( $tofind != $exclude ) {
 
-      $pos = strpos( $exclude, ',' . $tofind . ',' );
-      if ( $pos === false ) {
+        // Search in the middle
 
-        // Search on the left
-
-        $pos = strpos( substr( $exclude, 0, strlen( $tofind ) + 1 ), $tofind . ',' );
+        $pos = strpos( $exclude, ',' . $tofind . ',' );
         if ( $pos === false ) {
 
-          // Search on the right
+          // Search on the left
 
-          $pos = strpos( substr( $exclude, ( strlen( $tofind ) + 1 ) * -1, strlen( $tofind ) + 1 ), ',' . $tofind );
+          $pos = strpos( substr( $exclude, 0, strlen( $tofind ) + 1 ), $tofind . ',' );
           if ( $pos === false ) {
-            $return = false;
+
+            // Search on the right
+
+            $pos = strpos( substr( $exclude, ( strlen( $tofind ) + 1 ) * -1, strlen( $tofind ) + 1 ), ',' . $tofind );
+            if ( $pos === false ) {
+              $return = false;
+            }
           }
         }
       }
@@ -300,11 +308,25 @@ if ( !function_exists( 'prp_check_img_exists' ) ) {
 
     // prp_log( __( '  mime type:  \'' . mime_content_type( $filename . $ext ) . '\'', plugin_readme_parser_domain ) );
 
-    if ( mime_content_type( $filename . $ext ) === 'image/' . $ext ) {
-      // prp_log( __( '\'' . $filename . $ext . '\' exists: true', plugin_readme_parser_domain ) );
+    $file_url = $filename . $ext;
+
+    // $file_exists = @mime_content_type( $file_url ) === 'image/' . $ext;
+    // $file_exists = @file_exists( $file_url );
+
+    // $file_exists = (bool)@file_get_contents($file_url, false, stream_context_create([
+    //     'http' => [
+    //         'method' => 'HEAD',
+    //         'ignore_errors' => true,
+    //     ],
+    // ]));
+
+    $file_exists = false;
+
+    if ( $file_exists ) {
+      prp_log( __( '\'' . $filename . $ext . '\' exists: true', plugin_readme_parser_domain ) );
       return $ext;
     } else {
-      // prp_log( __( '\'' . $filename . $ext . '\' exists: false', plugin_readme_parser_domain ) );
+      prp_log( __( '\'' . $filename . $ext . '\' exists: false', plugin_readme_parser_domain ) );
       return false;
     }
   }

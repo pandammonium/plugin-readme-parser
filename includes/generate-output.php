@@ -40,13 +40,15 @@ if ( !function_exists( 'readme_parser' ) ) {
     $paras = prp_normalise_parameters( $paras );
     // prp_log( __( 'Parameters (normalised)', plugin_readme_parser_domain), $paras );
 
-    extract( shortcode_atts( array( 'assets' => '', 'exclude' => '', 'ext' => '', 'hide' => '', 'include' => '', 'scr_url' => '', 'scr_ext' => '' , 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $paras ) );
+    extract( shortcode_atts( array( 'exclude' => '', 'ext' => '', 'hide' => '', 'include' => '', 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $paras ) );
+    // extract( shortcode_atts( array( 'assets' => '', 'exclude' => '', 'ext' => '', 'hide' => '', 'include' => '', 'scr_url' => '', 'scr_ext' => '' , 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $paras ) );
 
     // Get cached output
 
     $result = false;
     if ( is_numeric( $cache ) ) {
-      $cache_key = 'prp_' . md5( $assets . $exclude . $ext . $hide . $include . $scr_url . $scr_ext . $target . $nofollow . $ignore . $cache . $version . $mirror . $content );
+      $cache_key = 'prp_' . md5( $exclude . $ext . $hide . $include . $target . $nofollow . $ignore . $cache . $version . $mirror . $content );
+      // $cache_key = 'prp_' . md5( $assets . $exclude . $ext . $hide . $include . $scr_url . $scr_ext . $target . $nofollow . $ignore . $cache . $version . $mirror . $content );
       $result = get_transient( $cache_key );
     }
 
@@ -147,7 +149,6 @@ if ( !function_exists( 'readme_parser' ) ) {
         $prev_section = '';
         $last_line_blank = true;
         $div_written = false;
-        $screenshot = 0; // Setting this to '1' causes an HTTP 403 (forbidden) error when trying to obtain the image file size.
         $code = false;
         $crlf = "\r\n";
         $file_combined = '';
@@ -274,9 +275,7 @@ if ( !function_exists( 'readme_parser' ) ) {
 
           $prev_section = $section;
 
-          // Get version, download but NOT screenshot details
-          // Screenshots cannot be obtained: WordPress' servers return an HTTP 403
-          // (forbidden) error.
+          // Get the download link for the most recent version
 
           if ( 'Stable tag:' == substr( $file_array[ $i ], 0, 11 ) ) {
 
@@ -285,19 +284,6 @@ if ( !function_exists( 'readme_parser' ) ) {
             $download = 'https://downloads.wordpress.org/plugin/' . $plugin_name . '.' . $version . '.zip';
             // // prp_log( __( 'download link', plugin_readme_parser_domain ), $download );
 
-            // // prp_log( __( 'No screenshots to be displayed', plugin_readme_parser_domain ) );
-            if ( $assets ) {
-              $screenshot_url = 'https://plugins.svn.wordpress.org/' . $plugin_name . '/assets/';
-              // // prp_log( __( 'screenshot url (assets)', plugin_readme_parser_domain ), $screenshot_url );
-            } else {
-              if ( 'trunk' == strtolower( $version ) ) {
-                $screenshot_url = 'https://plugins.svn.wordpress.org/' . $plugin_name . '/trunk/';
-                // // prp_log( __( 'screenshot url (trunk)', plugin_readme_parser_domain ), $screenshot_url );
-              } else {
-                $screenshot_url = 'https://plugins.svn.wordpress.org/' . $plugin_name . '/tags/' . $version . '/';
-                // // prp_log( __( 'screenshot url (tags)', plugin_readme_parser_domain ), $screenshot_url );
-              }
-            }
           }
 
           if ( $add_to_output ) {
@@ -385,51 +371,18 @@ if ( !function_exists( 'readme_parser' ) ) {
             }
           }
 
-          // Do not display screenshots: any attempt to access the screenshots on WordPress' servers is met with an HTTP 403 (forbidden) error.
 
-          if ( ( 'Screenshots' == $section ) && ( $add_to_output ) &&
-               ( '' != $screenshot_url ) ) {
-            // // prp_log( __( 'Screenshot', plugin_readme_parser_domain ), $screenshot );
-            // // prp_log( __( 'Screenshot url', plugin_readme_parser_domain ), $screenshot_url );
-            // // prp_log( __( 'File array['. $i .']', plugin_readme_parser_domain ), $file_array[ $i ] );
-            if ( substr( $file_array[ $i ], 0, strlen( $screenshot ) + 2 ) == $screenshot . '. ' ) {
-              $this_screenshot = $screenshot_url . 'screenshot-' . $screenshot . '.';
-              // // prp_log( __( 'This screenshot', plugin_readme_parser_domain ), $this_screenshot );
-
-              // Depending on file existence, set the appropriate file extension
-
-              $ext = prp_check_img_exists( $this_screenshot, 'png' );
-              if ( !$ext ) {
-                $ext = prp_check_img_exists( $this_screenshot, 'gif' );
-              }
-              if ( !$ext ) {
-                $ext = prp_check_img_exists( $this_screenshot, 'jpg' );
-              }
-              if ( !$ext ) {
-                $ext = prp_check_img_exists( $this_screenshot, 'jpeg' );
-              }
-              $this_screenshot .= $ext;
-
-              // Now put together the image URL
-
-              if ( !$ext ) {
-
-                $file_array[ $i ] = prp_report_error( sprintf( __( 'Could not find %s image file', plugin_readme_parser_domain ), 'screenshot-' . $screenshot ), plugin_readme_parser_name, false );
-
-              } else {
-
-                $file_array[ $i ] = '<img src="' . $this_screenshot . '" alt="' . $plugin_title . ' Screenshot ' . $screenshot . '" title="' . $plugin_title . ' Screenshot ' . $screenshot . '" class="np-screenshot' . $screenshot . '" /><br />' . $crlf . '*' . substr( $file_array[ $i ], strlen( $screenshot ) + 2 ) . '*';
-                if ( 1 != $screenshot ) {
-                  $file_array[ $i ] = '<br /><br />' . $file_array[ $i ];
-                }
-              }
-              $screenshot++;
-            }
+          if ( 'Screenshots' === $section ) {
+            // Do not display screenshots: any attempt to access the screenshots on WordPress' servers is met with an HTTP 403 (forbidden) error.
+            // prp_log( __(  'Screenshot section: ignore', plugin_readme_parser_domain ) );
           }
 
           // Add current line to output, assuming not compressed and not a second blank line
 
-          if ( ( ( '' != $file_array[ $i ] ) OR ( !$last_line_blank ) ) &&
+          // prp_log( __(  'current line: ' . $file_array[ $i ], plugin_readme_parser_domain ) );
+          // prp_log( __( 'last line is blank: ' . $last_line_blank, plugin_readme_parser_domain ) );
+
+          if ( ( ( '' != $file_array[ $i ] ) or ( !$last_line_blank ) ) &&
                ( $add_to_output ) ) {
             $file_combined .= $file_array[ $i ] . $crlf;
             if ( '' == $file_array[ $i ] ) {
@@ -442,7 +395,6 @@ if ( !function_exists( 'readme_parser' ) ) {
           // // prp_log( __( '    previous section', plugin_readme_parser_domain ), $prev_section );
           // // prp_log( __( '    last line blank', plugin_readme_parser_domain ), $last_line_blank );
           // // prp_log( __( '    <div> written', plugin_readme_parser_domain ), $div_written );
-          // // prp_log( __( '    screenshot', plugin_readme_parser_domain ), $screenshot );
           // // prp_log( __( '    code', plugin_readme_parser_domain ), $code );
           // // prp_log( __( '    crlf', plugin_readme_parser_domain ), $crlf );
           // // prp_log( __( '  file combined', plugin_readme_parser_domain ), $file_combined );
@@ -486,7 +438,9 @@ if ( !function_exists( 'readme_parser' ) ) {
 
               $title = substr( $file_array[ $i ], 4, strpos( $file_array[ $i ], '</h2>' ) - 4 );
               if ( prp_is_it_excluded( strtolower( $title ), $hide ) ) {
-                $state = 'hide'; } else { $state = 'show';
+                $state = 'hide';
+              } else {
+                $state = 'show';
               }
 
               // Call Content Reveal with heading details and replace current line

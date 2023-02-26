@@ -20,7 +20,6 @@ Key features include:
 
 * Convert your markdown readme to XHTML and display in any post or page
 * Use shortcodes or a direct PHP function call
-* Responsive output of screenshots
 * Output is cached for maximum performance
 * Links automatically added to author and tag information
 * Download links added
@@ -120,16 +119,6 @@ If you specify a readme filename instead of a name, the plugin name at the top o
 
 `[readme name="WP readme Parser"]https://plugins.svn.wordpress.org/plugin-readme-parser/trunk/readme.txt[/readme]`
 
-**ext**
-
-The extension that your screenshots are stored as (e.g. PNG or JPG).
-
-**assets**
-
-If your screenshots are in your assets folder, set the `assests` parameter to `yes` so that they can be read from there. For example:
-
-`[readme assets="yes"]WP readme Parser[/readme]`
-
 == Using Content Reveal ==
 
 If you also have the plugin [Content Reveal](https://wordpress.org/plugins/simple-content-reveal/ "Content Reveal") installed, each section of the readme will be collapsible; that is, you can click on the section heading to hide the section content.
@@ -144,24 +133,6 @@ Use the `hide` parameter to hide sections automatically. Simply click on them to
 
 `[readme hide="Changelog"]WP readme Parser[/readme]`
 
-**scr_url**
-
-To supply your own hide/reveal images, specify your own folder with the `scr_url` parameter.
-
-The two images (one for when the content is hidden, another for when it's shown) must be named image1 and image2. They can either be GIF or PNG images (see the next parameter).
-
-For example:
-
-`[readme scr_url="https://pandammonium.org/”]Plugin-readme Parser[/readme]`
-
-**scr_ext**
-
-Use this to specify whether PNG or GIF images should be used for your own hide/reveal images; GIF images are the default.
-
-For example:
-
-`[readme scr_url="https://artiss.blog" scr_ext="png"]WP readme Parser[/readme]`
-
 == Using a Function Call ==
 
 To code a direct PHP call to the plugin, you can do. The function is named `readme_parser` and accepts two parameters:
@@ -171,7 +142,7 @@ To code a direct PHP call to the plugin, you can do. The function is named `read
 
 For example:
 
-`echo readme_parser( array( 'exclude' => 'meta,upgrade notice,screenshots,support,changelog,links,installation,licence', 'ignore' => 'For help with this plugin,,for more information and advanced options ' ), 'YouTube Embed' );`
+`echo readme_parser( array( 'exclude' => 'meta,upgrade notice,support,changelog,links,installation,licence', 'ignore' => 'For help with this plugin,,for more information and advanced options ' ), 'YouTube Embed' );`
 
 This may be of particular use to plugin developers because it allows the readme for their plugins to be displayed within their administration screens.
 
@@ -220,10 +191,6 @@ Plugin-readme Parser can be found and installed via the Plugin menu within WordP
 
 Voilà, it's ready to go.
 
-== Screenshots ==
-
-1. Example of [Timed Content](https://artiss.blog/simple-timed-content "Timed Content") readme being displayed on artiss.blog website.
-
 == Frequently Asked Questions ==
 
 = Can I change the look of the output? =
@@ -233,8 +200,6 @@ You can. The whole output is encased in a `<div>` with a `class` of `np-` follow
 Each section that has a `<div>` around it with a `class` of `np-` followed by the section name (lower case and spaces converted to dashes).
 
 The download link has an additional `<div>` around it with a `class` of `np-download-link`.
-
-Screenshots have a `<div>` with a `class` of `np-screenshotx`, where `x` is the screenshot number.
 
 Each of these `div`'s can therefore be styled using your theme stylesheet.
 
@@ -246,6 +211,8 @@ Semantic versioning is used, with the first release being 1.0.
 
 * Bug: updated markdown library; the old version broke the plugin when running on more recent versions of PHP.
 * Bug: corrected variable name; a typo led to a broken plugin in certain circumstances.
+* Bug: removed display of screenshots because they aren't accessible from the
+plugin.
 * Maintenance: forked and maintained by [Caity Ross](https://pandammonium.org/).
 
 [Previous version history](https://plugins.trac.wordpress.org/browser/plugin-readme-parser/trunk/changelog.txt)
@@ -254,7 +221,7 @@ Semantic versioning is used, with the first release being 1.0.
 
 = 2.0.0 =
 
-This reworking of WP README Parser has a new name and works with more recent versions of PHP.
+This reworking of WP README Parser has a new name and works with more recent versions of PHP. It also removes broken features (e.g. the display of screenshots).
 
 = 1.3.7 =
 
