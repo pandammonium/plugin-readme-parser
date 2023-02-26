@@ -48,7 +48,6 @@ if ( !function_exists( 'readme_parser' ) ) {
     $result = false;
     if ( is_numeric( $cache ) ) {
       $cache_key = 'prp_' . md5( $exclude . $ext . $hide . $include . $target . $nofollow . $ignore . $cache . $version . $mirror . $content );
-      // $cache_key = 'prp_' . md5( $assets . $exclude . $ext . $hide . $include . $scr_url . $scr_ext . $target . $nofollow . $ignore . $cache . $version . $mirror . $content );
       $result = get_transient( $cache_key );
     }
 
@@ -75,12 +74,6 @@ if ( !function_exists( 'readme_parser' ) ) {
         $nofollow = ' rel="nofollow"';
       }
 
-      if ( 'yes' == strtolower( $assets ) ) {
-        $assets = true;
-      } else {
-        $assets = false;
-      }
-
       if ( '' == $ext ) {
         $ext = 'png';
       } else {
@@ -94,7 +87,6 @@ if ( !function_exists( 'readme_parser' ) ) {
       // prp_log( __( '  hide', plugin_readme_parser_domain ), $hide );
       // prp_log( __( '  links', plugin_readme_parser_domain ), $links );
       // prp_log( __( '  nofollow', plugin_readme_parser_domain ), $nofollow );
-      // prp_log( __( '  assets', plugin_readme_parser_domain ), $assets );
       // prp_log( __( '  extension', plugin_readme_parser_domain ), $ext );
       // prp_log( __( '  ignore', plugin_readme_parser_domain ), $ignore );
       // prp_log( __( '  mirror', plugin_readme_parser_domain ), $mirror );
