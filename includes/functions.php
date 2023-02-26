@@ -463,6 +463,8 @@ function prp_get_list( $input, $separator = '', $type = '' ) {   // Version 1.2
 if ( !function_exists( 'prp_normalise_parameters' ) ) {
 /**
  * Normalises the quotation marks to straight ones from curly ones.
+ * Fixes the erroneous array member created by having a space in 'Upgrade
+ * Notice'.
  *
  * @param  $text  string  The text to normalise the quotation marks in.
  * @return        string  The text containing normalised quotation marks.
