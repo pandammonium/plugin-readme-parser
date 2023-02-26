@@ -60,9 +60,11 @@ function prp_log( $message_name, $message = '', $error = false, $echo = false ) 
     }
     if ( ( $error && $echo ) ||
          $log_display ) {
-      if ( '' !== $message ) {
-        // Embolden the message name:
-        $output = str_replace( $message_name, '<b>' . $message_name . '</b>', $output );
+
+      $delim = ':';
+      $pos = strpos( $output, $delim );
+      if ( $pos !== false ) {
+        $output = '<b>' . str_replace( $delim, $delim . '</b>', $output );
       }
       if ( 'array' === $message_type ) {
         echo '<pre' . $error_style . '>' . $output . '</pre>';
