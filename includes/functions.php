@@ -261,7 +261,7 @@ function prp_display_links( $download, $target, $nofollow, $version, $mirror, $p
 
     // $output .= prp_report_error( __( '', '' ), '', false );
 
-    // $output .= prp_report_error( __( '<span class="np-download-link>No download link is available as the version number could not be found</span>', 'plugin-readme-parser' ), 'Plugin-readme Parser', false );
+    // $output .= prp_report_error( __( '<span class="np-download-link>No download link is available as the version number could not be found</span>', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
 
   }
 
@@ -529,7 +529,7 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
 
     $file = plugin_dir_path( __DIR__ );
     // // prp_log( 'Plugin directory: ' . $file );
-    if ( str_contains( $file, pandammonium_readme_parser_filename ) ) {
+    if ( str_contains( $file, plugin_readme_parser_filename ) ) {
 
       static $original_shortcodes = array();
 
@@ -547,7 +547,7 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
         $current_theme_supports_blocks = wp_is_block_theme();
 
         if ( $current_theme_supports_blocks ) {
-          prp_log( 'This theme DOES support blocks' );
+          // prp_log( 'This theme DOES support blocks' );
           //   prp_log( 'Toggling ALL global shortcodes OFF' );
           if  ( str_contains( $content, '[readme_info' ) ) {
             // prp_log( 'Content contains \'[readme_info\'' );
@@ -557,7 +557,7 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
           }
 
         } else {
-          prp_log( 'This theme DOES NOT support blocks' );
+          // prp_log( 'This theme DOES NOT support blocks' );
 
           // Need to put some of this plugin's ones back, otherwise it all breaks; it's unclear as to why and as to why these combinations work:
 
@@ -610,7 +610,7 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
 
       }
     } else {
-      prp_report_error( __( 'wrong plugin supplied', 'plugin-readme-parser'), pandammonium_readme_parser_name );
+      prp_report_error( __( 'wrong plugin supplied', plugin_readme_parser_domain), plugin_readme_parser_name );
       // prp_log( '***** Wrong plugin supplied *****' );
     }
     return $content;

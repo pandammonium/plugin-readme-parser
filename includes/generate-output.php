@@ -116,7 +116,7 @@ function readme_parser( $paras = '', $content = '' ) {
 
     if ( ( '' != $exclude ) &&
          ( '' != $include ) ) {
-      return prp_report_error( __( '\'include\' and \'exclude\' parameters cannot both be specified', 'plugin-readme-parser' ), 'Plugin-readme Parser', false );
+      return prp_report_error( __( '\'include\' and \'exclude\' parameters cannot both be specified', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
     }
 
     // Work out filename and fetch the contents
@@ -414,7 +414,7 @@ function readme_parser( $paras = '', $content = '' ) {
 
             if ( !$ext ) {
 
-              $file_array[ $i ] = prp_report_error( sprintf( __( 'Could not find %s image file', 'plugin-readme-parser' ), 'screenshot-' . $screenshot ), 'Plugin-readme Parser', false );
+              $file_array[ $i ] = prp_report_error( sprintf( __( 'Could not find %s image file', plugin_readme_parser_domain ), 'screenshot-' . $screenshot ), plugin_readme_parser_name, false );
 
             } else {
 
@@ -537,18 +537,18 @@ function readme_parser( $paras = '', $content = '' ) {
       if ( ( 0 < strlen( $file_data[ 'file' ] ) ) &&
            ( 0 == substr_count( $file_data[ 'file' ], "\n" ) ) ) {
 
-        $my_html = prp_report_error( __( 'invalid readme file: no carriage returns found', 'plugin-readme-parser' ), 'Plugin-readme Parser', false );
+        $my_html = prp_report_error( __( 'invalid readme file: no carriage returns found', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
 
       } else {
 
-        $my_html = prp_report_error( __( 'the readme file for the ' . $plugin_url . ' plugin is either missing or invalid: \'' . $file_data[ 'file' ] . '\'', 'plugin-readme-parser' ), 'Plugin-readme Parser', false );
+        $my_html = prp_report_error( __( 'the readme file for the ' . $plugin_url . ' plugin is either missing or invalid: \'' . $file_data[ 'file' ] . '\'', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
 
       }
     }
 
-    // Send the resultant code back, plus encapsulating DIV and version comments
+    // Send the resultant code back, plus encapsulating DIV and version comments. Use double-quotes to permit linebreaks (\n)
 
-    $content = '<!-- Plugin-readme Parser v' . pandammonium_readme_parser_version . " -->\n<div class=\"np-notepad\">" . $my_html . "</div>\n<!-- End of Plugin-readme Parser code -->\n";
+    $content = "\n<!-- " . plugin_readme_parser_name . " v" . plugin_readme_parser_version . " -->\n<div class=\"np-notepad\">" . $my_html . "</div>\n<!-- End of " . plugin_readme_parser_name . " code -->\n";
 
     // Cache the results
 
@@ -602,7 +602,7 @@ function readme_banner( $paras = '', $content = '' ) {
 
     // Report error if no name found
 
-    return prp_report_error( __( 'No plugin name was supplied for banner', 'plugin-readme-parser' ), 'Plugin-readme Parser', false );
+    return prp_report_error( __( 'No plugin name was supplied for banner', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
 
   } else {
 
@@ -758,7 +758,7 @@ function readme_info( $paras = '', $content = '' ) {
     } else {
       // prp_log( '*** PLUGIN URL', $plugin_url, true );
 
-      $output = prp_report_error( __( 'readme file could not be found or is malformed; name: \'' . $file_data[ 'name' ] . '\'', 'plugin-readme-parser' ) . ' - ' . $name, 'Plugin-readme Parser', false );
+      $output = prp_report_error( __( 'readme file could not be found or is malformed; name: \'' . $file_data[ 'name' ] . '\'', plugin_readme_parser_domain ) . ' - ' . $name, plugin_readme_parser_name, false );
     }
   } else {
 
@@ -777,7 +777,7 @@ function readme_info( $paras = '', $content = '' ) {
       if ( ( '' != $plugin_name ) && ( '' != $version ) ) {
         $output = '<a href="https://downloads.wordpress.org/plugin/' . $plugin_name . '.' . $version . '.zip" target="' . $target . '"' . $nofollow . '>' . $content. '</a>';
       } else {
-        $output = prp_report_error( __( 'The name and/or version number could not be found in the readme', 'plugin-readme-parser' ), 'Plugin-readme Parser', false );
+        $output = prp_report_error( __( 'The name and/or version number could not be found in the readme', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
       }
     }
 
@@ -787,7 +787,7 @@ function readme_info( $paras = '', $content = '' ) {
       if ( '' != $version ) {
         $output = $version;
       } else {
-        $output = prp_report_error( __( 'Version number not found in the readme', 'plugin-readme-parser' ), 'Plugin-readme Parser', false );
+        $output = prp_report_error( __( 'Version number not found in the readme', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
       }
     }
 
@@ -797,7 +797,7 @@ function readme_info( $paras = '', $content = '' ) {
       if ( '' != $plugin_name ) {
         $output = '<a href="https://wordpress.org/tags/' . $plugin_name . '" target="' . $target . '"' . $nofollow . '>' . $content . '</a>';
       } else {
-        $output = prp_report_error( __( 'Plugin name not supplied', 'plugin-readme-parser' ), 'Plugin-readme Parser', false );
+        $output = prp_report_error( __( 'Plugin name not supplied', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
       }
     }
 
@@ -807,13 +807,13 @@ function readme_info( $paras = '', $content = '' ) {
       if ( '' != $plugin_name ) {
         $output = '<a href="https://wordpress.org/extend/plugins/' . $plugin_name . '/" target="' . $target . '"' . $nofollow . '>' . $content . '</a>';
       } else {
-        $output = prp_report_error( __( 'Plugin name not supplied', 'plugin-readme-parser' ), 'Plugin-readme Parser', false );
+        $output = prp_report_error( __( 'Plugin name not supplied', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
       }
     }
 
     // Report an error if the data parameter was invalid or missing
 
-    if ( '' == $output ) { $output = prp_report_error( __( 'The data parameter was invalid or missing', 'plugin-readme-parser' ), 'Plugin-readme Parser', false ); }
+    if ( '' == $output ) { $output = prp_report_error( __( 'The data parameter was invalid or missing', plugin_readme_parser_domain ), plugin_readme_parser_name, false ); }
 
   }
 
