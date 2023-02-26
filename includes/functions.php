@@ -58,7 +58,7 @@ function prp_log( $message_name, $message = '', $error = false, $echo = false ) 
     if ( $log_file ) {
       error_log( $prefix . $output );
     }
-    if ( $error && $echo ||
+    if ( ( $error && $echo ) ||
          $log_display ) {
       if ( '' !== $message ) {
         // Embolden the message name:
