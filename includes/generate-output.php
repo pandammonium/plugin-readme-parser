@@ -41,7 +41,6 @@ if ( !function_exists( 'readme_parser' ) ) {
     // prp_log( __( 'Parameters (normalised)', plugin_readme_parser_domain), $paras );
 
     extract( shortcode_atts( array( 'exclude' => '', 'ext' => '', 'hide' => '', 'include' => '', 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $paras ) );
-    // extract( shortcode_atts( array( 'assets' => '', 'exclude' => '', 'ext' => '', 'hide' => '', 'include' => '', 'scr_url' => '', 'scr_ext' => '' , 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $paras ) );
 
     // Get cached output
 
@@ -377,6 +376,8 @@ if ( !function_exists( 'readme_parser' ) ) {
 
           if ( 'Screenshots' === $section ) {
             // Do not display screenshots: any attempt to access the screenshots on WordPress' servers is met with an HTTP 403 (forbidden) error.
+            // Clear the line so as to prevent anything using the screenshots data
+            $file_array[ $i ] = '';
             // prp_log( __(  'Screenshot section: ignore', plugin_readme_parser_domain ) );
           }
 
