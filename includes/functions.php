@@ -19,7 +19,7 @@
  * @param bool  $error  Whether the message is about an error or not.
  *
  */
-function prp_log( $message_name, $message = '', $error = false, $echo = true ) {
+function prp_log( $message_name, $message = '', $error = false, $echo = false ) {
 
   $debugging = defined( 'WP_DEBUG' ) && WP_DEBUG;
   $log_file = defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG;
