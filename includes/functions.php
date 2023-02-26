@@ -616,8 +616,8 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
     return $content;
   }
 
-  // add_filter( 'the_content', 'prp_toggle_global_shortcodes', -1 );
-  // add_filter( 'the_content', 'prp_toggle_global_shortcodes', PHP_INT_MAX );
+  add_filter( 'the_content', 'prp_toggle_global_shortcodes', -1 );
+  add_filter( 'the_content', 'prp_toggle_global_shortcodes', PHP_INT_MAX );
 }
 
 /**
