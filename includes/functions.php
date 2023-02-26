@@ -190,7 +190,7 @@ if ( !function_exists( 'prp_is_it_excluded' ) ) {
         }
       }
     }
-    // prp_log( __( '  \'' . $tofind . '\' is ' . ( $return ? 'excluded' : 'included', plugin_readme_parser_domain ) ) );
+    // prp_log( __( '  \'' . $tofind . '\' is ' . ( $return ? 'excluded' : 'included' ), plugin_readme_parser_domain ) );
     return $return;
   }
 }
