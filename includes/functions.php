@@ -89,28 +89,28 @@ function prp_log( $message_name, $message = '', $error = false, $echo = false ) 
 
 function prp_get_readme( $plugin_url, $version = '' ) {
 
-  prp_log( __( '  Get readme:', plugin_readme_parser_domain ) );
-  prp_log( __( '  title:      \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
+  // prp_log( __( '  Get readme:', plugin_readme_parser_domain ) );
+  // prp_log( __( '  title:      \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
 
   // Work out filename and fetch the contents
 
   if ( strpos( $plugin_url, '://' ) === false ) {
     $array[ 'name' ] = str_replace( ' ', '-', strtolower( $plugin_url ) );
     $plugin_url = 'https://plugins.svn.wordpress.org/' . $array[ 'name' ] . '/';
-    prp_log( __( '  url:        \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
+    // prp_log( __( '  url:        \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
   if ( is_numeric( $version ) ) {
     $plugin_url .= 'tags/' . $version;
-    prp_log( __( '  tag url:    \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
+    // prp_log( __( '  tag url:    \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
   } else {
     $plugin_url .= 'trunk';
-    prp_log( __( '  trunk url:  \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
+    // prp_log( __( '  trunk url:  \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
   }
   $plugin_url .= '/readme.txt';
-  prp_log( __( '  readme.txt: \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
+  // prp_log( __( '  readme.txt: \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
   }
 
   $file_data = prp_get_file( $plugin_url );
-  prp_log( __( '  file data:   contents of readme file', plugin_readme_parser_domain ) );
+  // prp_log( __( '  file data:   contents of readme file', plugin_readme_parser_domain ) );
   // prp_log( $file_data, '  file data:' );
 
   // Ensure the file is valid
@@ -128,7 +128,7 @@ function prp_get_readme( $plugin_url, $version = '' ) {
 
   } else {
 
-    prp_log( __( '  readme file is invalid', plugin_readme_parser_domain ) );
+    // prp_log( __( '  readme file is invalid', plugin_readme_parser_domain ) );
 
     // If not valid, return false
 
@@ -203,8 +203,8 @@ function prp_get_section_name( $readme_line, $start_pos ) {
     $section = substr( $readme_line, $start_pos + 1 );
   }
 
-  prp_log( __( '  Get section name:', plugin_readme_parser_domain ) );
-  prp_log( __( '  section name: \'' . $section . '\'', plugin_readme_parser_domain ) );
+  // prp_log( __( '  Get section name:', plugin_readme_parser_domain ) );
+  // prp_log( __( '  section name: \'' . $section . '\'', plugin_readme_parser_domain ) );
 
   return $section;
 }
@@ -228,11 +228,11 @@ function prp_get_section_name( $readme_line, $start_pos ) {
 
 function prp_display_links( $download, $target, $nofollow, $version, $mirror, $plugin_name ) {
 
-  prp_log( __( '  Display links:', plugin_readme_parser_domain ) );
-  prp_log( __( '  download link: \'' . $download . '\'', plugin_readme_parser_domain ) );
-  prp_log( __( '  target:        \'' . $target . '\'', plugin_readme_parser_domain ) );
-  prp_log( __( '  nofollow:      \'' . $nofollow . '\'', plugin_readme_parser_domain ) );
-  prp_log( __( '  version:       \'' . $version . '\'', plugin_readme_parser_domain ) );
+  // prp_log( __( '  Display links:', plugin_readme_parser_domain ) );
+  // prp_log( __( '  download link: \'' . $download . '\'', plugin_readme_parser_domain ) );
+  // prp_log( __( '  target:        \'' . $target . '\'', plugin_readme_parser_domain ) );
+  // prp_log( __( '  nofollow:      \'' . $nofollow . '\'', plugin_readme_parser_domain ) );
+  // prp_log( __( '  version:       \'' . $version . '\'', plugin_readme_parser_domain ) );
 
   $crlf = "\r\n";
 
@@ -241,23 +241,23 @@ function prp_display_links( $download, $target, $nofollow, $version, $mirror, $p
   if ( $version != '' ) {
     $output .= '<a class="np-download-link" href="' . $download . '" target="' . $target . '"' . $nofollow . '>Download the latest version</a> (' . $version . ')<br /><br />' . $crlf;
 
-    prp_log( __( '  version found; outputting download link', plugin_readme_parser_domain ) );
+    // prp_log( __( '  version found; outputting download link', plugin_readme_parser_domain ) );
 
     // If mirrors exist, add them to the output
 
     if ( $mirror[ 0 ] > 0 ) {
       for ( $m = 1; $m <= $mirror[ 0 ]; $m++ ) {
         $output .= '<a class="np-download-link" href="' . $mirror[ $m ] . '" target="' . $target . '"' . $nofollow . '>Download from mirror ' . $m . '</a><br />' . $crlf;
-        prp_log( __( '  mirror[' . $m . ']: ', plugin_readme_parser_domain ) . $mirror[ $m ] );
+        // prp_log( __( '  mirror[' . $m . ']: ', plugin_readme_parser_domain ) . $mirror[ $m ] );
       }
       $output .= '<br />';
     } else {
-      prp_log( __( '  mirror:        \'none\'', plugin_readme_parser_domain ) );
+      // prp_log( __( '  mirror:        \'none\'', plugin_readme_parser_domain ) );
     }
 
   } else {
 
-    prp_log( __( '  no version, therefore no download link', plugin_readme_parser_domain ) );
+    // prp_log( __( '  no version, therefore no download link', plugin_readme_parser_domain ) );
 
     $output .= '<span class="np-download-link error">No download link is available as the version number could not be found</span><br /><br />' . $crlf;
 
@@ -289,16 +289,16 @@ function prp_display_links( $download, $target, $nofollow, $version, $mirror, $p
 
 function prp_check_img_exists( $filename, $ext ) {
 
-  prp_log( __( '  Check image exists:', plugin_readme_parser_domain ) );
-  prp_log( __( '  image file: \'' . $filename . $ext . '\'', plugin_readme_parser_domain ) );
+  // prp_log( __( '  Check image exists:', plugin_readme_parser_domain ) );
+  // prp_log( __( '  image file: \'' . $filename . $ext . '\'', plugin_readme_parser_domain ) );
 
-  prp_log( __( '  mime type:  \'' . mime_content_type( $filename . $ext ) . '\'', plugin_readme_parser_domain ) );
+  // prp_log( __( '  mime type:  \'' . mime_content_type( $filename . $ext ) . '\'', plugin_readme_parser_domain ) );
 
   if ( mime_content_type( $filename . $ext ) === 'image/' . $ext ) {
-    prp_log( __( '\'' . $filename . $ext . '\' exists: true', plugin_readme_parser_domain ) );
+    // prp_log( __( '\'' . $filename . $ext . '\' exists: true', plugin_readme_parser_domain ) );
     return $ext;
   } else {
-    prp_log( __( '\'' . $filename . $ext . '\' exists: false', plugin_readme_parser_domain ) );
+    // prp_log( __( '\'' . $filename . $ext . '\' exists: false', plugin_readme_parser_domain ) );
     return false;
   }
 }
@@ -319,18 +319,18 @@ function prp_check_img_exists( $filename, $ext ) {
 
 function prp_strip_list( $list, $type, $target, $nofollow ) {
 
-  prp_log( __( '  Strip list:', plugin_readme_parser_domain ) );
-  prp_log( __( '  list:     \'' . $list. '\'', plugin_readme_parser_domain ) );
-  prp_log( __( '  type:     \'' . $type . '\'', plugin_readme_parser_domain ) );
-  prp_log( __( '  target:   \'' . $target . '\'', plugin_readme_parser_domain ) );
-  prp_log( __( '  nofollow: \'' . $nofollow . '\'', plugin_readme_parser_domain ) );
+  // prp_log( __( '  Strip list:', plugin_readme_parser_domain ) );
+  // prp_log( __( '  list:     \'' . $list. '\'', plugin_readme_parser_domain ) );
+  // prp_log( __( '  type:     \'' . $type . '\'', plugin_readme_parser_domain ) );
+  // prp_log( __( '  target:   \'' . $target . '\'', plugin_readme_parser_domain ) );
+  // prp_log( __( '  nofollow: \'' . $nofollow . '\'', plugin_readme_parser_domain ) );
 
   if ( $type == 'c' ) {
     $url = 'https://profiles.wordpress.org/users/';
   } else if ( $type == 't' ) {
     $url = 'https://wordpress.org/extend/plugins/tags/';
   } else {
-    prp_log( __( 'Invalid type found.', '', plugin_readme_parser_domain ), true );
+    // prp_log( __( 'Invalid type found.', '', plugin_readme_parser_domain ), true );
     $url = '';
   }
 
@@ -342,7 +342,7 @@ function prp_strip_list( $list, $type, $target, $nofollow ) {
   while ( $endpos !== false ) {
     ++$number;
     $name = trim( substr( $list, $startpos, $endpos - $startpos ) );
-    prp_log( __( '  name:     \'' . $name . '\'', plugin_readme_parser_domain ) );
+    // prp_log( __( '  name:     \'' . $name . '\'', plugin_readme_parser_domain ) );
     if ( $number > 1 ) {
       $return .= ', ';
     }
@@ -375,9 +375,9 @@ function prp_strip_list( $list, $type, $target, $nofollow ) {
 
 function prp_get_file( $filein, $header = false ) {
 
-  prp_log( __( '  Get file:', plugin_readme_parser_domain ) );
-  prp_log( __( '  file in:     \'' . $filein. '\'', plugin_readme_parser_domain ) );
-  prp_log( __( '  header:      ' . ( $header ? 'true' : 'false' ), plugin_readme_parser_domain ) );
+  // prp_log( __( '  Get file:', plugin_readme_parser_domain ) );
+  // prp_log( __( '  file in:     \'' . $filein. '\'', plugin_readme_parser_domain ) );
+  // prp_log( __( '  header:      ' . ( $header ? 'true' : 'false' ), plugin_readme_parser_domain ) );
 
   $rc = 0;
   $error = '';
@@ -407,9 +407,9 @@ function prp_get_file( $filein, $header = false ) {
     }
   }
 
-  prp_log( __( '  file out:    contents of readme file', plugin_readme_parser_domain ) );
+  // prp_log( __( '  file out:    contents of readme file', plugin_readme_parser_domain ) );
   // prp_log( $fileout, '  file out:' );
-  prp_log( __( '  file return: contents of readme file', plugin_readme_parser_domain ) );
+  // prp_log( __( '  file return: contents of readme file', plugin_readme_parser_domain ) );
   // prp_log( $file_return, '  file return:' );
 
   return $file_return;
@@ -432,10 +432,9 @@ function prp_get_file( $filein, $header = false ) {
 
 function prp_get_list( $input, $separator = '', $type = '' ) {   // Version 1.2
 
-  prp_log( __( '  Get \'' . $type . '\' list:', plugin_readme_parser_domain ) );
-  prp_log( __( '  input:     \'' . $input . '\'', plugin_readme_parser_domain ) );
-  prp_log( __( '  separator: \'' . $separator . '\'', plugin_readme_parser_domain ) );
-  prp_log( __( '  type:      \'' . $type . '\'', plugin_readme_parser_domain ) );
+  // prp_log( __( '  Get \'' . $type . '\' list:', plugin_readme_parser_domain ) );
+  // prp_log( __( '  input:     \'' . $input . '\'', plugin_readme_parser_domain ) );
+  // prp_log( __( '  separator: \'' . $separator . '\'', plugin_readme_parser_domain ) );
 
   if ( $separator == '' ) {
     $separator = ',';
@@ -456,7 +455,7 @@ function prp_get_list( $input, $separator = '', $type = '' ) {   // Version 1.2
   }
 
   $content[ 0 ] = $item;
-  prp_log( $content[0], '  content[0]:' );
+  // prp_log( $content[0], '  content[0]:' );
   return $content;
 }
 
@@ -481,16 +480,16 @@ if ( !function_exists( 'prp_normalise_parameters' ) ) {
 
     if ( is_string( $text ) ) {
       $normalised_text = str_replace(array_keys(QUOTES), array_values(QUOTES), $text);
-      prp_log( __( 'Normalised ', plugin_readme_parser_domain ) . $text );
-      prp_log( __( '        to ', plugin_readme_parser_domain ) . $normalised_text  );
+      // prp_log( __( 'Normalised ', plugin_readme_parser_domain ) . $text );
+      // prp_log( __( '        to ', plugin_readme_parser_domain ) . $normalised_text  );
       return $normalised_text;
 
     } else if ( is_array($text ) ) {
       $normalised_text = array();
       foreach ( $text as $key => $value ) {
-        prp_log( $key . ': ' . $value );
+        // prp_log( $key . ': ' . $value );
         $normalised_text[$key] = str_replace(array_keys(QUOTES), array_values(QUOTES), $text[$key]);
-        prp_log( $key . ': ' . $normalised_text[$key] );
+        // prp_log( $key . ': ' . $normalised_text[$key] );
       }
       if ( isset( $normalised_text[0] ) ) {
         if ( isset( $normalised_text[ 'exclude' ] ) ) {
@@ -498,14 +497,14 @@ if ( !function_exists( 'prp_normalise_parameters' ) ) {
         } else if ( isset( $normalised_text[ 'include' ] ) ) {
           $normalised_text['include'] .= ' ' . $normalised_text[0];
         } else {
-          prp_log( __( 'Erroneous parameter found', plugin_readme_parser_domain ) );
+          // prp_log( __( 'Erroneous parameter found', plugin_readme_parser_domain ) );
         }
         unset( $normalised_text[0] );
       }
       return $normalised_text;
 
     } else {
-      prp_log( $text, 'Normalise: wanted a string or an array; got \'' . gettype( $text ) . '\':'  );
+      // prp_log( $text, 'Normalise: wanted a string or an array; got \'' . gettype( $text ) . '\':'  );
       return $text;
     }
 
@@ -551,35 +550,35 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
         $current_theme_supports_blocks = wp_is_block_theme();
 
         if ( $current_theme_supports_blocks ) {
-          prp_log( __( 'This theme DOES support blocks', plugin_readme_parser_domain ) );
-          //   prp_log( __( 'Toggling ALL global shortcodes OFF', plugin_readme_parser_domain ) );
+          // prp_log( __( 'This theme DOES support blocks', plugin_readme_parser_domain ) );
+          //   // prp_log( __( 'Toggling ALL global shortcodes OFF', plugin_readme_parser_domain ) );
           if  ( str_contains( $content, '[readme_info' ) ) {
-            prp_log( __( 'Content contains \'[readme_info\'', plugin_readme_parser_domain ) );
+            // prp_log( __( 'Content contains \'[readme_info\'', plugin_readme_parser_domain ) );
             $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
-            prp_log( __( 'Toggling global shortcodes OFF except for:', plugin_readme_parser_domain ) );
-            prp_log( $GLOBALS['shortcode_tags'], 'Global shortcodes:' );
+            // prp_log( __( 'Toggling global shortcodes OFF except for:', plugin_readme_parser_domain ) );
+            // prp_log( $GLOBALS['shortcode_tags'], 'Global shortcodes:' );
           }
 
         } else {
-          prp_log( __( 'This theme DOES NOT support blocks', plugin_readme_parser_domain ) );
+          // prp_log( __( 'This theme DOES NOT support blocks', plugin_readme_parser_domain ) );
 
           // Need to put some of this plugin's ones back, otherwise it all breaks; it's unclear as to why and as to why these combinations work:
 
           if ( ( str_contains( $content, '[readme ' ) ) ||
                ( str_contains( $content, '[readme]' ) ) ) {
-            prp_log( __( 'Content contains \'[readme \' or \'[readme]\'', plugin_readme_parser_domain ) );
+            // prp_log( __( 'Content contains \'[readme \' or \'[readme]\'', plugin_readme_parser_domain ) );
 
             $GLOBALS['shortcode_tags']['readme'] = 'readme_parser';
             $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
             $GLOBALS['shortcode_tags']['readme_banner'] = 'readme_banner';
 
           } else if  ( str_contains( $content, '[readme_info' ) ) {
-            prp_log( __( 'Content contains \'[readme_info\'', plugin_readme_parser_domain ) );
+            // prp_log( __( 'Content contains \'[readme_info\'', plugin_readme_parser_domain ) );
 
             $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
 
           } else if  ( str_contains( $content, '[readme_banner' ) ) {
-            prp_log( __( 'Content contains \'[readme_banner\'', plugin_readme_parser_domain ) );
+            // prp_log( __( 'Content contains \'[readme_banner\'', plugin_readme_parser_domain ) );
 
             // Need to check this combo once banner display is working.
 
@@ -588,25 +587,25 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
             $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
 
           } else {
-            prp_log( __( 'Failed to find Plugin-readme Parser shortcode', plugin_readme_parser_domain ) );
+            // prp_log( __( 'Failed to find Plugin-readme Parser shortcode', plugin_readme_parser_domain ) );
 
             // We're in the wild, not writing out a readme with this plugin, so all the shortcodes need to be functional:
-            prp_log( __( 'Toggling ALL global shortcodes ON', plugin_readme_parser_domain ) );
-            prp_log( __( '# original shortcodes: ', plugin_readme_parser_domain ) . count ( $original_shortcodes ) );
-            prp_log( __( '# global shortcodes:   ' . count ( $GLOBALS['shortcode_tags'] ), plugin_readme_parser_domain ) );
+            // prp_log( __( 'Toggling ALL global shortcodes ON', plugin_readme_parser_domain ) );
+            // prp_log( __( '# original shortcodes: ', plugin_readme_parser_domain ) . count ( $original_shortcodes ) );
+            // prp_log( __( '# global shortcodes:   ' . count ( $GLOBALS['shortcode_tags'] ), plugin_readme_parser_domain ) );
             $GLOBALS['shortcode_tags'] = $original_shortcodes;
             return $content;
 
           }
 
-          prp_log( __( 'Toggling global shortcodes OFF except for:', plugin_readme_parser_domain ) );
-          prp_log( $GLOBALS['shortcode_tags'], 'Global shortcodes:' );
+          // prp_log( __( 'Toggling global shortcodes OFF except for:', plugin_readme_parser_domain ) );
+          // prp_log( $GLOBALS['shortcode_tags'], 'Global shortcodes:' );
         }
 
       } else {
         // Toggle the shortcodes ON
 
-        prp_log( __( 'Toggling global shortcodes ON', plugin_readme_parser_domain ) );
+        // prp_log( __( 'Toggling global shortcodes ON', plugin_readme_parser_domain ) );
 
         $GLOBALS['shortcode_tags'] = $original_shortcodes;
         $original_shortcodes = array();
@@ -615,7 +614,7 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
       }
     } else {
       prp_report_error( __( 'wrong plugin supplied', plugin_readme_parser_domain), plugin_readme_parser_name );
-      prp_log( __( '***** Wrong plugin supplied *****', plugin_readme_parser_domain ) );
+      // prp_log( __( '***** Wrong plugin supplied *****', plugin_readme_parser_domain ) );
     }
     return $content;
   }
@@ -643,7 +642,7 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
 
 function prp_report_error( $plugin_name, $error, $echo = true ) {
 
-  prp_log( $error, $plugin_name, true, $echo );
+  // prp_log( $error, $plugin_name, true, $echo );
 
   // $output = '<p class="error">' . $plugin_name . ': ' . $error . '</p>';
 

@@ -30,15 +30,15 @@
 
 function readme_parser( $paras = '', $content = '' ) {
 
-  prp_log( __( 'Readme parser:', plugin_readme_parser_domain ) );
+  // prp_log( __( 'Readme parser:', plugin_readme_parser_domain ) );
 
   prp_toggle_global_shortcodes( $content );
 
   // Extract parameters
 
-  prp_log( __( 'Parameters (raw)', plugin_readme_parser_domain), $paras );
+  // prp_log( __( 'Parameters (raw)', plugin_readme_parser_domain), $paras );
   $paras = prp_normalise_parameters( $paras );
-  // // prp_log( __( 'Parameters (normalised)', plugin_readme_parser_domain), $paras );
+  // prp_log( __( 'Parameters (normalised)', plugin_readme_parser_domain), $paras );
 
   extract( shortcode_atts( array( 'assets' => '', 'exclude' => '', 'ext' => '', 'hide' => '', 'include' => '', 'scr_url' => '', 'scr_ext' => '' , 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $paras ) );
 
