@@ -286,6 +286,7 @@ if ( !function_exists( 'readme_parser' ) ) {
                  ( 'Donate link:' == substr( $file_array[ $i ], 0, 12 ) ) or
                  ( 'Tags:' == substr( $file_array[ $i ], 0, 5 ) ) or
                  ( 'Requires at least:' == substr( $file_array[ $i ], 0, 18 ) ) or
+                 ( 'Requires PHP:' == substr( $file_array[ $i ], 0, 13 ) ) or
                  ( 'Tested up to:' == substr( $file_array[ $i ], 0, 13 ) ) or
                  ( 'Stable tag:' == substr( $file_array[ $i ], 0, 11 ) ) or
                  ( 'License URI:' == substr( $file_array[ $i ], 0, 12 ) ) or
@@ -303,8 +304,18 @@ if ( !function_exists( 'readme_parser' ) ) {
                 $add_to_output = false;
               }
 
+              if ( ( 'Requires PHP:' == substr( $file_array[ $i ], 0, 18 ) ) &&
+                   ( prp_is_it_excluded( 'requires php', $exclude ) ) ) {
+                $add_to_output = false;
+              }
+
               if ( ( 'Tested up to:' == substr( $file_array[ $i ], 0, 13 ) ) &&
                    ( prp_is_it_excluded( 'tested', $exclude ) ) ) {
+                $add_to_output = false;
+              }
+
+              if ( ( 'License:' == substr( $file_array[ $i ], 0, 8 ) ) &&
+                   ( prp_is_it_excluded( 'license', $exclude ) ) ) {
                 $add_to_output = false;
               }
 
