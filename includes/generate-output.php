@@ -296,7 +296,7 @@ if ( !function_exists( 'readme_parser' ) ) {
                 // prp_log( __( '\'meta\' is excluded (' . $exclude . ')', plugin_readme_parser_domain ) );
                 $add_to_output = false;
               } else {
-                // prp_log( __( '\'meta\' is included (' . $exclude . ')', plugin_readme_parser_domain ) );
+                // prp_log( __( '\'meta\' is included (' . $include . ')', plugin_readme_parser_domain ) );
               }
 
               if ( ( 'Requires at least:' == substr( $file_array[ $i ], 0, 18 ) ) &&
