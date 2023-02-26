@@ -52,7 +52,7 @@ Each readme is divided into a number of sections. To exclude one or more section
 
 The readme file begins with the head, comprising the plugin's meta data (e.g. tags) and its description.
 
-To exclude the meta data from the output XHTML, use the section name "meta" as the parameter's value. To remove the description, use "description". To remove bother the meta data and the description, use "head".
+To exclude the meta data from the output XHTML, use the section name "meta" as the parameter's value. To remove the description, use "description". To remove both the meta data and the description, use "head".
 
 To remove specific items of meta data, specify `contributors`, `donate`, `tags`, `requires`, `license`, `license uri`, `tested` or `stable`.
 
