@@ -155,8 +155,8 @@ if ( !function_exists( 'prp_is_it_excluded' ) ) {
    */
   function prp_is_it_excluded( $tofind, $exclude ) {
 
-    prp_log( __( '  Is \'' . strtolower( $tofind ) . '\' excluded?', plugin_readme_parser_domain ) );
-    prp_log( __( '  exclusion list: \'' . $exclude . '\'', plugin_readme_parser_domain ) );
+    // prp_log( __( '  Is \'' . strtolower( $tofind ) . '\' excluded?', plugin_readme_parser_domain ) );
+    // prp_log( __( '  exclusion list: \'' . $exclude . '\'', plugin_readme_parser_domain ) );
 
     $tofind = strtolower( $tofind );
     $return = true;
