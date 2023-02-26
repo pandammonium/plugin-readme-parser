@@ -19,7 +19,7 @@
  * @return string  Links, now with settings added
  */
 
-if ( !function_exists('prp_add_settings_link' ) ) {
+if ( !function_exists( 'prp_add_settings_link' ) ) {
 /**
   * Add a link to the Plugin-readme Parser settings page from the installed
   * plugins list.
@@ -39,14 +39,20 @@ if ( !function_exists('prp_add_settings_link' ) ) {
 }
 
 
-function prp_set_plugin_meta( $links, $file ) {
+if ( !function_exists( 'prp_set_plugin_meta' ) ) {
+/**
+  * Add a link to the Plugin-readme Parser support page from the installed
+  * plugins list.
+  */
+  function prp_set_plugin_meta( $links, $file ) {
 
-  if ( str_contains( $file, plugin_readme_parser_filename ) ) {
-    $links = array_merge( $links, array( '<a href="https://wordpress.org/support/plugin/plugin-readme-parser">' . __( 'Support',plugin_readme_parser_domain ) . '</a>' ) );
+    if ( str_contains( $file, plugin_readme_parser_filename ) ) {
+      $links = array_merge( $links, array( '<a href="https://wordpress.org/support/plugin/plugin-readme-parser">' . __( 'Support',plugin_readme_parser_domain ) . '</a>' ) );
+    }
+
+    return $links;
   }
-
-  return $links;
+  // add_filter( 'plugin_row_meta', 'prp_set_plugin_meta', 10, 2 );
 }
 
-// add_filter( 'plugin_row_meta', 'prp_set_plugin_meta', 10, 2 );
 ?>
