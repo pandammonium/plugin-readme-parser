@@ -294,8 +294,8 @@ if ( !function_exists( 'prp_check_img_exists' ) ) {
    * Check image exists
    *
    * Function to check if an image files with a specific extension exists
-   * This fumction results in an HTTP 403 (Forbidden) erro from the
-   * server
+   * This fumction results in an HTTP 403 (Forbidden) error from the
+   * server, therefore all it does (for) now is return false
    *
    * @since  1.2
    *
@@ -307,10 +307,10 @@ if ( !function_exists( 'prp_check_img_exists' ) ) {
 
     // prp_log( __( '  Check image exists:', plugin_readme_parser_domain ) );
     // prp_log( __( '  image file: \'' . $filename . $ext . '\'', plugin_readme_parser_domain ) );
+    $file_url = $filename . $ext;
 
     // prp_log( __( '  mime type:  \'' . mime_content_type( $filename . $ext ) . '\'', plugin_readme_parser_domain ) );
 
-    $file_url = $filename . $ext;
 
     // $file_exists = @mime_content_type( $file_url ) === 'image/' . $ext;
     // $file_exists = @file_exists( $file_url );
@@ -322,15 +322,16 @@ if ( !function_exists( 'prp_check_img_exists' ) ) {
     //     ],
     // ]));
 
-    $file_exists = false;
 
-    if ( $file_exists ) {
-      prp_log( __( '\'' . $filename . $ext . '\' exists: true', plugin_readme_parser_domain ) );
-      return $ext;
-    } else {
-      prp_log( __( '\'' . $filename . $ext . '\' exists: false', plugin_readme_parser_domain ) );
-      return false;
-    }
+    return false;
+
+    // if ( $file_exists ) {
+    //   prp_log( __( '\'' . $filename . $ext . '\' exists: true', plugin_readme_parser_domain ) );
+    //   return $ext;
+    // } else {
+    //   prp_log( __( '\'' . $filename . $ext . '\' exists: false', plugin_readme_parser_domain ) );
+    //   return false;
+    // }
   }
 }
 
