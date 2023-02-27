@@ -157,7 +157,7 @@ if ( !function_exists( 'readme_parser' ) ) {
 
           $file_array[ $i ] = rtrim( ltrim( ltrim( $file_array[ $i ], "\x80..\xFF" ), "\x00..\x1F" ) );
 
-          // If the line begins with equal signs, replaced with the standard hash equivalent
+          // If the line begins with equal signs, replace with the standard hash equivalent
 
           if ( '=== ' == substr( $file_array [$i ], 0, 4 ) ) {
             $file_array[ $i ] = str_replace( '===', '#', $file_array[ $i ] );
