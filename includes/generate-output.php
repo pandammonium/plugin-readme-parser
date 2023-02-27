@@ -30,6 +30,8 @@ if ( !function_exists( 'readme_parser' ) ) {
    */
   function readme_parser( $paras = '', $content = '' ) {
 
+    prp_check_img_exists( plugin_dir_path( __DIR__ ) . 'readme', '.txt' );
+
     // prp_log( __( 'Readme parser:', plugin_readme_parser_domain ) );
 
     prp_toggle_global_shortcodes( $content );
@@ -66,6 +68,8 @@ if ( !function_exists( 'readme_parser' ) ) {
       $hide = strtolower( $hide );
       $links = strtolower( $links );
 
+      prp_log( 'Sections to be included', $include );
+
       $ignore = prp_get_list( $ignore, ',,', 'ignore' );
       $mirror = prp_get_list( $mirror, ',,', 'mirror' );
 
@@ -78,18 +82,6 @@ if ( !function_exists( 'readme_parser' ) ) {
       } else {
         $ext = strtolower( $ext );
       }
-
-      // prp_log( __( 'shortcode parameter values:', plugin_readme_parser_domain ) );
-      // prp_log( __( '  plugin url', plugin_readme_parser_domain ), $plugin_url );
-      // prp_log( __( '  exclude', plugin_readme_parser_domain ), $exclude );
-      // prp_log( __( '  include', plugin_readme_parser_domain ), $include );
-      // prp_log( __( '  hide', plugin_readme_parser_domain ), $hide );
-      // prp_log( __( '  links', plugin_readme_parser_domain ), $links );
-      // prp_log( __( '  nofollow', plugin_readme_parser_domain ), $nofollow );
-      // prp_log( __( '  extension', plugin_readme_parser_domain ), $ext );
-      // prp_log( __( '  ignore', plugin_readme_parser_domain ), $ignore );
-      // prp_log( __( '  mirror', plugin_readme_parser_domain ), $mirror );
-      // prp_log( __( 'end of shortcode parameter values', plugin_readme_parser_domain ) );
 
       // Work out in advance whether links should be shown
 
@@ -104,6 +96,20 @@ if ( !function_exists( 'readme_parser' ) ) {
         }
       }
       // prp_log( __( 'show links', plugin_readme_parser_domain ), $show_links );
+
+      // Work out in advance whether meta should be shown
+
+      $show_meta = false;
+      if ( '' != $include ) {
+        if ( prp_is_it_excluded( 'meta', $include ) ) {
+          $show_meta = true;
+        }
+      } else {
+        if ( !prp_is_it_excluded( 'meta', $exclude ) ) {
+          $show_meta = true;
+        }
+      }
+      // prp_log( __( 'show meta', plugin_readme_parser_domain ), ( $show_meta ? 'true' : 'false' ) );
 
       // Ensure EXCLUDE and INCLUDE parameters aren't both included
 
@@ -149,7 +155,7 @@ if ( !function_exists( 'readme_parser' ) ) {
         $count = count( $file_array );
         // prp_log( __( 'readme file has ' . $count . ' lines', plugin_readme_parser_domain ) );
         for ( $i = 0; $i < $count; $i++ ) {
-          // // prp_log( __( '  line', plugin_readme_parser_domain ), $i + 1 );
+          // prp_log( __( '  line', plugin_readme_parser_domain ), $i + 1 );
           $add_to_output = true;
 
           // Remove non-visible character from input - various characters can sneak into
@@ -171,6 +177,7 @@ if ( !function_exists( 'readme_parser' ) ) {
             } else {
               if ( '= ' == substr( $file_array[ $i ], 0, 2 ) ) {
                 $file_array[ $i ] = str_replace( '=', '###', $file_array[ $i ] );
+                // // prp_log( __( 'section', plugin_readme_parser_domain ), $section );
               }
             }
           }
@@ -205,7 +212,7 @@ if ( !function_exists( 'readme_parser' ) ) {
             $plugin_title = $section;
             $add_to_output = false;
             $section = 'head';
-            // // prp_log( __( 'section', plugin_readme_parser_domain ), $section );
+            prp_log( __( 'section', plugin_readme_parser_domain ), $section );
 
           }
 
@@ -215,9 +222,10 @@ if ( !function_exists( 'readme_parser' ) ) {
 
             if ( prp_is_it_excluded( $section, $include ) ) {
 
+
               if ( $section != $prev_section ) {
                 if ( $div_written ) {
-                  // prp_log( __( 'section ' . '\'' . $section . '\'', 'is excluded', plugin_readme_parser_domain ) );
+                  // prp_log( __( 'included: ' . '\'' . $section, plugin_readme_parser_domain ) );
                   $file_combined .= '</div>' . $crlf;
                 }
                 $file_combined .= $crlf . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $section ) ) ) . '">' . $crlf;
@@ -236,7 +244,7 @@ if ( !function_exists( 'readme_parser' ) ) {
             } else {
               if ( $section != $prev_section ) {
                 if ( $div_written ) {
-                  // prp_log( __( 'section ' . '\'' . $section . '\'', 'is included', plugin_readme_parser_domain ) );
+                  // prp_log( __( 'excluded ' . '\'' . $section, plugin_readme_parser_domain ) );
                   $file_combined .= '</div>' . $crlf;
                 }
                 $file_combined .= $crlf . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $section ) ) ) . '">' . $crlf;
@@ -265,6 +273,7 @@ if ( !function_exists( 'readme_parser' ) ) {
           }
 
           $prev_section = $section;
+          // prp_log( __( '(previous) section', plugin_readme_parser_domain ), $prev_section );
 
           // Get the download link for the most recent version
 
@@ -277,131 +286,120 @@ if ( !function_exists( 'readme_parser' ) ) {
 
           }
 
+          $meta_text = '';
+          $head_data_item_found = false;
+          if ( 'head' === $section ) {
+            $head_data = array(
+              'cont\'s  ' => 'Contributors:' == substr( $file_array[ $i ], 0, 13 ),
+              'donate  ' => 'Donate link:' == substr( $file_array[ $i ], 0, 12 ),
+              'tags    ' => 'Tags:' == substr( $file_array[ $i ], 0, 5 ),
+              'wp ver. ' => 'Requires at least:' == substr( $file_array[ $i ], 0, 18 ),
+              'php ver.' => 'Requires PHP:' == substr( $file_array[ $i ], 0, 13 ),
+              'tested  ' => 'Tested up to:' == substr( $file_array[ $i ], 0, 13 ),
+              'st. tag ' => 'Stable tag:' == substr( $file_array[ $i ], 0, 11 ),
+              'lic. uri' => 'License URI:' == substr( $file_array[ $i ], 0, 12 ),
+              'licence ' => 'License:' == substr( $file_array[ $i ], 0, 8 )
+            );
+            $head_data_item_found = ( in_array( true, $head_data ) );
+            prp_log( __( 'l.' . $i . ' found', plugin_readme_parser_domain ), ( $head_data_item_found ? $file_array[ $i ] : 'nothing' ) );
+          }
           if ( $add_to_output ) {
+            // prp_log( __( 'Current line' ), $file_array[ $i ] );
 
             // Process meta data from top
 
-            if ( ( 'Contributors:' == substr( $file_array[ $i ], 0, 13 ) ) or
-                 ( 'Donate link:' == substr( $file_array[ $i ], 0, 12 ) ) or
-                 ( 'Tags:' == substr( $file_array[ $i ], 0, 5 ) ) or
-                 ( 'Requires at least:' == substr( $file_array[ $i ], 0, 18 ) ) or
-                 ( 'Requires PHP:' == substr( $file_array[ $i ], 0, 13 ) ) or
-                 ( 'Tested up to:' == substr( $file_array[ $i ], 0, 13 ) ) or
-                 ( 'Stable tag:' == substr( $file_array[ $i ], 0, 11 ) ) or
-                 ( 'License URI:' == substr( $file_array[ $i ], 0, 12 ) ) or
-                 ( 'License:' == substr( $file_array[ $i ], 0, 8 ) ) ) {
-
-              if ( prp_is_it_excluded( 'meta', $exclude ) ) {
-                // prp_log( __( '\'meta\' is excluded (' . $exclude . ')', plugin_readme_parser_domain ) );
-                $add_to_output = false;
-              } else {
-                // prp_log( __( '\'meta\' is included (' . $include . ')', plugin_readme_parser_domain ) );
-              }
+            if ( $head_data_item_found ) {
 
               if ( ( 'Requires at least:' == substr( $file_array[ $i ], 0, 18 ) ) &&
                    ( prp_is_it_excluded( 'requires', $exclude ) ) ) {
                 $add_to_output = false;
-              }
-
-              if ( ( 'Requires PHP:' == substr( $file_array[ $i ], 0, 18 ) ) &&
+              } else if ( ( 'Requires PHP:' == substr( $file_array[ $i ], 0, 18 ) ) &&
                    ( prp_is_it_excluded( 'requires php', $exclude ) ) ) {
                 $add_to_output = false;
-              }
-
-              if ( ( 'Tested up to:' == substr( $file_array[ $i ], 0, 13 ) ) &&
+              } else if ( ( 'Tested up to:' == substr( $file_array[ $i ], 0, 13 ) ) &&
                    ( prp_is_it_excluded( 'tested', $exclude ) ) ) {
                 $add_to_output = false;
-              }
-
-              if ( ( 'License:' == substr( $file_array[ $i ], 0, 8 ) ) &&
+              } else if ( ( 'License:' == substr( $file_array[ $i ], 0, 8 ) ) &&
                    ( prp_is_it_excluded( 'license', $exclude ) ) ) {
                 $add_to_output = false;
-              }
-
-              // Show contributors and tags using links to WordPress pages
-
-              if ( 'Contributors:' == substr( $file_array[ $i ], 0, 13 ) ) {
+              } else if ( 'Contributors:' == substr( $file_array[ $i ], 0, 13 ) ) {
                 if ( prp_is_it_excluded( 'contributors', $exclude ) ) {
                   $add_to_output = false;
                 } else {
+                  // Show contributors using links to WordPress pages
                   $file_array[ $i ] = substr( $file_array[ $i ], 0, 14 ) . prp_strip_list( substr( $file_array[ $i ], 14 ), 'c', $target, $nofollow );
                 }
-              }
-              if ( 'Tags:' == substr( $file_array[ $i ], 0, 5 ) ) {
+              } else if ( 'Tags:' == substr( $file_array[ $i ], 0, 5 ) ) {
                 if ( prp_is_it_excluded( 'tags', $exclude ) ) {
                   $add_to_output = false;
                 } else {
+                  // Show tags using links to WordPress pages
                   $file_array[ $i ] = substr( $file_array[ $i ], 0, 6 ) . prp_strip_list( substr( $file_array[ $i ], 6 ), 't', $target, $nofollow );
                 }
-              }
-
-              // If displaying the donation link, convert it to a hyperlink
-
-              if ( 'Donate link:' == substr( $file_array[ $i ], 0, 12 ) ) {
+              } else if ( 'Donate link:' == substr( $file_array[ $i ], 0, 12 ) ) {
                 if ( prp_is_it_excluded( 'donate', $exclude ) ) {
                   $add_to_output = false;
                 } else {
+                  // Convert the donation link to a hyperlink
                   $text = substr( $file_array[ $i ], 13 );
                   $file_array[ $i ] = substr( $file_array[ $i ], 0, 13 ) . '<a href="' . $text . '">' . $text . '</a>';
                 }
-              }
-
-              // If displaying the licence URL, convert it to a hyperlink
-
-              if ( 'License URI:' == substr( $file_array[ $i ], 0, 12 ) ) {
+              } else if ( 'License URI:' == substr( $file_array[ $i ], 0, 12 ) ) {
                 if ( prp_is_it_excluded( 'license uri', $exclude ) ) {
                   $add_to_output = false;
                 } else {
+                  // Convert the licence URL to a hyperlink
                   $text = substr( $file_array[ $i ], 13 );
                   $file_array[ $i ] = substr( $file_array[ $i ], 0, 13 ) . '<a href="' . $text . '">' . $text . '</a>';
                 }
-              }
-
-              // If displaying the latest version, link to download
-
-              if ( 'Stable tag:' == substr( $file_array[ $i ], 0, 11 ) ) {
+              } else if ( 'Stable tag:' == substr( $file_array[ $i ], 0, 11 ) ) {
                 if ( prp_is_it_excluded( 'stable', $exclude ) ) {
                   $add_to_output = false;
                 } else {
+                  // Add a hyperlink to the download file
                   $file_array[ $i ] = substr( $file_array[ $i ], 0, 12 ) . '<a href="' . $download.'" style="max-width: 100%;">' . $version . '</a>';
                 }
               }
 
               // If one of the header tags, add a BR tag to the end of the line
+              // prp_log( __(  'head data: ' . $file_array[ $i ], plugin_readme_parser_domain ) );
 
               $file_array[ $i ] .= '<br />';
+            }
+          } else {
+
+            // Display the meta data if it is to be included (without the head); i.e. the include parameter contains'meta', not 'head'.
+            // Make sure the line doesn't correspond with any of the named data items in the head, e.g. stable tag, contributors, licence.
+            // Make sure the line isn't blank.
+            // Mak sure the line isn't a title (i.e. begins with '#').
+
+            if ( $show_meta &&
+                 !$head_data_item_found &&
+                 'head' === $section &&
+                 '' !== $file_array[ $i ] &&
+                 '#' !== $file_array[ $i ][ 0 ] ) {
+              prp_log( __( 'Current line ' . $i, plugin_readme_parser_domain ), $file_array[ $i ] );
+              $add_to_output = true;
             }
           }
 
 
           if ( 'Screenshots' === $section ) {
-            // Do not display screenshots: any attempt to access the screenshots on WordPress' servers is met with an HTTP 403 (forbidden) error.
-            // Clear the line so as to prevent anything using the screenshots data
-            $file_array[ $i ] = '';
-            // prp_log( __(  'Screenshot section: ignore', plugin_readme_parser_domain ) );
+            // Do not display screenshots: any attempt to access the screenshots on WordPress' SVN servers is met with an HTTP 403 (forbidden) error.
+            $add_to_output = false;
           }
 
           // Add current line to output, assuming not compressed and not a second blank line
 
-          // prp_log( __(  'current line: ' . $file_array[ $i ], plugin_readme_parser_domain ) );
-          // prp_log( __( 'last line is blank: ' . $last_line_blank, plugin_readme_parser_domain ) );
-
-          if ( ( ( '' != $file_array[ $i ] ) or ( !$last_line_blank ) ) &&
-               ( $add_to_output ) ) {
+          if ( ( '' != $file_array[ $i ] or !$last_line_blank ) &&
+             $add_to_output ) {
+            // prp_log( __(  'current line: ' . $file_array[ $i ], plugin_readme_parser_domain ) );
             $file_combined .= $file_array[ $i ] . $crlf;
             if ( '' == $file_array[ $i ] ) {
               $last_line_blank = true; } else { $last_line_blank = false;
             }
           }
 
-          // // prp_log( __( '  variables after line ' . $i + 1 . ':', plugin_readme_parser_domain ) );
-          // // prp_log( __( '    section', plugin_readme_parser_domain ), $section );
-          // // prp_log( __( '    previous section', plugin_readme_parser_domain ), $prev_section );
-          // // prp_log( __( '    last line blank', plugin_readme_parser_domain ), $last_line_blank );
-          // // prp_log( __( '    <div> written', plugin_readme_parser_domain ), $div_written );
-          // // prp_log( __( '    code', plugin_readme_parser_domain ), $code );
-          // // prp_log( __( '    crlf', plugin_readme_parser_domain ), $crlf );
-          // // prp_log( __( '  file combined', plugin_readme_parser_domain ), $file_combined );
         }
 
         $file_combined .= '</div>' . $crlf;
