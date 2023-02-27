@@ -250,9 +250,9 @@ if ( !function_exists( 'readme_parser' ) ) {
           if ( $add_to_output ) {
             $exclude_loop = 1;
             while ( $exclude_loop <= $ignore[ 0 ] ) {
-            if ( false !== strpos( $file_array[ $i ], $ignore[ $exclude_loop ], 0 ) ) {
-              $add_to_output = false;
-            }
+              if ( false !== strpos( $file_array[ $i ], $ignore[ $exclude_loop ], 0 ) ) {
+                $add_to_output = false;
+              }
             $exclude_loop++;
             }
           }
