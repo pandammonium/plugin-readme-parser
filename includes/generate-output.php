@@ -408,7 +408,10 @@ if ( !function_exists( 'readme_parser' ) ) {
             // prp_log( __( 'Adding l.' . $i . ' to output', plugin_readme_parser_domain ) );
 
             if ( '' == $file_array[ $i ] ) {
-              $last_line_blank = true; } else { $last_line_blank = false;
+              $last_line_blank = true;
+
+            } else {
+              $last_line_blank = false;
             }
           }
 
