@@ -682,7 +682,7 @@ if ( !function_exists( 'prp_report_error' ) ) {
    *
    * @since  1.0
    *
-   * @param  $plugin_name  string  The name of the plugin where the error
+   * @param  $plugin_domain  string  The domain of the plugin where the error
    * occurred.
    * @param  $error    string  The error message to report.
    * @param  $echo   string  A boolean value indicating whether to output the
@@ -690,18 +690,18 @@ if ( !function_exists( 'prp_report_error' ) ) {
    * formatted error message instead of echoing it.
    * @return     string / true  If $echo === true, the function outputs the error message using echo and returns true. If $echo is false, the function returns the formatted error message instead of echoing it.
    */
-  function prp_report_error( $plugin_name, $error, $echo = true ) {
+  function prp_report_error( $plugin_domain, $error, $echo = true ) {
 
     // prp_log( $error, $plugin_name, true, $echo );
 
-    // $output = '<p class="error">' . $plugin_name . ': ' . $error . '</p>';
+    $output = '<p class="error">' . $plugin_name . ': ' . $error . '</p>';
 
-    // if ( $echo ) {
-    //   echo $output;
-    //   return true;
-    // } else {
-    //   return $output;
-    // }
+    if ( $echo ) {
+      echo $output;
+      return true;
+    } else {
+      return $output;
+    }
 
   }
 }
