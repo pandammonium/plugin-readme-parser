@@ -8,6 +8,7 @@
  * @since  1.0
  */
 
+
 if ( !function_exists( 'readme_parser' ) ) {
   /**
    * Output the readme
@@ -30,9 +31,18 @@ if ( !function_exists( 'readme_parser' ) ) {
    */
   function readme_parser( $paras = '', $content = '' ) {
 
+    static $c = 0;
+    $colours = array (
+      0 => 'red',
+      1 => 'orange',
+      2 => 'yellow',
+      3 => 'green',
+      4 => 'blue',
+    );
     prp_check_img_exists( plugin_dir_path( __DIR__ ) . 'readme', '.txt' );
 
-    // prp_log( __( 'Readme parser:', plugin_readme_parser_domain ) );
+    prp_log( __( '---------------- README PARSER ----------------', plugin_readme_parser_domain ) );
+    prp_log( __( '---------------- ' . $colours[ $c++ ], plugin_readme_parser_domain ) );
 
     prp_toggle_global_shortcodes( $content );
 
@@ -67,11 +77,11 @@ if ( !function_exists( 'readme_parser' ) ) {
       $include = strtolower( $include );
       $hide = strtolower( $hide );
       $links = strtolower( $links );
-
-      prp_log( 'Sections to be included', $include );
-
       $ignore = prp_get_list( $ignore, ',,', 'ignore' );
       $mirror = prp_get_list( $mirror, ',,', 'mirror' );
+
+      prp_log( __( 'Sections to be included', plugin_readme_parser_domain), $include );
+      prp_log( __( 'Sections to be excluded', plugin_readme_parser_domain), $exclude );
 
       if ( 'yes' == strtolower( $nofollow ) ) {
         $nofollow = ' rel="nofollow"';
@@ -154,8 +164,10 @@ if ( !function_exists( 'readme_parser' ) ) {
 
         $count = count( $file_array );
         // prp_log( __( 'readme file has ' . $count . ' lines', plugin_readme_parser_domain ) );
+        $line_length = 37;
         for ( $i = 0; $i < $count; $i++ ) {
-          // prp_log( __( '  line', plugin_readme_parser_domain ), $i + 1 );
+          // prp_log( __( '  l.' . $i, plugin_readme_parser_domain ), substr( $file_array[ $i ], 0, $line_length ) . ( strlen( $file_array[ $i ] ) > $line_length ? '…' : '' ) );
+
           $add_to_output = true;
 
           // Remove non-visible character from input - various characters can sneak into
@@ -212,7 +224,7 @@ if ( !function_exists( 'readme_parser' ) ) {
             $plugin_title = $section;
             $add_to_output = false;
             $section = 'head';
-            prp_log( __( 'section', plugin_readme_parser_domain ), $section );
+            // prp_log( __( 'section', plugin_readme_parser_domain ), $section );
 
           }
 
@@ -221,11 +233,10 @@ if ( !function_exists( 'readme_parser' ) ) {
             // Is this an included section?
 
             if ( prp_is_it_excluded( $section, $include ) ) {
-
+              // prp_log( __( 'included', plugin_readme_parser_domain ), $section );
 
               if ( $section != $prev_section ) {
                 if ( $div_written ) {
-                  // prp_log( __( 'included: ' . '\'' . $section, plugin_readme_parser_domain ) );
                   $file_combined .= '</div>' . $crlf;
                 }
                 $file_combined .= $crlf . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $section ) ) ) . '">' . $crlf;
@@ -241,10 +252,10 @@ if ( !function_exists( 'readme_parser' ) ) {
 
             if ( prp_is_it_excluded( $section, $exclude ) ) {
               $add_to_output = false;
+              // prp_log( __( 'excluded', plugin_readme_parser_domain ), $section );
             } else {
               if ( $section != $prev_section ) {
                 if ( $div_written ) {
-                  // prp_log( __( 'excluded ' . '\'' . $section, plugin_readme_parser_domain ) );
                   $file_combined .= '</div>' . $crlf;
                 }
                 $file_combined .= $crlf . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $section ) ) ) . '">' . $crlf;
@@ -393,8 +404,9 @@ if ( !function_exists( 'readme_parser' ) ) {
 
           if ( ( '' != $file_array[ $i ] or !$last_line_blank ) &&
              $add_to_output ) {
-            // prp_log( __(  'current line: ' . $file_array[ $i ], plugin_readme_parser_domain ) );
             $file_combined .= $file_array[ $i ] . $crlf;
+            // prp_log( __( 'Adding l.' . $i . ' to output', plugin_readme_parser_domain ) );
+
             if ( '' == $file_array[ $i ] ) {
               $last_line_blank = true; } else { $last_line_blank = false;
             }
