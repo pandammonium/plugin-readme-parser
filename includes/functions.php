@@ -308,12 +308,25 @@ if ( !function_exists( 'prp_check_img_exists' ) ) {
    */
   function prp_check_img_exists( $filename, $ext ) {
 
+    // $file_url = $filename . $ext;
+    // $file_exists = false;
+
     // prp_log( __( '  Check image exists:', plugin_readme_parser_domain ) );
-    // prp_log( __( '  image file: \'' . $filename . $ext . '\'', plugin_readme_parser_domain ) );
-    $file_url = $filename . $ext;
 
-    // prp_log( __( '  mime type:  \'' . mime_content_type( $filename . $ext ) . '\'', plugin_readme_parser_domain ) );
+    // prp_log( __( '  file path', plugin_readme_parser_domain ), $file_url );
 
+    // prp_log( __( '  file exists', plugin_readme_parser_domain ), file_exists( $file_url ) );
+
+    // prp_log( __( '  mime type', plugin_readme_parser_domain ), mime_content_type( $file_url ) );
+
+    // $file_contents = (bool)@file_get_contents($file_url, false, stream_context_create([
+    //     'http' => [
+    //         'method' => 'HEAD',
+    //         'ignore_errors' => true,
+    //     ],
+    // ]));
+
+    // prp_log( __( '  can get file contents', plugin_readme_parser_domain ), $file_contents );
 
     // $file_exists = @mime_content_type( $file_url ) === 'image/' . $ext;
     // $file_exists = @file_exists( $file_url );
