@@ -155,14 +155,15 @@ if ( !function_exists( 'prp_is_it_excluded' ) ) {
    */
   function prp_is_it_excluded( $tofind, $exclude ) {
 
-    // prp_log( __( '  Is \'' . strtolower( $tofind ) . '\' excluded?', plugin_readme_parser_domain ) );
-    // prp_log( __( '  exclusion list: \'' . $exclude . '\'', plugin_readme_parser_domain ) );
-
     $tofind = strtolower( $tofind );
     $return = true;
 
-    if ( 'screenshots' == $tofind ||
-         'screenshot' == $tofind ) {
+    // prp_log( __( '  Is \'' . $tofind . '\' excluded?', plugin_readme_parser_domain ) );
+    // prp_log( __( '  exclusion list: \'' . $exclude . '\'', plugin_readme_parser_domain ) );
+
+
+    if ( 'screenshots' === $tofind ||
+         'screenshot' === $tofind ) {
 
       $return = true;
 
@@ -190,7 +191,9 @@ if ( !function_exists( 'prp_is_it_excluded' ) ) {
         }
       }
     }
-    // prp_log( __( '  \'' . $tofind . '\' is ' . ( $return ? 'excluded' : 'included' ), plugin_readme_parser_domain ) );
+    // if ( 'meta' === $tofind || 'head' === $tofind ) {
+    //   prp_log( __( '  \'' . $tofind . '\' is ' . ( $return ? 'explicitly excluded' : 'not explicitly excluded' ), plugin_readme_parser_domain ) );
+    // }
     return $return;
   }
 }
