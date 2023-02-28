@@ -107,19 +107,44 @@ if ( !function_exists( 'readme_parser' ) ) {
       }
       // prp_log( __( 'show links', plugin_readme_parser_domain ), $show_links );
 
-      // Work out in advance whether meta should be shown
+      // Work out in advance whether head should be shown:
+      // * explicitly include head: show head === true && show meta === true
+      // * explicitly exclude head: show head === false && show meta === false
+      // * explicitly include meta without mentioning head: show head === false && show meta === true
+      // * explicitly exclude meta without mentioning head: show head === true && show meta === false
 
+      $show_head = false;
       $show_meta = false;
-      if ( '' != $include ) {
-        if ( prp_is_it_excluded( 'meta', $include ) ) {
-          $show_meta = true;
-        }
-      } else {
-        if ( !prp_is_it_excluded( 'meta', $exclude ) ) {
-          $show_meta = true;
+
+      $head_explicitly_excluded = prp_is_it_excluded( 'head', $exclude );
+      $head_explicitly_included = prp_is_it_excluded( 'head', $include );
+      $meta_explicitly_excluded = prp_is_it_excluded( 'meta', $exclude );
+      $meta_explicitly_included = prp_is_it_excluded( 'meta', $include );
+
+      prp_log( __( 'head exp exc', plugin_readme_parser_domain ), ( $head_explicitly_excluded ? 'true' : 'false' ) );
+      prp_log( __( 'head exp inc', plugin_readme_parser_domain ), ( $head_explicitly_included ? 'true' : 'false' ) );
+      prp_log( __( 'meta exp exc', plugin_readme_parser_domain ), ( $meta_explicitly_excluded ? 'true' : 'false' ) );
+      prp_log( __( 'meta exp inc', plugin_readme_parser_domain ), ( $meta_explicitly_included ? 'true' : 'false' ) );
+
+      if ( !$head_explicitly_excluded ) {
+        if ( !$meta_explicitly_excluded ) {
+          if ( $meta_explicitly_included ) {
+            $show_head = false;
+            $show_meta = true;
+          } else {
+            $show_head = true;
+            $show_meta = true;
+          }
         }
       }
-      // prp_log( __( 'show meta', plugin_readme_parser_domain ), ( $show_meta ? 'true' : 'false' ) );
+      if ( !$head_explicitly_included ) {
+        if ( $meta_explicitly_excluded ) {
+          $show_head = true;
+          $show_meta = false;
+        }
+      }
+      prp_log( __( 'show head', plugin_readme_parser_domain ), ( $show_head ? 'true' : 'false' ) );
+      prp_log( __( 'show meta', plugin_readme_parser_domain ), ( $show_meta ? 'true' : 'false' ) );
 
       // Ensure EXCLUDE and INCLUDE parameters aren't both included
 
@@ -297,100 +322,19 @@ if ( !function_exists( 'readme_parser' ) ) {
 
           }
 
-          $meta_text = '';
-          $head_data_item_found = false;
-          if ( 'head' === $section ) {
-            $head_data = array(
-              'cont\'s  ' => 'Contributors:' == substr( $file_array[ $i ], 0, 13 ),
-              'donate  ' => 'Donate link:' == substr( $file_array[ $i ], 0, 12 ),
-              'tags    ' => 'Tags:' == substr( $file_array[ $i ], 0, 5 ),
-              'wp ver. ' => 'Requires at least:' == substr( $file_array[ $i ], 0, 18 ),
-              'php ver.' => 'Requires PHP:' == substr( $file_array[ $i ], 0, 13 ),
-              'tested  ' => 'Tested up to:' == substr( $file_array[ $i ], 0, 13 ),
-              'st. tag ' => 'Stable tag:' == substr( $file_array[ $i ], 0, 11 ),
-              'lic. uri' => 'License URI:' == substr( $file_array[ $i ], 0, 12 ),
-              'licence ' => 'License:' == substr( $file_array[ $i ], 0, 8 )
-            );
-            $head_data_item_found = ( in_array( true, $head_data ) );
-            prp_log( __( 'l.' . $i . ' found', plugin_readme_parser_domain ), ( $head_data_item_found ? $file_array[ $i ] : 'nothing' ) );
-          }
           if ( $add_to_output ) {
-            // prp_log( __( 'Current line' ), $file_array[ $i ] );
 
-            // Process meta data from top
+            // prp_log( __( 'SECTION', plugin_readme_parser_domain ), $section );
 
-            if ( $head_data_item_found ) {
-
-              if ( ( 'Requires at least:' == substr( $file_array[ $i ], 0, 18 ) ) &&
-                   ( prp_is_it_excluded( 'requires', $exclude ) ) ) {
-                $add_to_output = false;
-              } else if ( ( 'Requires PHP:' == substr( $file_array[ $i ], 0, 18 ) ) &&
-                   ( prp_is_it_excluded( 'requires php', $exclude ) ) ) {
-                $add_to_output = false;
-              } else if ( ( 'Tested up to:' == substr( $file_array[ $i ], 0, 13 ) ) &&
-                   ( prp_is_it_excluded( 'tested', $exclude ) ) ) {
-                $add_to_output = false;
-              } else if ( ( 'License:' == substr( $file_array[ $i ], 0, 8 ) ) &&
-                   ( prp_is_it_excluded( 'license', $exclude ) ) ) {
-                $add_to_output = false;
-              } else if ( 'Contributors:' == substr( $file_array[ $i ], 0, 13 ) ) {
-                if ( prp_is_it_excluded( 'contributors', $exclude ) ) {
-                  $add_to_output = false;
-                } else {
-                  // Show contributors using links to WordPress pages
-                  $file_array[ $i ] = substr( $file_array[ $i ], 0, 14 ) . prp_strip_list( substr( $file_array[ $i ], 14 ), 'c', $target, $nofollow );
-                }
-              } else if ( 'Tags:' == substr( $file_array[ $i ], 0, 5 ) ) {
-                if ( prp_is_it_excluded( 'tags', $exclude ) ) {
-                  $add_to_output = false;
-                } else {
-                  // Show tags using links to WordPress pages
-                  $file_array[ $i ] = substr( $file_array[ $i ], 0, 6 ) . prp_strip_list( substr( $file_array[ $i ], 6 ), 't', $target, $nofollow );
-                }
-              } else if ( 'Donate link:' == substr( $file_array[ $i ], 0, 12 ) ) {
-                if ( prp_is_it_excluded( 'donate', $exclude ) ) {
-                  $add_to_output = false;
-                } else {
-                  // Convert the donation link to a hyperlink
-                  $text = substr( $file_array[ $i ], 13 );
-                  $file_array[ $i ] = substr( $file_array[ $i ], 0, 13 ) . '<a href="' . $text . '">' . $text . '</a>';
-                }
-              } else if ( 'License URI:' == substr( $file_array[ $i ], 0, 12 ) ) {
-                if ( prp_is_it_excluded( 'license uri', $exclude ) ) {
-                  $add_to_output = false;
-                } else {
-                  // Convert the licence URL to a hyperlink
-                  $text = substr( $file_array[ $i ], 13 );
-                  $file_array[ $i ] = substr( $file_array[ $i ], 0, 13 ) . '<a href="' . $text . '">' . $text . '</a>';
-                }
-              } else if ( 'Stable tag:' == substr( $file_array[ $i ], 0, 11 ) ) {
-                if ( prp_is_it_excluded( 'stable', $exclude ) ) {
-                  $add_to_output = false;
-                } else {
-                  // Add a hyperlink to the download file
-                  $file_array[ $i ] = substr( $file_array[ $i ], 0, 12 ) . '<a href="' . $download.'" style="max-width: 100%;">' . $version . '</a>';
-                }
-              }
-
-              // If one of the header tags, add a BR tag to the end of the line
-              // prp_log( __(  'head data: ' . $file_array[ $i ], plugin_readme_parser_domain ) );
-
-              $file_array[ $i ] .= '<br />';
-            }
-          } else {
-
-            // Display the meta data if it is to be included (without the head); i.e. the include parameter contains'meta', not 'head'.
-            // Make sure the line doesn't correspond with any of the named data items in the head, e.g. stable tag, contributors, licence.
-            // Make sure the line isn't blank.
-            // Mak sure the line isn't a title (i.e. begins with '#').
-
-            if ( $show_meta &&
-                 !$head_data_item_found &&
-                 'head' === $section &&
-                 '' !== $file_array[ $i ] &&
-                 '#' !== $file_array[ $i ][ 0 ] ) {
-              prp_log( __( 'Current line ' . $i, plugin_readme_parser_domain ), $file_array[ $i ] );
-              $add_to_output = true;
+            if ( 'head' === $section ) {
+              $metadata = array(
+                'exclude' => $exclude,
+                'nofollow' => $nofollow,
+                'version' => $version,
+                'download' => $download,
+                'target' => $target,
+              );
+              $add_to_output = prp_add_head_to_output( $show_head, $show_meta, $file_array[ $i ], $metadata );
             }
           }
 
@@ -413,6 +357,10 @@ if ( !function_exists( 'readme_parser' ) ) {
             } else {
               $last_line_blank = false;
             }
+
+          } else {
+            // prp_log( __(  'Not adding to output', plugin_readme_parser_domain ), $file_array[ $i ] );
+
           }
 
         }
