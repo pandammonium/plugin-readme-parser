@@ -148,19 +148,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
           $this->nofollow = ' rel="nofollow"';
         }
 
-        // Work out in advance whether links should be shown
-
-        // $this->show_links = false; // Initialised as false
-        if ( '' != $this->include ) {
-          if ( prp_is_it_excluded( 'links', $this->include ) ) {
-            $this->show_links = true;
-          }
-        } else {
-          if ( !prp_is_it_excluded( 'links', $this->exclude ) ) {
-            $this->show_links = true;
-          }
-        }
-        // prp_log( __( 'show links', plugin_readme_parser_domain ), $this->show_links );
+        $this->should_links_be_shown();
 
         // Work out in advance whether head should be shown
 
@@ -854,6 +842,28 @@ if ( !class_exists( 'Generate_Output' ) ) {
         return $parameters;
       }
     }
+
+    /**
+     * Determines whether the links should be shown or not.
+     */
+    private function should_links_be_shown(): void {
+
+      // Work out in advance whether links should be shown
+
+      $this->show_links = false;
+      if ( '' != $this->include ) {
+        if ( prp_is_it_excluded( 'links', $this->include ) ) {
+          $this->show_links = true;
+        }
+      } else {
+        if ( !prp_is_it_excluded( 'links', $this->exclude ) ) {
+          $this->show_links = true;
+        }
+      }
+      // prp_log( __( 'show links', plugin_readme_parser_domain ), ( $this->show_links ? 'true' : 'false' ) );
+    }
+
+
   }
 
   $generator = new Generate_Output();
