@@ -180,7 +180,9 @@ For example:
 
 == Acknowledgements ==
 
-Plugin-readme Parser uses [PHP Markdown Extra](https://michelf.ca/projects/php-markdown/ "PHP Markdown") by Michel Fortin.
+Plugin-readme Parser is based on a fork [Plugin README Parser](https://github.com/dartiss/plugin-readme-parser) (also known as WP README Parser) by [David Artiss].
+
+Plugin-readme Parser uses [PHP Markdown](https://michelf.ca/projects/php-markdown/) by Michel Fortin.
 
 == Installation ==
 
@@ -213,7 +215,9 @@ Semantic versioning is used, with the first release being 1.0.
 * Bug: corrected variable name; a typo led to a broken plugin in certain circumstances.
 * Bug: removed display of screenshots because they aren't accessible from the
 plugin.
-* Maintenance: forked and maintained by [Caity Ross](https://pandammonium.org/).
+* Enhancement: adds support for block themes.
+* Enhancement: if parameter include="meta,…" is provided, it is changed to include="head,…", otherwise nothing is output. An error message is written to the error log to tell the user about the change.
+* Maintenance: forked and now maintained by [Caity Ross](https://pandammonium.org/).
 
 [Previous version history](https://plugins.trac.wordpress.org/browser/plugin-readme-parser/trunk/changelog.txt)
 
@@ -221,7 +225,7 @@ plugin.
 
 = 2.0.0 =
 
-This reworking of WP README Parser has a new name and works with more recent versions of PHP. It also removes broken features (e.g. the display of screenshots).
+This reworking of WP README Parser has a new name and works with more recent versions of PHP. It also removes broken features (e.g. the display of screenshots). It os not backwards compatible WP README Parser.
 
 = 1.3.7 =
 
