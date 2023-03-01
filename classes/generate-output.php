@@ -14,13 +14,25 @@ if ( !class_exists( 'Generate_Output' ) ) {
    */
   class Generate_Output {
 
-    private static $c = 0;
-    private $colours = array (
-      0 => 'red',
-      1 => 'orange',
-      2 => 'yellow',
-      3 => 'green',
-      4 => 'blue',
+    private $parameters = '';
+    private $content = '';
+
+    // private static $c = 0;
+    // private const COLOURS = array (
+    //   0 => 'red',
+    //   1 => 'orange',
+    //   2 => 'yellow',
+    //   3 => 'green',
+    //   4 => 'blue',
+    // );
+
+    private const QUOTES = array(
+     '“' => '',
+     '”' => '',
+     '‘' => '',
+     '’' => '',
+     '&#8220;' => '',
+     '&#8221;' => ''
     );
 
     /**
@@ -44,18 +56,10 @@ if ( !class_exists( 'Generate_Output' ) ) {
      */
     public function readme_parser( $paras = '', $content = '' ) {
 
-      static $c = 0;
-      $colours = array (
-        0 => 'red',
-        1 => 'orange',
-        2 => 'yellow',
-        3 => 'green',
-        4 => 'blue',
-      );
       prp_check_img_exists( plugin_dir_path( __DIR__ ) . 'readme', '.txt' );
 
-      prp_log( __( '---------------- README PARSER ----------------', plugin_readme_parser_domain ) );
-      prp_log( __( '---------------- ' . $colours[ self::$c++ ], plugin_readme_parser_domain ) );
+      // prp_log( __( '---------------- README PARSER ----------------', plugin_readme_parser_domain ) );
+      // prp_log( __( '---------------- ' . self::COLOURS[ self::$c++ ], plugin_readme_parser_domain ) );
 
       prp_toggle_global_shortcodes( $content );
 
