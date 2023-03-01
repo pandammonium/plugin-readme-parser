@@ -56,8 +56,6 @@ if ( !class_exists( 'Generate_Output' ) ) {
      */
     public function readme_parser( $paras = '', $content = '' ) {
 
-      prp_check_img_exists( plugin_dir_path( __DIR__ ) . 'readme', '.txt' );
-
       // prp_log( __( '---------------- README PARSER ----------------', plugin_readme_parser_domain ) );
       // prp_log( __( '---------------- ' . self::COLOURS[ self::$c++ ], plugin_readme_parser_domain ) );
 
