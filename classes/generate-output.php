@@ -17,6 +17,49 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private $parameters = '';
     private $content = '';
 
+    private array $file_array = array();
+    private $file_data = '';
+
+    private $plugin_url = '';
+    private $plugin_name = '';
+    private $plugin_title = '';
+
+    private $cache = '';
+    private $cache_key = '';
+    private $exclude = '';
+    private $include = '';
+    private $hide = '';
+    private $links = '';
+    private $ignore = '';
+    private $mirror = '';
+    private $nofollow = '';
+    private $version = '';
+    private $target = '';
+    private $download = '';
+    private $metadata = '';
+
+    private $show_links = false;
+    private $show_head = false;
+    private $show_meta = false;
+
+    private $head_explicitly_excluded = false;
+    private $head_explicitly_included = false;
+    private $meta_explicitly_excluded = false;
+    private $meta_explicitly_included = false;
+
+    private $section = '';
+    private $prev_section = '';
+    // private $last_line_blank = true;
+    // private $div_written = false;
+    private $code = false;
+    private $file_combined = '';
+    private const LINE_END = "\r\n";
+
+    private $my_html = '';
+
+
+    private $meta = '';
+
     // private static $c = 0;
     // private const COLOURS = array (
     //   0 => 'red',
@@ -54,28 +97,27 @@ if ( !class_exists( 'Generate_Output' ) ) {
      * @param  string    $paras  Parameters
      * @return   string          Output
      */
-    public function readme_parser( $paras = '', $content = '' ) {
+    public function readme_parser( array $paras = array(), string $content = '' ): string {
 
       // prp_log( __( '---------------- README PARSER ----------------', plugin_readme_parser_domain ) );
       // prp_log( __( '---------------- ' . self::COLOURS[ self::$c++ ], plugin_readme_parser_domain ) );
 
-      prp_toggle_global_shortcodes( $content );
+      $this->content = $content;
+      prp_toggle_global_shortcodes( $this->content );
 
-      $my_html = '';
+      $this->my_html = '';
 
       // Extract parameters
 
-      // prp_log( __( 'Parameters (raw)', plugin_readme_parser_domain), $paras );
       $this->parameters = $this->normalise_parameters( $paras );
-      // prp_log( __( 'Parameters (normalised)', plugin_readme_parser_domain), $this->parameters );
 
-      extract( shortcode_atts( array( 'exclude' => '', 'ext' => '', 'hide' => '', 'include' => '', 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $this->parameters ) );
+      extract( shortcode_atts( array( 'exclude' => '', 'hide' => '', 'include' => '', 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $this->parameters ) );
 
       // Get cached output
 
       $result = false;
       if ( is_numeric( $cache ) ) {
-        $cache_key = 'prp_' . md5( $exclude . $ext . $hide . $include . $target . $nofollow . $ignore . $cache . $version . $mirror . $content );
+        $cache_key = 'prp_' . md5( $exclude . $hide . $include . $target . $nofollow . $ignore . $cache . $version . $mirror . $content );
         $result = get_transient( $cache_key );
       }
 
@@ -88,150 +130,146 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         // Set parameter values
 
-        $plugin_url = $content;
+        $this->plugin_url = $content;
 
-        $exclude = strtolower( $exclude );
-        $include = strtolower( $include );
-        $hide = strtolower( $hide );
-        $links = strtolower( $links );
-        $ignore = prp_get_list( $ignore, ',,', 'ignore' );
-        $mirror = prp_get_list( $mirror, ',,', 'mirror' );
+        $this->exclude = strtolower( $exclude );
+        $this->include = strtolower( $include );
+        $this->hide = strtolower( $hide );
+        $this->links = strtolower( $links );
+        $this->ignore = prp_get_list( $ignore, ',,', 'ignore' );
+        $this->mirror = prp_get_list( $mirror, ',,', 'mirror' );
+        $this->version = $version;
+        $this->target = $target;
 
         // prp_log( __( 'Sections to be included', plugin_readme_parser_domain), $include );
         // prp_log( __( 'Sections to be excluded', plugin_readme_parser_domain), $exclude );
 
         if ( 'yes' == strtolower( $nofollow ) ) {
-          $nofollow = ' rel="nofollow"';
-        }
-
-        if ( '' == $ext ) {
-          $ext = 'png';
-        } else {
-          $ext = strtolower( $ext );
+          $this->nofollow = ' rel="nofollow"';
         }
 
         // Work out in advance whether links should be shown
 
-        $show_links = false;
-        if ( '' != $include ) {
-          if ( prp_is_it_excluded( 'links', $include ) ) {
-            $show_links = true;
+        // $this->show_links = false; // Initialised as false
+        if ( '' != $this->include ) {
+          if ( prp_is_it_excluded( 'links', $this->include ) ) {
+            $this->show_links = true;
           }
         } else {
-          if ( !prp_is_it_excluded( 'links', $exclude ) ) {
-            $show_links = true;
+          if ( !prp_is_it_excluded( 'links', $this->exclude ) ) {
+            $this->show_links = true;
           }
         }
-        // prp_log( __( 'show links', plugin_readme_parser_domain ), $show_links );
+        // prp_log( __( 'show links', plugin_readme_parser_domain ), $this->show_links );
 
         // Work out in advance whether head should be shown
 
-        $show_head = false;
-        $show_meta = false;
+        $this->show_head = false;
+        $this->show_meta = false;
 
-        $head_explicitly_excluded = prp_is_it_excluded( 'head', $exclude );
-        $head_explicitly_included = prp_is_it_excluded( 'head', $include );
-        $meta_explicitly_excluded = prp_is_it_excluded( 'meta', $exclude );
-        $meta_explicitly_included = prp_is_it_excluded( 'meta', $include );
+        $this->head_explicitly_excluded = prp_is_it_excluded( 'head', $exclude );
+        $this->head_explicitly_included = prp_is_it_excluded( 'head', $include );
+        $this->meta_explicitly_excluded = prp_is_it_excluded( 'meta', $exclude );
+        $this->meta_explicitly_included = prp_is_it_excluded( 'meta', $include );
 
-        // prp_log( __( 'head exp exc', plugin_readme_parser_domain ), ( $head_explicitly_excluded ? 'true' : 'false' ) );
-        // prp_log( __( 'head exp inc', plugin_readme_parser_domain ), ( $head_explicitly_included ? 'true' : 'false' ) );
-        // prp_log( __( 'meta exp exc', plugin_readme_parser_domain ), ( $meta_explicitly_excluded ? 'true' : 'false' ) );
-        // prp_log( __( 'meta exp inc', plugin_readme_parser_domain ), ( $meta_explicitly_included ? 'true' : 'false' ) );
+        // prp_log( __( 'head exp exc', plugin_readme_parser_domain ), ( $this->head_explicitly_excluded ? 'true' : 'false' ) );
+        // prp_log( __( 'head exp inc', plugin_readme_parser_domain ), ( $this->head_explicitly_included ? 'true' : 'false' ) );
+        // prp_log( __( 'meta exp exc', plugin_readme_parser_domain ), ( $this->meta_explicitly_excluded ? 'true' : 'false' ) );
+        // prp_log( __( 'meta exp inc', plugin_readme_parser_domain ), ( $this->meta_explicitly_included ? 'true' : 'false' ) );
 
-        if ( !$head_explicitly_excluded ) {
-          if ( !$meta_explicitly_excluded ) {
-            if ( $meta_explicitly_included ) {
-              $new_include = str_replace( 'meta', 'head', $include );
-              prp_log( __( "Cannot include the meta data part of the head without the summary part.\n  Parameters supplied:   include=\"" . $include . "\"\n  Parameters changed to: include=\"" . $new_include . "\"", plugin_readme_parser_domain ), '', true, false );
+        if ( !$this->head_explicitly_excluded ) {
+          if ( !$this->meta_explicitly_excluded ) {
+            if ( $this->meta_explicitly_included ) {
+              $new_include = str_replace( 'meta', 'head', $this->include );
+              // prp_log( __( "Cannot include the meta data part of the head without the summary part.\n  Parameters supplied:   include=\"" . $this->include . "\"\n  Parameters changed to: include=\"" . $new_include . "\"", plugin_readme_parser_domain ), '', true, false );
               // Add the head to the include parameter value:
-              $include = $new_include;
+              $this->include = $new_include;
               // Set show_head to be true instead of false:
-              $show_head = true;
-              $show_meta = true;
+              $this->show_head = true;
+              $this->show_meta = true;
             } else {
-              $show_head = true;
-              $show_meta = true;
+              $this->show_head = true;
+              $this->show_meta = true;
             }
           }
         }
-        if ( !$head_explicitly_included ) {
-          if ( $meta_explicitly_excluded ) {
-            $show_head = true;
-            $show_meta = false;
+        if ( !$this->head_explicitly_included ) {
+          if ( $this->meta_explicitly_excluded ) {
+            $this->show_head = true;
+            $this->show_meta = false;
           }
         }
-        // prp_log( __( 'show head', plugin_readme_parser_domain ), ( $show_head ? 'true' : 'false' ) );
+        // prp_log( __( 'show head', plugin_readme_parser_domain ), ( $this->show_head ? 'true' : 'false' ) );
         // prp_log( __( 'show meta', plugin_readme_parser_domain ), ( $show_meta ? 'true' : 'false' ) );
 
         // Ensure EXCLUDE and INCLUDE parameters aren't both included
 
-        if ( ( '' != $exclude ) &&
-             ( '' != $include ) ) {
+        if ( ( '' != $this->exclude ) &&
+             ( '' != $this->include ) ) {
           return prp_report_error( __( '\'include\' and \'exclude\' parameters cannot both be specified', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
         }
 
         // Work out filename and fetch the contents
 
-        $file_data = prp_get_readme( $plugin_url, $version );
+        $this->file_data = prp_get_readme( $this->plugin_url, $this->version );
 
         // Ensure the file is valid
 
-        if ( false !== $file_data ) {
+        if ( false !== $this->file_data ) {
 
           // prp_log( __( 'file_data', plugin_readme_parser_domain ), $file_data );
 
-          if ( isset( $file_data[ 'name' ] ) ) {
-            $plugin_name = $file_data[ 'name' ];
+          if ( isset( $this->file_data[ 'name' ] ) ) {
+            $this->plugin_name = $this->file_data[ 'name' ];
           } else {
-            $plugin_name = '';
+            $this->plugin_name = '';
           }
           // prp_log( __( 'plugin name', plugin_readme_parser_domain ), $plugin_name );
 
           // Split file into array based on CRLF
 
-          $file_array = preg_split( "/((\r(?!\n))|((?<!\r)\n)|(\r\n))/", $file_data[ 'file' ] );
-          // prp_log( __( 'file_array', plugin_readme_parser_domain ), $file_array, false, true );
+          $this->file_array = preg_split( "/((\r(?!\n))|((?<!\r)\n)|(\r\n))/", $this->file_data[ 'file' ] );
+          // prp_log( __( 'file_array', plugin_readme_parser_domain ), $this->file_array, false, true );
 
-          // Set initial variables
+          // // Set initial variables // Initialised with these values
 
-          $section = '';
-          $prev_section = '';
+          // $this->section = '';
+          // $this->prev_section = '';
           $last_line_blank = true;
           $div_written = false;
-          $code = false;
-          $crlf = "\r\n";
-          $file_combined = '';
+          // $this->code = false;
+          // self::LINE_END = "\r\n";
+          // $this->file_combined = '';
 
           // Count the number of lines and read through the array
 
-          $count = count( $file_array );
+          $count = count( $this->file_array );
           // prp_log( __( 'readme file has ' . $count . ' lines', plugin_readme_parser_domain ) );
           for ( $i = 0; $i < $count; $i++ ) {
-            // prp_log_truncated_line( $file_array[ $i ], $i );
+            // prp_log_truncated_line( $this->file_array[ $i ], $i );
 
             $add_to_output = true;
 
             // Remove non-visible character from input - various characters can sneak into
             // text files and this can affect output
 
-            $file_array[ $i ] = rtrim( ltrim( ltrim( $file_array[ $i ], "\x80..\xFF" ), "\x00..\x1F" ) );
+            $this->file_array[ $i ] = rtrim( ltrim( ltrim( $this->file_array[ $i ], "\x80..\xFF" ), "\x00..\x1F" ) );
 
             // If the line begins with equal signs, replace with the standard hash equivalent
 
-            if ( '=== ' == substr( $file_array [$i ], 0, 4 ) ) {
-              $file_array[ $i ] = str_replace( '===', '#', $file_array[ $i ] );
-              $section = prp_get_section_name( $file_array[ $i ], 1 );
-              // // prp_log( __( 'section', plugin_readme_parser_domain ), $section );
+            if ( '=== ' == substr( $this->file_array [$i ], 0, 4 ) ) {
+              $this->file_array[ $i ] = str_replace( '===', '#', $this->file_array[ $i ] );
+              $this->section = prp_get_section_name( $this->file_array[ $i ], 1 );
+              // // prp_log( __( 'section', plugin_readme_parser_domain ), $this->section );
             } else {
-              if ( '== ' == substr( $file_array[ $i ], 0, 3 ) ) {
-                $file_array[ $i ] = str_replace( '==', '##' , $file_array[ $i ] );
-                $section = prp_get_section_name( $file_array[ $i ], 2 );
-                // // prp_log( __( 'section', plugin_readme_parser_domain ), $section );
+              if ( '== ' == substr( $this->file_array[ $i ], 0, 3 ) ) {
+                $this->file_array[ $i ] = str_replace( '==', '##' , $this->file_array[ $i ] );
+                $this->section = prp_get_section_name( $this->file_array[ $i ], 2 );
+                // // prp_log( __( 'section', plugin_readme_parser_domain ), $this->section );
               } else {
-                if ( '= ' == substr( $file_array[ $i ], 0, 2 ) ) {
-                  $file_array[ $i ] = str_replace( '=', '###', $file_array[ $i ] );
-                  // // prp_log( __( 'section', plugin_readme_parser_domain ), $section );
+                if ( '= ' == substr( $this->file_array[ $i ], 0, 2 ) ) {
+                  $this->file_array[ $i ] = str_replace( '=', '###', $this->file_array[ $i ] );
+                  // // prp_log( __( 'section', plugin_readme_parser_domain ), $this->section );
                 }
               }
             }
@@ -239,57 +277,57 @@ if ( !class_exists( 'Generate_Output' ) ) {
             // If an asterisk is used for a list, but it doesn't have a space after it, add one!
             // This only works if no other asterisks appear in the line
 
-            if ( ( '*' == substr( $file_array[ $i ], 0, 1 ) ) &&
-                 ( ' ' != substr( $file_array[ $i ], 0, 2 ) ) &&
-                 ( false === strpos( $file_array[ $i ], '*', 1 ) ) ) {
-              $file_array[ $i ] = '* ' . substr( $file_array[ $i ], 1 );
+            if ( ( '*' == substr( $this->file_array[ $i ], 0, 1 ) ) &&
+                 ( ' ' != substr( $this->file_array[ $i ], 0, 2 ) ) &&
+                 ( false === strpos( $this->file_array[ $i ], '*', 1 ) ) ) {
+              $this->file_array[ $i ] = '* ' . substr( $this->file_array[ $i ], 1 );
             }
 
             // Track current section. If very top, make it "head" and save as plugin name
 
-            if ( ( $section != $prev_section ) &&
-                 ( '' == $prev_section ) ) {
+            if ( ( $this->section != $this->prev_section ) &&
+                 ( '' == $this->prev_section ) ) {
 
               // If a plugin name was not specified attempt to use the name parameter. If that's not set, assume
               // it's the one in the readme header
 
-              // // prp_log( __( 'name (from args)', plugin_readme_parser_domain ), $name );
+              // // prp_log( __( 'name (from args)', plugin_readme_parser_domain ), $this->name );
 
-              if ( '' == $plugin_name ) {
-                if ( '' == $name ) {
-                  $plugin_name = str_replace( ' ', '-', strtolower( $section ) );
+              if ( '' == $this->plugin_name ) {
+                if ( '' == $this->name ) {
+                  $this->plugin_name = str_replace( ' ', '-', strtolower( $this->section ) );
                 } else {
-                  $plugin_name = $name;
+                  $this->plugin_name = $this->name;
                 }
               }
 
-              $plugin_title = $section;
+              $this->plugin_title = $this->section;
               $add_to_output = false;
-              $section = 'head';
-              // prp_log( __( 'section', plugin_readme_parser_domain ), $section );
+              $this->section = 'head';
+              // prp_log( __( 'section', plugin_readme_parser_domain ), $this->section );
 
             }
 
-            if ( '' != $include ) {
+            if ( '' != $this->include ) {
 
               // Is this an included section?
 
-              if ( prp_is_it_excluded( $section, $include ) ) {
-                // prp_log( __( 'included', plugin_readme_parser_domain ), $section );
+              if ( prp_is_it_excluded( $this->section, $this->include ) ) {
+                // prp_log( __( 'included', plugin_readme_parser_domain ), $this->section );
 
-                if ( $section != $prev_section ) {
+                if ( $this->section != $this->prev_section ) {
                   if ( $div_written ) {
-                    $file_combined .= '</div>' . $crlf;
+                    $this->file_combined .= '</div>' . self::LINE_END;
                   }
-                  $file_combined .= $crlf . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $section ) ) ) . '">' . $crlf;
+                  $this->file_combined .= self::LINE_END . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $this->section ) ) ) . '">' . self::LINE_END;
                   $div_written = true;
-                  if ( 'Description' === $section ) {
+                  if ( 'Description' === $this->section ) {
                     // prp_log( 'A. ADD TO OUTPUT', $add_to_output );
                   }
                 }
               } else {
                 $add_to_output = false;
-                if ( 'Description' === $section ) {
+                if ( 'Description' === $this->section ) {
                   // prp_log( 'B. ADD TO OUTPUT', $add_to_output );
                 }
               }
@@ -298,20 +336,20 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
               // Is this an excluded section?
 
-              if ( prp_is_it_excluded( $section, $exclude ) ) {
+              if ( prp_is_it_excluded( $this->section, $this->exclude ) ) {
                 $add_to_output = false;
-                // prp_log( __( 'excluded', plugin_readme_parser_domain ), $section );
-                if ( 'Description' === $section ) {
+                // prp_log( __( 'excluded', plugin_readme_parser_domain ), $this->section );
+                if ( 'Description' === $this->section ) {
                   // prp_log( 'C. ADD TO OUTPUT', $add_to_output );
                 }
               } else {
-                if ( $section != $prev_section ) {
+                if ( $this->section != $this->prev_section ) {
                   if ( $div_written ) {
-                    $file_combined .= '</div>' . $crlf;
+                    $this->file_combined .= '</div>' . self::LINE_END;
                   }
-                  $file_combined .= $crlf . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $section ) ) ) . '">' . $crlf;
+                  $this->file_combined .= self::LINE_END . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $this->section ) ) ) . '">' . self::LINE_END;
                   $div_written = true;
-                  if ( 'Description' === $section ) {
+                  if ( 'Description' === $this->section ) {
                     // prp_log( 'D. ADD TO OUTPUT', $add_to_output );
                   }
                 }
@@ -322,56 +360,56 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
             if ( $add_to_output ) {
               $exclude_loop = 1;
-              while ( $exclude_loop <= $ignore[ 0 ] ) {
-                if ( false !== strpos( $file_array[ $i ], $ignore[ $exclude_loop ], 0 ) ) {
+              while ( $exclude_loop <= $this->ignore[ 0 ] ) {
+                if ( false !== strpos( $this->file_array[ $i ], $this->ignore[ $exclude_loop ], 0 ) ) {
                   $add_to_output = false;
                 }
               $exclude_loop++;
               }
             }
 
-            if ( ( $links == strtolower( $section ) ) &&
-                 ( $section != $prev_section ) ) {
-              if ( $show_links ) {
-                $file_array[ $i ] = prp_display_links( $download, $target, $nofollow, $version, $mirror, $plugin_name ) . $file_array[ $i ];
+            if ( ( $this->links == strtolower( $this->section ) ) &&
+                 ( $this->section != $this->prev_section ) ) {
+              if ( $this->show_links ) {
+                $this->file_array[ $i ] = prp_display_links( $this->download, $this->target, $this->nofollow, $this->version, $this->mirror, $this->plugin_name ) . $this->file_array[ $i ];
               }
             }
 
-            $prev_section = $section;
-            // prp_log( __( '(previous) section', plugin_readme_parser_domain ), $prev_section );
+            $this->prev_section = $this->section;
+            // prp_log( __( '(previous) section', plugin_readme_parser_domain ), $this->prev_section );
 
             // Get the download link for the most recent version
 
-            if ( 'Stable tag:' == substr( $file_array[ $i ], 0, 11 ) ) {
+            if ( 'Stable tag:' == substr( $this->file_array[ $i ], 0, 11 ) ) {
 
-              $version = substr( $file_array[ $i ], 12 );
-              // prp_log( __( 'version', plugin_readme_parser_domain ), $version );
-              $download = 'https://downloads.wordpress.org/plugin/' . $plugin_name . '.' . $version . '.zip';
-              // // prp_log( __( 'download link', plugin_readme_parser_domain ), $download );
+              $this->version = substr( $this->file_array[ $i ], 12 );
+              // prp_log( __( 'version', plugin_readme_parser_domain ), $this->version );
+              $this->download = 'https://downloads.wordpress.org/plugin/' . $this->plugin_name . '.' . $this->version . '.zip';
+              // // prp_log( __( 'download link', plugin_readme_parser_domain ), $this->download );
 
             }
 
             if ( $add_to_output ) {
 
-              // prp_log( __( 'SECTION', plugin_readme_parser_domain ), $section );
+              // prp_log( __( 'SECTION', plugin_readme_parser_domain ), $this->section );
 
-              if ( 'head' === $section ) {
+              if ( 'head' === $this->section ) {
                 $metadata = array(
-                  'exclude' => $exclude,
-                  'nofollow' => $nofollow,
-                  'version' => $version,
-                  'download' => isset( $download ) ? $download : '',
-                  'target' => $target,
+                  'exclude' => $this->exclude,
+                  'nofollow' => $this->nofollow,
+                  'version' => $this->version,
+                  'download' => isset( $this->download ) ? $this->download : '',
+                  'target' => $this->target,
                 );
-                $add_to_output = prp_add_head_meta_data_to_output( $show_head, $show_meta, $file_array[ $i ], $metadata );
+                $add_to_output = prp_add_head_meta_data_to_output( $this->show_head, $this->show_meta, $this->file_array[ $i ], $this->metadata );
               }
             }
 
-            // if ( 'Description' === $section ) {
+            // if ( 'Description' === $this->section ) {
             //   prp_log( 'ADD TO OUTPUT', $add_to_output );
             // }
 
-            if ( 'Screenshots' === $section ) {
+            if ( 'Screenshots' === $this->section ) {
               // Do not display screenshots: any attempt to access the screenshots on WordPress' SVN servers is met with an HTTP 403 (forbidden) error.
               $add_to_output = false;
             }
@@ -380,17 +418,17 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
             // prp_log( __( 'test', plugin_readme_parser_domain ), array(
             //   'line no.'        => $i,
-            //   'line'            => $file_array[ $i ],
+            //   'line'            => $this->file_array[ $i ],
             //   'last line blank' => $last_line_blank,
-            //   'add to output'   => $add_to_output
+            //   'add to output'   => $this->add_to_output
             // ) );
 
-            if ( ( '' != $file_array[ $i ] or !$last_line_blank ) &&
+            if ( ( '' != $this->file_array[ $i ] or !$last_line_blank ) &&
                $add_to_output ) {
-              $file_combined .= $file_array[ $i ] . $crlf;
-              // prp_log_truncated_line( 'Adding l.' . $i . ' ' . $file_array[ $i ] );
+              $this->file_combined .= $this->file_array[ $i ] . self::LINE_END;
+              // prp_log_truncated_line( 'Adding l.' . $i . ' ' . $this->file_array[ $i ] );
 
-              if ( '' == $file_array[ $i ] ) {
+              if ( '' == $this->file_array[ $i ] ) {
                 $last_line_blank = true;
 
               } else {
@@ -398,34 +436,34 @@ if ( !class_exists( 'Generate_Output' ) ) {
               }
 
             } else {
-              // prp_log_truncated_line( 'Not adding l.' . $i . ' ' . $file_array[ $i ] );
+              // prp_log_truncated_line( 'Not adding l.' . $i . ' ' . $this->file_array[ $i ] );
 
             }
 
           }
 
-          $file_combined .= '</div>' . $crlf;
+          $this->file_combined .= '</div>' . self::LINE_END;
 
           // Display links section
 
-          if ( ( $show_links ) &&
-               ( 'bottom' == $links ) ) {
-            $file_combined .= prp_display_links( $download, $target, $nofollow, $version, $mirror, $plugin_name );
+          if ( ( $this->show_links ) &&
+               ( 'bottom' == $this->links ) ) {
+            $this->file_combined .= prp_display_links( $this->download, $this->target, $this->nofollow, $this->version, $this->mirror, $this->plugin_name );
           }
 
           // Call Markdown code to convert
 
-          $my_html = \Michelf\MarkdownExtra::defaultTransform( $file_combined );
+          $this->my_html = \Michelf\MarkdownExtra::defaultTransform( $this->file_combined );
 
           // Split HTML again
 
-          $file_array = preg_split( "/((\r(?!\n))|((?<!\r)\n)|(\r\n))/", $my_html );
-          $my_html = '';
+          $this->file_array = preg_split( "/((\r(?!\n))|((?<!\r)\n)|(\r\n))/", $this->my_html );
+          $this->my_html = '';
 
           // Count lines of code and process one at a time
 
           $titles_found = 0;
-          $count = count( $file_array );
+          $count = count( $this->file_array );
 
           for ( $i = 0; $i < $count; $i++ ) {
 
@@ -436,12 +474,12 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
               // If line is a sub-heading add the first part of the code
 
-              if ( '<h2>' == substr( $file_array[ $i ], 0, 4 ) ) {
+              if ( '<h2>' == substr( $this->file_array[ $i ], 0, 4 ) ) {
 
                 // Extract title and check if it should be hidden or shown by default
 
-                $title = substr( $file_array[ $i ], 4, strpos( $file_array[ $i ], '</h2>' ) - 4 );
-                if ( prp_is_it_excluded( strtolower( $title ), $hide ) ) {
+                $this->title = substr( $this->file_array[ $i ], 4, strpos( $this->file_array[ $i ], '</h2>' ) - 4 );
+                if ( prp_is_it_excluded( strtolower( $this->title ), $this->hide ) ) {
                   $state = 'hide';
                 } else {
                   $state = 'show';
@@ -449,84 +487,84 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
                 // Call Content Reveal with heading details and replace current line
 
-                $file_array[ $i ] = acr_start( '<h2>%image% ' . $title . '</h2>', $title, $state, $scr_url, $scr_ext );
+                $this->file_array[ $i ] = acr_start( '<h2>%image% ' . $this->title . '</h2>', $this->title, $this->state, $scr_url, $scr_ext );
                 $titles_found++;
               }
 
               // If a DIV is found and previous section is not hidden add the end part of code
 
-              if ( ( '</div>' == $file_array[ $i ] ) && ( 0 < $titles_found ) ) {
-                $file_array[ $i ] = acr_end() . $crlf . $file_array[ $i ];
+              if ( ( '</div>' == $this->file_array[ $i ] ) && ( 0 < $titles_found ) ) {
+                $this->file_array[ $i ] = acr_end() . self::LINE_END . $this->file_array[ $i ];
               }
             }
 
             // If first line of code multi-line, replace CODE with PRE tag
 
-            if ( ( strpos( $file_array[ $i ], '<code>', 0 ) ) && ( !strpos( $file_array[ $i ], '</code>', 0 ) ) ) {
-              $file_array[ $i ] = str_replace( '<code>', '<pre>', $file_array[ $i ] );
+            if ( ( strpos( $this->file_array[ $i ], '<code>', 0 ) ) && ( !strpos( $this->file_array[ $i ], '</code>', 0 ) ) ) {
+              $this->file_array[ $i ] = str_replace( '<code>', '<pre>', $this->file_array[ $i ] );
             }
 
             // If final line to code multi-line, replace /CODE with /PRE tag
 
-            if ( ( strpos( $file_array[ $i ], '</code>', 0 ) ) && ( !strpos( $file_array[ $i ], '<code>', 0 ) ) ) {
-              $file_array[ $i ] = str_replace( '</code>', '</pre>', $file_array[ $i ] );
+            if ( ( strpos( $this->file_array[ $i ], '</code>', 0 ) ) && ( !strpos( $this->file_array[ $i ], '<code>', 0 ) ) ) {
+              $this->file_array[ $i ] = str_replace( '</code>', '</pre>', $this->file_array[ $i ] );
             }
 
             // If all code is one line, replace CODE with PRE tags
 
-            if ( ( strpos( $file_array[ $i ], '<code>', 0 ) ) && ( strpos( $file_array[ $i ], '</code>', 0 ) ) ) {
-              if ( '' == ltrim( strip_tags( substr( $file_array[ $i ], 0, strpos( $file_array[ $i ], '<code>', 0 ) ) ) ) ) {
-                $file_array[ $i ] = str_replace( 'code>', 'pre>', $file_array[ $i ] );
+            if ( ( strpos( $this->file_array[ $i ], '<code>', 0 ) ) && ( strpos( $this->file_array[ $i ], '</code>', 0 ) ) ) {
+              if ( '' == ltrim( strip_tags( substr( $this->file_array[ $i ], 0, strpos( $this->file_array[ $i ], '<code>', 0 ) ) ) ) ) {
+                $this->file_array[ $i ] = str_replace( 'code>', 'pre>', $this->file_array[ $i ] );
               }
             }
 
-            if ( '' != $file_array[ $i ] ) {
-              $my_html .= $file_array[ $i ] . $crlf;
+            if ( '' != $this->file_array[ $i ] ) {
+              $this->my_html .= $this->file_array[ $i ] . self::LINE_END;
             }
           }
 
           // Modify <CODE> and <PRE> with class to suppress translation
 
-          $my_html = str_replace( '<code>', '<code class="notranslate">', str_replace( '<pre>', '<pre class="notranslate">', $my_html ) );
+          $this->my_html = str_replace( '<code>', '<code class="notranslate">', str_replace( '<pre>', '<pre class="notranslate">', $this->my_html ) );
 
 
         } else {
 
-          if ( ( 0 < strlen( $file_data[ 'file' ] ) ) &&
-               ( 0 == substr_count( $file_data[ 'file' ], "\n" ) ) ) {
+          if ( ( 0 < strlen( $this->file_data[ 'file' ] ) ) &&
+               ( 0 == substr_count( $this->file_data[ 'file' ], "\n" ) ) ) {
 
-            $my_html = prp_report_error( __( 'invalid readme file: no carriage returns found', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
+            $this->my_html = prp_report_error( __( 'invalid readme file: no carriage returns found', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
 
           } else {
 
-            $my_html = prp_report_error( __( 'the readme file for the ' . $plugin_url . ' plugin is either missing or invalid: \'' . $file_data[ 'file' ] . '\'', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
+            $this->my_html = prp_report_error( __( 'the readme file for the ' . $this->plugin_url . ' plugin is either missing or invalid: \'' . $this->file_data[ 'file' ] . '\'', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
 
           }
         }
 
         // Send the resultant code back, plus encapsulating DIV and version comments. Use double quotes to permit linebreaks (\n)
 
-        $content = "\n<!-- " . plugin_readme_parser_name . " v" . plugin_readme_parser_version . " -->\n<div class=\"np-notepad\">" . $my_html . "</div>\n<!-- End of " . plugin_readme_parser_name . " code -->\n";
+        $this->content = "\n<!-- " . plugin_readme_parser_name . " v" . plugin_readme_parser_version . " -->\n<div class=\"np-notepad\">" . $this->my_html . "</div>\n<!-- End of " . plugin_readme_parser_name . " code -->\n";
 
         // Cache the results
 
-        if ( is_numeric( $cache ) ) {
+        if ( is_numeric( $this->cache ) ) {
           // // prp_log( __( 'caching transient', plugin_readme_parser_domain ) );
-          set_transient( $cache_key, $content, 3600 * $cache );
+          set_transient( $this->cache_key, $this->content, 3600 * $this->cache );
         }
 
       } else {
 
         // // prp_log( __( 'transient already cached', plugin_readme_parser_domain ) );
 
-        $content = $result;
+        $this->content = $result;
       }
 
-      prp_toggle_global_shortcodes( $content );
+      prp_toggle_global_shortcodes( $this->content );
 
       // prp_log( __( '---------------- README PARSER -- end ---------', plugin_readme_parser_domain ) );
 
-      return $content;
+      return $this->content;
     }
 
     /**
@@ -541,7 +579,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
      * @param  string    $content  Plugin name or URL
      * @param  string          Output
      */
-    public function readme_banner( $paras = '', $content = '' ) {
+    public function readme_banner( $paras = '', $content = '' ): string {
 
       // prp_log( __( 'Readme banner:', plugin_readme_parser_domain ) );
 
@@ -637,7 +675,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
      * @param  string    $content  Post content
      * @param  string          Output
      */
-    public function readme_info( $paras = '', $content = '' ) {
+    public function readme_info( $paras = '', $content = '' ): string {
 
       // prp_log( __( 'Readme Info', plugin_readme_parser_domain ) );
 
@@ -657,9 +695,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       // Get the cache
 
-      if ( is_numeric( $cache ) ) {
-        $cache_key = 'prp_info_' . md5( $name . $cache );
-        $result = get_transient( $cache_key );
+      if ( is_numeric( $this->cache ) ) {
+        $this->cache_key = 'prp_info_' . md5( $name . $this->cache );
+        $result = get_transient( $this->cache_key );
       }
 
       if ( !$result ) {
@@ -673,43 +711,43 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
           // Split file into array based on CRLF
 
-          $file_array = preg_split( "/((\r(?!\n))|((?<!\r)\n)|(\r\n))/", $file_data[ 'file' ] );
+          $this->file_array = preg_split( "/((\r(?!\n))|((?<!\r)\n)|(\r\n))/", $file_data[ 'file' ] );
 
           // Loop through the array
 
-          $count = count( $file_array );
+          $count = count( $this->file_array );
           for ( $i = 0; $i < $count; $i++ ) {
 
             // Remove non-visible character from input - various characters can sneak into
             // text files and this can affect output
 
-            $file_array[ $i ] = rtrim( ltrim( ltrim( $file_array[ $i ], "\x80..\xFF" ), "\x00..\x1F" ) );
+            $this->file_array[ $i ] = rtrim( ltrim( ltrim( $this->file_array[ $i ], "\x80..\xFF" ), "\x00..\x1F" ) );
 
             // If first record extract plugin name
 
             if ( ( '' == $plugin_name ) &&
                  ( 0 == $i ) ) {
 
-              $pos = strpos( $file_array [ 0 ], ' ===' );
+              $pos = strpos( $this->file_array [ 0 ], ' ===' );
               if ( false !== $pos ) {
-                $plugin_name = substr( $file_array[ 0 ], 4, $pos - 4 );
+                $plugin_name = substr( $this->file_array[ 0 ], 4, $pos - 4 );
                 $plugin_name = str_replace( ' ', '-', strtolower( $plugin_name ) );
               }
             }
 
             // Extract version number
 
-            if ( 'Stable tag:' == substr( $file_array[ $i ], 0, 11 ) ) {
-              $version = substr( $file_array[ $i ], 12 );
+            if ( 'Stable tag:' == substr( $this->file_array[ $i ], 0, 11 ) ) {
+              $version = substr( $this->file_array[ $i ], 12 );
             }
           }
 
           // Save cache
 
-          if ( is_numeric( $cache ) ) {
+          if ( is_numeric( $this->cache ) ) {
             $result[ 'version' ] = $version;
             $result[ 'name' ] = $plugin_name;
-            set_transient( $cache_key, $result, 3600 * $cache );
+            set_transient( $this->cache_key, $result, 3600 * $this->cache );
           }
 
         } else {
@@ -784,18 +822,14 @@ if ( !class_exists( 'Generate_Output' ) ) {
      * Fixes the erroneous array member created by having a space in 'Upgrade
      * Notice'.
      *
-     * @param  $parameters  string  The text to normalise the quotation marks in.
-     * @return        string  The text containing normalised quotation marks.
+     * @param  $parameters  array  The text to normalise the quotation marks in.
+     * @return        array  The text containing normalised quotation marks.
      */
-    private function normalise_parameters( $parameters ) {
+    private function normalise_parameters( array $parameters ): array {
 
-      if ( is_string( $parameters ) ) {
-        $normalised_parameters = str_replace(array_keys(self::QUOTES), array_values(self::QUOTES), $parameters);
-        // prp_log( __( 'Normalised ', plugin_readme_parser_domain ) . $parameters );
-        // prp_log( __( '        to ', plugin_readme_parser_domain ) . $normalised_parameters  );
-        return $normalised_parameters;
+      // prp_log( __( 'Parameters (raw)', plugin_readme_parser_domain), $parameters );
 
-      } else if ( is_array($parameters ) ) {
+      if ( is_array($parameters ) ) {
         $normalised_parameters = array();
         foreach ( $parameters as $key => $value ) {
           // prp_log( $key . ': ' . $value );
@@ -812,10 +846,11 @@ if ( !class_exists( 'Generate_Output' ) ) {
           }
           unset( $normalised_parameters[0] );
         }
+        // prp_log( __( 'Parameters (normalised)', plugin_readme_parser_domain), $this->parameters );
         return $normalised_parameters;
 
       } else {
-        // prp_log( $parameters, 'Normalise: wanted a string or an array; got \'' . gettype( $parameters ) . '\':'  );
+        prp_log( 'Normalise: wanted a string or an array; got \'' . gettype( $parameters ) . '\'', $parameters, true );
         return $parameters;
       }
     }
