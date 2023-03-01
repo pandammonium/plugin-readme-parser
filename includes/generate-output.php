@@ -41,10 +41,12 @@ if ( !function_exists( 'readme_parser' ) ) {
     );
     prp_check_img_exists( plugin_dir_path( __DIR__ ) . 'readme', '.txt' );
 
-    prp_log( __( '---------------- README PARSER ----------------', plugin_readme_parser_domain ) );
-    prp_log( __( '---------------- ' . $colours[ $c++ ], plugin_readme_parser_domain ) );
+    // prp_log( __( '---------------- README PARSER ----------------', plugin_readme_parser_domain ) );
+    // prp_log( __( '---------------- ' . $colours[ $c++ ], plugin_readme_parser_domain ) );
 
     prp_toggle_global_shortcodes( $content );
+
+    $my_html = '';
 
     // Extract parameters
 
@@ -80,8 +82,8 @@ if ( !function_exists( 'readme_parser' ) ) {
       $ignore = prp_get_list( $ignore, ',,', 'ignore' );
       $mirror = prp_get_list( $mirror, ',,', 'mirror' );
 
-      prp_log( __( 'Sections to be included', plugin_readme_parser_domain), $include );
-      prp_log( __( 'Sections to be excluded', plugin_readme_parser_domain), $exclude );
+      // prp_log( __( 'Sections to be included', plugin_readme_parser_domain), $include );
+      // prp_log( __( 'Sections to be excluded', plugin_readme_parser_domain), $exclude );
 
       if ( 'yes' == strtolower( $nofollow ) ) {
         $nofollow = ' rel="nofollow"';
@@ -107,11 +109,7 @@ if ( !function_exists( 'readme_parser' ) ) {
       }
       // prp_log( __( 'show links', plugin_readme_parser_domain ), $show_links );
 
-      // Work out in advance whether head should be shown:
-      // * explicitly include head: show head === true && show meta === true
-      // * explicitly exclude head: show head === false && show meta === false
-      // * explicitly include meta without mentioning head: show head === false && show meta === true
-      // * explicitly exclude meta without mentioning head: show head === true && show meta === false
+      // Work out in advance whether head should be shown
 
       $show_head = false;
       $show_meta = false;
@@ -121,15 +119,20 @@ if ( !function_exists( 'readme_parser' ) ) {
       $meta_explicitly_excluded = prp_is_it_excluded( 'meta', $exclude );
       $meta_explicitly_included = prp_is_it_excluded( 'meta', $include );
 
-      prp_log( __( 'head exp exc', plugin_readme_parser_domain ), ( $head_explicitly_excluded ? 'true' : 'false' ) );
-      prp_log( __( 'head exp inc', plugin_readme_parser_domain ), ( $head_explicitly_included ? 'true' : 'false' ) );
-      prp_log( __( 'meta exp exc', plugin_readme_parser_domain ), ( $meta_explicitly_excluded ? 'true' : 'false' ) );
-      prp_log( __( 'meta exp inc', plugin_readme_parser_domain ), ( $meta_explicitly_included ? 'true' : 'false' ) );
+      // prp_log( __( 'head exp exc', plugin_readme_parser_domain ), ( $head_explicitly_excluded ? 'true' : 'false' ) );
+      // prp_log( __( 'head exp inc', plugin_readme_parser_domain ), ( $head_explicitly_included ? 'true' : 'false' ) );
+      // prp_log( __( 'meta exp exc', plugin_readme_parser_domain ), ( $meta_explicitly_excluded ? 'true' : 'false' ) );
+      // prp_log( __( 'meta exp inc', plugin_readme_parser_domain ), ( $meta_explicitly_included ? 'true' : 'false' ) );
 
       if ( !$head_explicitly_excluded ) {
         if ( !$meta_explicitly_excluded ) {
           if ( $meta_explicitly_included ) {
-            $show_head = false;
+            $new_include = str_replace( 'meta', 'head', $include );
+            prp_log( __( "Cannot include the meta data part of the head without the summary part.\n  Parameters supplied:   include=\"" . $include . "\"\n  Parameters changed to: include=\"" . $new_include . "\"", plugin_readme_parser_domain ), '', true, false );
+            // Add the head to the include parameter value:
+            $include = $new_include;
+            // Set show_head to be true instead of false:
+            $show_head = true;
             $show_meta = true;
           } else {
             $show_head = true;
@@ -143,8 +146,8 @@ if ( !function_exists( 'readme_parser' ) ) {
           $show_meta = false;
         }
       }
-      prp_log( __( 'show head', plugin_readme_parser_domain ), ( $show_head ? 'true' : 'false' ) );
-      prp_log( __( 'show meta', plugin_readme_parser_domain ), ( $show_meta ? 'true' : 'false' ) );
+      // prp_log( __( 'show head', plugin_readme_parser_domain ), ( $show_head ? 'true' : 'false' ) );
+      // prp_log( __( 'show meta', plugin_readme_parser_domain ), ( $show_meta ? 'true' : 'false' ) );
 
       // Ensure EXCLUDE and INCLUDE parameters aren't both included
 
@@ -189,9 +192,8 @@ if ( !function_exists( 'readme_parser' ) ) {
 
         $count = count( $file_array );
         // prp_log( __( 'readme file has ' . $count . ' lines', plugin_readme_parser_domain ) );
-        $line_length = 37;
         for ( $i = 0; $i < $count; $i++ ) {
-          // prp_log( __( '  l.' . $i, plugin_readme_parser_domain ), substr( $file_array[ $i ], 0, $line_length ) . ( strlen( $file_array[ $i ] ) > $line_length ? '…' : '' ) );
+          // prp_log_truncated_line( $file_array[ $i ], $i );
 
           $add_to_output = true;
 
@@ -266,9 +268,15 @@ if ( !function_exists( 'readme_parser' ) ) {
                 }
                 $file_combined .= $crlf . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $section ) ) ) . '">' . $crlf;
                 $div_written = true;
+                if ( 'Description' === $section ) {
+                  // prp_log( 'A. ADD TO OUTPUT', $add_to_output );
+                }
               }
             } else {
               $add_to_output = false;
+              if ( 'Description' === $section ) {
+                // prp_log( 'B. ADD TO OUTPUT', $add_to_output );
+              }
             }
 
           } else {
@@ -278,6 +286,9 @@ if ( !function_exists( 'readme_parser' ) ) {
             if ( prp_is_it_excluded( $section, $exclude ) ) {
               $add_to_output = false;
               // prp_log( __( 'excluded', plugin_readme_parser_domain ), $section );
+              if ( 'Description' === $section ) {
+                // prp_log( 'C. ADD TO OUTPUT', $add_to_output );
+              }
             } else {
               if ( $section != $prev_section ) {
                 if ( $div_written ) {
@@ -285,6 +296,9 @@ if ( !function_exists( 'readme_parser' ) ) {
                 }
                 $file_combined .= $crlf . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $section ) ) ) . '">' . $crlf;
                 $div_written = true;
+                if ( 'Description' === $section ) {
+                  // prp_log( 'D. ADD TO OUTPUT', $add_to_output );
+                }
               }
             }
           }
@@ -331,13 +345,16 @@ if ( !function_exists( 'readme_parser' ) ) {
                 'exclude' => $exclude,
                 'nofollow' => $nofollow,
                 'version' => $version,
-                'download' => $download,
+                'download' => isset( $download ) ? $download : '',
                 'target' => $target,
               );
-              $add_to_output = prp_add_head_to_output( $show_head, $show_meta, $file_array[ $i ], $metadata );
+              $add_to_output = prp_add_head_meta_data_to_output( $show_head, $show_meta, $file_array[ $i ], $metadata );
             }
           }
 
+          // if ( 'Description' === $section ) {
+          //   prp_log( 'ADD TO OUTPUT', $add_to_output );
+          // }
 
           if ( 'Screenshots' === $section ) {
             // Do not display screenshots: any attempt to access the screenshots on WordPress' SVN servers is met with an HTTP 403 (forbidden) error.
@@ -346,10 +363,17 @@ if ( !function_exists( 'readme_parser' ) ) {
 
           // Add current line to output, assuming not compressed and not a second blank line
 
+          // prp_log( __( 'test', plugin_readme_parser_domain ), array(
+          //   'line no.'        => $i,
+          //   'line'            => $file_array[ $i ],
+          //   'last line blank' => $last_line_blank,
+          //   'add to output'   => $add_to_output
+          // ) );
+
           if ( ( '' != $file_array[ $i ] or !$last_line_blank ) &&
              $add_to_output ) {
             $file_combined .= $file_array[ $i ] . $crlf;
-            // prp_log( __( 'Adding l.' . $i . ' to output', plugin_readme_parser_domain ) );
+            // prp_log_truncated_line( 'Adding l.' . $i . ' ' . $file_array[ $i ] );
 
             if ( '' == $file_array[ $i ] ) {
               $last_line_blank = true;
@@ -359,7 +383,7 @@ if ( !function_exists( 'readme_parser' ) ) {
             }
 
           } else {
-            // prp_log( __(  'Not adding to output', plugin_readme_parser_domain ), $file_array[ $i ] );
+            // prp_log_truncated_line( 'Not adding l.' . $i . ' ' . $file_array[ $i ] );
 
           }
 
@@ -485,6 +509,7 @@ if ( !function_exists( 'readme_parser' ) ) {
 
     prp_toggle_global_shortcodes( $content );
 
+    // prp_log( __( '---------------- README PARSER -- end ---------', plugin_readme_parser_domain ) );
 
     return $content;
   }

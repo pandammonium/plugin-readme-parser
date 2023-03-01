@@ -40,7 +40,7 @@ function prp_log( $message_name, $message = '', $error = false, $echo = false ) 
     //   print_r( '$echo:            ' . ($echo ? 'true' : 'false' ), true ) .
     //  '</pre>';
 
-    $prefix = 'PRP | ';
+    $prefix = 'PRP | ' . ( $error ? 'Error: ' : '' );
     $header = ( '' === $message_name ) ? '' : $message_name;
     $error_style = $error ? ' class="error"' : '';
     $divider = ( '' === $message ) ? '' : ': ';
@@ -55,12 +55,15 @@ function prp_log( $message_name, $message = '', $error = false, $echo = false ) 
       break;
     }
 
-    if ( $debugging ) {
-      if ( $log_file ) {
+    if ( $debugging ||
+         ( $error && $echo ) ) {
+      if ( $log_file ||
+           ( $error && $echo ) ) {
         error_log( $prefix . $output );
+        // return $echo ? true : $output;
       }
-      if ( ( $error && $echo ) ||
-           $log_display ) {
+      if ( $log_display ||
+           ( $error && $echo ) ) {
 
         $delim = ':';
         $pos = strpos( $output, $delim );
@@ -72,9 +75,23 @@ function prp_log( $message_name, $message = '', $error = false, $echo = false ) 
         } else {
           echo '<p' . $error_style . '>' . $output . '</p>';
         }
+        // return $echo ? true : $output;
       }
     }
+  }
+}
 
+if ( !function_exists( 'prp_log_truncated_line' ) ) {
+  function prp_log_truncated_line( $line, $line_number = -1 ) {
+
+    $line_length = 46;
+
+    if ( $line_number > -1 ) {
+      $line = 'l.' . $line_number . ' ' . $line;
+    }
+    $line = substr( $line, 0, $line_length ) . ( strlen( $line ) > $line_length ? '…' : '' );
+
+    prp_log( __( $line, plugin_readme_parser_domain ) );
   }
 }
 
@@ -191,7 +208,7 @@ if ( !function_exists( 'prp_is_it_excluded' ) ) {
         }
       }
     }
-    // if ( 'meta' === $tofind || 'head' === $tofind ) {
+    // if ( 'description' === $tofind ) {
     //   prp_log( __( '  \'' . $tofind . '\' is ' . ( $return ? 'explicitly excluded' : 'not explicitly excluded' ), plugin_readme_parser_domain ) );
     // }
     return $return;
@@ -673,93 +690,6 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
   add_filter( 'the_content', 'prp_toggle_global_shortcodes', PHP_INT_MAX );
 }
 
-if ( !function_exists( 'prp_add_head_to_output' ) ) {
-  /**
-   * Determine which parts of the head, if nay, should be added to the output.
-   *
-   * The head comprises the plugin title/name, the meta data and a summary/
-   * description of the plugin. There may be one or more blank lines.
-   *
-   * The title is never displayed.
-   * The meta data is the labelled data, such as tags, licence and
-   * contributors. It is added to the output if
-   *   $show_head === $show_meta === true
-   * or if
-   *   $show_head === false and $show_meta === true.
-   * The summary is added to the output if
-   *   $show_head === $show_meta === true
-   * or if
-   *   $show_head === true and $show_meta === false.
-   *
-   * @param $show_head  boolean  If true, the head should be output. If false,
-   * the head should not be output.
-   * @param $show_meta  boolean  If true, the meta data should be
-   * output, even if the rest of the head should not be output. If false, the
-   * meta data should not be output, even if the rest of the head should be
-   * output.
-   * @param &$line_in_file  string  The line in the readme file currently
-   * being parsed. It is passed by reference so that any amendments may be
-   * made.
-   * @return boolean  True if this line should be added to the output,
-   * otherwise false.
-   */
-  function prp_add_head_to_output( $show_head, $show_meta, &$line_in_file, $metadata ) {
-    $add_to_output = true;
-
-    prp_log( __( 'show head', plugin_readme_parser_domain ), ( $show_head ? 'true' : 'false' ) );
-    prp_log( __( 'show meta', plugin_readme_parser_domain ), ( $show_meta ? 'true' : 'false' ) );
-
-    if ( $show_head ) {
-      // At least some of the head is to be output.
-      if ( $show_meta ) {
-        // prp_log( __( 'INC META, INC SUMMARY', plugin_readme_parser_domain ) );
-        // Add the full head to the output:
-        if ( prp_line_is_head_meta_data( $line_in_file ) ) {
-          $add_to_output = prp_add_head_meta_data_to_output( $show_head, $show_meta, $line_in_file );
-          if ( !$add_to_output ) {
-            if ( '' === $line_in_file[ 0 ] ) {
-              $add_to_output = false;
-            } else {
-              $add_to_output = true;
-            }
-          }
-        } else {
-          if ( '' === $line_in_file[ 0 ] ) {
-            $add_to_output = false;
-          } else {
-            $add_to_output = true;
-          }
-        }
-      } else {
-        // prp_log( __( 'INC META, EXC SUMMARY', plugin_readme_parser_domain ) );
-        // Add the summary only
-        if ( prp_line_is_head_meta_data( $line_in_file ) ) {
-          $add_to_output = false;
-        } else {
-          if ( '' === $line_in_file ) {
-            $add_to_output = false;
-          } else {
-            $add_to_output = true;
-          }
-        }
-      }
-    } else {
-      if ( $show_meta ) {
-        // prp_log( __( 'ADDING META DATA ONLY', plugin_readme_parser_domain ) );
-        // Add the head but not the meta data to the output:
-        $add_to_output = prp_add_head_meta_data_to_output( $show_head, $show_meta, $line_in_file );
-      } else {
-        // prp_log( __( 'ADDING NO HEAD', plugin_readme_parser_domain ) );
-        // Add nothing to the output.
-        $add_to_output = false;
-      }
-    }
-    // prp_log( __( 'add to output', plugin_readme_parser_domain ), ( $add_to_output ? 'true' : 'false' ) );
-
-    return $add_to_output;
-  }
-}
-
 if ( !function_exists( 'prp_line_is_head_meta_data' ) ) {
   /**
    * Tests to see whether the current line in the readme file is a line in the head meta data (e.g. tags, licence, contributors) or not.
@@ -787,42 +717,71 @@ if ( !function_exists( 'prp_line_is_head_meta_data' ) ) {
 }
 
 if ( !function_exists( 'prp_add_head_meta_data_to_output' ) ) {
+  /**
+   * Determine which parts of the head meta data, if any, should be added to the output.
+   *
+   * The head comprises the plugin title/name, the meta data and a summary/
+   * description of the plugin. There may be one or more blank lines. This function deals with the meta data only.
+   *
+   * The meta data is the labelled data, such as tags, licence and
+   * contributors. It is added to the output if
+   *   $show_head === $show_meta === true
+   * or if
+   *   $show_head === false and $show_meta === true.
+   * The summary is added to the output if
+   *   $show_head === $show_meta === true
+   * or if
+   *   $show_head === true and $show_meta === false.
+   *
+   * @param $show_head  boolean  If true, the head should be output. If false,
+   * the head should not be output.
+   * @param $show_meta  boolean  If true, the meta data should be
+   * output. If false, the meta data should not be output.
+   * @param &$line_in_file  string  The line in the readme file currently
+   * being parsed. It is passed by reference so that any amendments may be
+   * made as necessary.
+   * @return boolean  True if this line should be added to the output,
+   * otherwise false.
+   */
   function prp_add_head_meta_data_to_output( $show_head, $show_meta, &$line_in_file, $metadata ) {
+
     $add_to_output = true;
 
-    // Process meta data from top
+    if ( $show_head || $show_meta ) {
 
-    if ( $show_head ||
-         $show_meta ) {
+      // prp_log_truncated_line( 'checking ' . ( '' === $line_in_file ? '\'\'' : $line_in_file ) );
+
       if ( prp_line_is_head_meta_data( $line_in_file ) ) {
 
+        // Process meta data from top
+
         if ( !$show_meta ) {
-          prp_log( __( 'exclude all meta', plugin_readme_parser_domain ) );
+          // prp_log( __( 'exclude all meta', plugin_readme_parser_domain ) );
           $add_to_output = false;
 
         } else if ( ( 'Requires at least:' == substr( $line_in_file, 0, 18 ) ) &&
              ( prp_is_it_excluded( 'requires', $metadata[ 'exclude' ] ) ) ) {
-          prp_log( __( 'exclude WP req', plugin_readme_parser_domain ) );
+          // prp_log( __( 'exclude WP req', plugin_readme_parser_domain ) );
           $add_to_output = false;
 
         } else if ( ( 'Requires PHP:' == substr( $line_in_file, 0, 18 ) ) &&
              ( prp_is_it_excluded( 'requires php', $metadata[ 'exclude' ] ) ) ) {
-          prp_log( __( 'exclude PHP req', plugin_readme_parser_domain ) );
+          // prp_log( __( 'exclude PHP req', plugin_readme_parser_domain ) );
           $add_to_output = false;
 
         } else if ( ( 'Tested up to:' == substr( $line_in_file, 0, 13 ) ) &&
              ( prp_is_it_excluded( 'tested', $metadata[ 'exclude' ] ) ) ) {
-          prp_log( __( 'exclude test', plugin_readme_parser_domain ) );
+          // prp_log( __( 'exclude test', plugin_readme_parser_domain ) );
           $add_to_output = false;
 
         } else if ( ( 'License:' == substr( $line_in_file, 0, 8 ) ) &&
              ( prp_is_it_excluded( 'license', $metadata[ 'exclude' ] ) ) ) {
-          prp_log( __( 'exclude licence', plugin_readme_parser_domain ) );
+          // prp_log( __( 'exclude licence', plugin_readme_parser_domain ) );
           $add_to_output = false;
 
         } else if ( 'Contributors:' == substr( $line_in_file, 0, 13 ) ) {
           if ( prp_is_it_excluded( 'contributors', $metadata[ 'exclude' ] ) ) {
-          prp_log( __( 'exclude contrib', plugin_readme_parser_domain ) );
+          // prp_log( __( 'exclude contrib', plugin_readme_parser_domain ) );
             $add_to_output = false;
           } else {
             // Show contributors and tags using links to WordPress pages
@@ -831,7 +790,7 @@ if ( !function_exists( 'prp_add_head_meta_data_to_output' ) ) {
 
         } else if ( 'Tags:' == substr( $line_in_file, 0, 5 ) ) {
           if ( prp_is_it_excluded( 'tags', $metadata[ 'exclude' ] ) ) {
-          prp_log( __( 'exclude tags', plugin_readme_parser_domain ) );
+          // prp_log( __( 'exclude tags', plugin_readme_parser_domain ) );
             $add_to_output = false;
           } else {
             $line_in_file = substr( $line_in_file, 0, 6 ) . prp_strip_list( substr( $line_in_file, 6 ), 't', $metadata[ 'target' ], $metadata[ 'nofollow' ] );
@@ -839,7 +798,7 @@ if ( !function_exists( 'prp_add_head_meta_data_to_output' ) ) {
 
         } else if ( 'Donate link:' == substr( $line_in_file, 0, 12 ) ) {
           if ( prp_is_it_excluded( 'donate', $metadata[ 'exclude' ] ) ) {
-          prp_log( __( 'exclude donate', plugin_readme_parser_domain ) );
+          // prp_log( __( 'exclude donate', plugin_readme_parser_domain ) );
             $add_to_output = false;
           } else {
             // Convert the donation link to a hyperlink
@@ -849,7 +808,7 @@ if ( !function_exists( 'prp_add_head_meta_data_to_output' ) ) {
 
         } else if ( 'License URI:' == substr( $line_in_file, 0, 12 ) ) {
           if ( prp_is_it_excluded( 'license uri', $metadata[ 'exclude' ] ) ) {
-          prp_log( __( 'exclude lic uri', plugin_readme_parser_domain ) );
+          // prp_log( __( 'exclude lic uri', plugin_readme_parser_domain ) );
             $add_to_output = false;
           } else {
             // Convert the licence URL to a hyperlink
@@ -859,7 +818,7 @@ if ( !function_exists( 'prp_add_head_meta_data_to_output' ) ) {
 
         } else if ( 'Stable tag:' == substr( $line_in_file, 0, 11 ) ) {
           if ( prp_is_it_excluded( 'stable', $metadata[ 'exclude' ] ) ) {
-          prp_log( __( 'exclude stab tag', plugin_readme_parser_domain ) );
+          // prp_log( __( 'exclude stab tag', plugin_readme_parser_domain ) );
             $add_to_output = false;
           } else {
             // Link to the download given by the version
@@ -871,12 +830,14 @@ if ( !function_exists( 'prp_add_head_meta_data_to_output' ) ) {
         // As the output is meant to be XHTML, the BR tag needs to be closed. The proper way to do this is to have no space before the slash.
 
         $line_in_file .= '<br/>';
+      } else {
+        // prp_log( __( 'line is not meta data; add to output', plugin_readme_parser_domain ), ( $add_to_output ? 'true' : 'false' ) );
       }
     } else {
       $add_to_out = false;
     }
 
-    prp_log( __( 'add head meta data to output', plugin_readme_parser_domain ), ( $add_to_output ? 'true' : 'false' ) );
+    // prp_log( __( 'add head meta data to output', plugin_readme_parser_domain ), ( $add_to_output ? 'true' : 'false' ) );
     return $add_to_output;
   }
 }
@@ -898,18 +859,18 @@ if ( !function_exists( 'prp_report_error' ) ) {
    * formatted error message instead of echoing it.
    * @return     string / true  If $echo === true, the function outputs the error message using echo and returns true. If $echo is false, the function returns the formatted error message instead of echoing it.
    */
-  function prp_report_error( $plugin_name, $error, $echo = true ) {
+  function prp_report_error( $error, $plugin_name, $echo = true ) {
 
-    // prp_log( $error, $plugin_name, true, $echo );
+    prp_log( $plugin_name, $error, true, false );
 
-    $output = '<p class="error">' . $plugin_name . ': ' . $error . '</p>';
+    // $output = '<p class="error">' . $plugin_name . ': ' . $error . '</p>';
 
-    if ( $echo ) {
-      echo $output;
-      return true;
-    } else {
-      return $output;
-    }
+    // if ( $echo ) {
+    //   echo $output;
+    //   return true;
+    // } else {
+    //   return $output;
+    // }
 
   }
 }
