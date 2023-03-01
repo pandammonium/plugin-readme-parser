@@ -898,7 +898,7 @@ if ( !function_exists( 'prp_report_error' ) ) {
    * formatted error message instead of echoing it.
    * @return     string / true  If $echo === true, the function outputs the error message using echo and returns true. If $echo is false, the function returns the formatted error message instead of echoing it.
    */
-  function prp_report_error( $plugin_domain, $error, $echo = true ) {
+  function prp_report_error( $plugin_name, $error, $echo = true ) {
 
     // prp_log( $error, $plugin_name, true, $echo );
 
