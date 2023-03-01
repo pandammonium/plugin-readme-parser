@@ -528,54 +528,6 @@ if ( !function_exists( 'prp_get_list' ) ) {
 }
 
 if ( !function_exists( 'prp_normalise_parameters' ) ) {
-/**
- * Normalises the quotation marks to straight ones from curly ones.
- * Fixes the erroneous array member created by having a space in 'Upgrade
- * Notice'.
- *
- * @param  $text  string  The text to normalise the quotation marks in.
- * @return        string  The text containing normalised quotation marks.
- */
-  define( 'QUOTES', array(
-   '“' => '',
-   '”' => '',
-   '‘' => '',
-   '’' => '',
-   '&#8220;' => '',
-   '&#8221;' => ''
-  ) );
-  function prp_normalise_parameters( $text ) {
-
-    if ( is_string( $text ) ) {
-      $normalised_text = str_replace(array_keys(QUOTES), array_values(QUOTES), $text);
-      // prp_log( __( 'Normalised ', plugin_readme_parser_domain ) . $text );
-      // prp_log( __( '        to ', plugin_readme_parser_domain ) . $normalised_text  );
-      return $normalised_text;
-
-    } else if ( is_array($text ) ) {
-      $normalised_text = array();
-      foreach ( $text as $key => $value ) {
-        // prp_log( $key . ': ' . $value );
-        $normalised_text[$key] = str_replace(array_keys(QUOTES), array_values(QUOTES), $text[$key]);
-        // prp_log( $key . ': ' . $normalised_text[$key] );
-      }
-      if ( isset( $normalised_text[0] ) ) {
-        if ( isset( $normalised_text[ 'exclude' ] ) ) {
-          $normalised_text['exclude'] .= ' ' . $normalised_text[0];
-        } else if ( isset( $normalised_text[ 'include' ] ) ) {
-          $normalised_text['include'] .= ' ' . $normalised_text[0];
-        } else {
-          // prp_log( __( 'Erroneous parameter found', plugin_readme_parser_domain ) );
-        }
-        unset( $normalised_text[0] );
-      }
-      return $normalised_text;
-
-    } else {
-      // prp_log( $text, 'Normalise: wanted a string or an array; got \'' . gettype( $text ) . '\':'  );
-      return $text;
-    }
-  }
 }
 
 if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {

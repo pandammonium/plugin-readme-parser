@@ -68,10 +68,10 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // Extract parameters
 
       // prp_log( __( 'Parameters (raw)', plugin_readme_parser_domain), $paras );
-      $paras = prp_normalise_parameters( $paras );
-      // prp_log( __( 'Parameters (normalised)', plugin_readme_parser_domain), $paras );
+      $this->parameters = $this->normalise_parameters( $paras );
+      // prp_log( __( 'Parameters (normalised)', plugin_readme_parser_domain), $this->parameters );
 
-      extract( shortcode_atts( array( 'exclude' => '', 'ext' => '', 'hide' => '', 'include' => '', 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $paras ) );
+      extract( shortcode_atts( array( 'exclude' => '', 'ext' => '', 'hide' => '', 'include' => '', 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $this->parameters ) );
 
       // Get cached output
 
@@ -82,7 +82,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
 
       // prp_log( __( 'shortcode content', plugin_readme_parser_domain ), $content );
-      // prp_log( __( 'shortcode parameters', plugin_readme_parser_domain ), $paras );
+      // prp_log( __( 'shortcode parameters', plugin_readme_parser_domain ), $this->parameters );
 
       if ( !$result ) {
 
@@ -506,7 +506,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
           }
         }
 
-        // Send the resultant code back, plus encapsulating DIV and version comments. Use double-quotes to permit linebreaks (\n)
+        // Send the resultant code back, plus encapsulating DIV and version comments. Use double quotes to permit linebreaks (\n)
 
         $content = "\n<!-- " . plugin_readme_parser_name . " v" . plugin_readme_parser_version . " -->\n<div class=\"np-notepad\">" . $my_html . "</div>\n<!-- End of " . plugin_readme_parser_name . " code -->\n";
 
@@ -550,7 +550,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       prp_toggle_global_shortcodes( $content );
 
-      extract( shortcode_atts( array( 'nofollow' => '' ), $paras ) );
+      $this->parameters = $this->normalise_parameters( $paras );
+
+      extract( shortcode_atts( array( 'nofollow' => '' ), $this->parameters ) );
 
       $output = '';
 
@@ -644,7 +646,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       prp_toggle_global_shortcodes( $content );
 
-      extract( shortcode_atts( array( 'name' => '', 'target' => '_blank', 'nofollow' => '', 'data' => '', 'cache' => '5' ), $paras ) );
+      $this->parameters = $this->normalise_parameters( $paras );
+
+      extract( shortcode_atts( array( 'name' => '', 'target' => '_blank', 'nofollow' => '', 'data' => '', 'cache' => '5' ), $this->parameters ) );
 
       $result = false;
       $output = '';
@@ -775,6 +779,47 @@ if ( !class_exists( 'Generate_Output' ) ) {
       prp_toggle_global_shortcodes( $content );
 
       return do_shortcode( $output );
+    }
+
+    /**
+     * Normalises the quotation marks to straight ones from curly ones.
+     * Fixes the erroneous array member created by having a space in 'Upgrade
+     * Notice'.
+     *
+     * @param  $parameters  string  The text to normalise the quotation marks in.
+     * @return        string  The text containing normalised quotation marks.
+     */
+    private function normalise_parameters( $parameters ) {
+
+      if ( is_string( $parameters ) ) {
+        $normalised_parameters = str_replace(array_keys(self::QUOTES), array_values(self::QUOTES), $parameters);
+        // prp_log( __( 'Normalised ', plugin_readme_parser_domain ) . $parameters );
+        // prp_log( __( '        to ', plugin_readme_parser_domain ) . $normalised_parameters  );
+        return $normalised_parameters;
+
+      } else if ( is_array($parameters ) ) {
+        $normalised_parameters = array();
+        foreach ( $parameters as $key => $value ) {
+          // prp_log( $key . ': ' . $value );
+          $normalised_parameters[$key] = str_replace(array_keys(self::QUOTES), array_values(self::QUOTES), $parameters[$key]);
+          // prp_log( $key . ': ' . $normalised_parameters[$key] );
+        }
+        if ( isset( $normalised_parameters[0] ) ) {
+          if ( isset( $normalised_parameters[ 'exclude' ] ) ) {
+            $normalised_parameters['exclude'] .= ' ' . $normalised_parameters[0];
+          } else if ( isset( $normalised_parameters[ 'include' ] ) ) {
+            $normalised_parameters['include'] .= ' ' . $normalised_parameters[0];
+          } else {
+            // prp_log( __( 'Erroneous parameter found', plugin_readme_parser_domain ) );
+          }
+          unset( $normalised_parameters[0] );
+        }
+        return $normalised_parameters;
+
+      } else {
+        // prp_log( $parameters, 'Normalise: wanted a string or an array; got \'' . gettype( $parameters ) . '\':'  );
+        return $parameters;
+      }
     }
   }
 
