@@ -186,12 +186,9 @@ Plugin-readme Parser uses [PHP Markdown](https://michelf.ca/projects/php-markdow
 
 == Installation ==
 
-Plugin-readme Parser can be found and installed via the Plugin menu within WordPress administration (Plugins -> Add New). Alternatively, it can be downloaded from WordPress.org and installed manually:
+Follow [WordPress' instructions for installation of plugins](https://wordpress.org/support/article/managing-plugins/#installing-plugins-1) to install this plugin.
 
-1. Upload the entire `plugin-readme-parser` folder to your `wp-content/plugins/` directory.
-2. Activate the plugin through the 'Plugins' menu in WordPress administration.
-
-Voilà, it's ready to go.
+Now you're ready to add a shortcode to show off your plugin readme file.
 
 == Frequently Asked Questions ==
 
