@@ -1015,17 +1015,21 @@ if ( !class_exists( 'Generate_Output' ) ) {
   if ( !function_exists( 'readme_parser' )) {
     function readme_parser( $paras = '', $content = '' ) {
       global $generator;
+      // $generator = new Generate_Output();
       return $generator->readme_parser( $paras, $content );
     }
   }
   if ( !function_exists( 'readme_banner' )) {
     function readme_banner( $paras = '', $content = '' ) {
+      global $generator;
+      // $generator = new Generate_Output();
       return $generator->readme_banner( $paras, $content );
     }
   }
   if ( !function_exists( 'readme_info' )) {
     function readme_info( $paras = '', $content = '' ) {
       global $generator;
+      // $generator = new Generate_Output();
       return $generator->readme_info( $paras, $content);
     }
   }
