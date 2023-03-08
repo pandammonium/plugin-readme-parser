@@ -14,7 +14,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
    */
   class Generate_Output {
 
-    private $parameters = '';
+    private array $parameters = array();
     private $content = '';
 
     private array $file_array = array();
@@ -26,6 +26,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private $cache = '';
     private $cache_key = '';
+
     private $exclude = '';
     private $include = '';
     private $hide = '';
@@ -49,25 +50,14 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private $section = '';
     private $prev_section = '';
-    // private $last_line_blank = true;
-    // private $div_written = false;
+    private $last_line_blank = true;
+    private $div_written = false;
+    private $add_to_output = true;
     private $code = false;
     private $file_combined = '';
     private const LINE_END = "\r\n";
 
     private $my_html = '';
-
-
-    private $meta = '';
-
-    // private static $c = 0;
-    // private const COLOURS = array (
-    //   0 => 'red',
-    //   1 => 'orange',
-    //   2 => 'yellow',
-    //   3 => 'green',
-    //   4 => 'blue',
-    // );
 
     private const QUOTES = array(
      '“' => '',
@@ -77,6 +67,15 @@ if ( !class_exists( 'Generate_Output' ) ) {
      '&#8220;' => '',
      '&#8221;' => ''
     );
+
+    // private static $c = 0;
+    // private const COLOURS_DEBUG = array (
+    //   0 => 'red',
+    //   1 => 'orange',
+    //   2 => 'yellow',
+    //   3 => 'green',
+    //   4 => 'blue',
+    // );
 
     /**
      * Output the readme
@@ -99,8 +98,11 @@ if ( !class_exists( 'Generate_Output' ) ) {
      */
     public function readme_parser( array $paras = array(), string $content = '' ): string {
 
+
       // prp_log( __( '---------------- README PARSER ----------------', plugin_readme_parser_domain ) );
-      // prp_log( __( '---------------- ' . self::COLOURS[ self::$c++ ], plugin_readme_parser_domain ) );
+      // prp_log( __( '---------------- ' . self::COLOURS_DEBUG[ self::$c++ ], plugin_readme_parser_domain ) );
+
+      $this->reset();
 
       $this->content = $content;
       prp_toggle_global_shortcodes( $this->content );
@@ -113,16 +115,21 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       extract( shortcode_atts( array( 'exclude' => '', 'hide' => '', 'include' => '', 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $this->parameters ) );
 
+      // prp_log( 'cache', $cache );
+
       // Get cached output
 
       $result = false;
-      if ( is_numeric( $cache ) ) {
-        $cache_key = 'prp_' . md5( $exclude . $hide . $include . $target . $nofollow . $ignore . $cache . $version . $mirror . $content );
-        $result = get_transient( $cache_key );
+      $this->cache = $cache;
+      if ( is_numeric( $this->cache ) ) {
+        $this->cache_key = 'prp_' . md5( $exclude . $hide . $include . $target . $nofollow . $ignore . $this->cache . $version . $mirror . $content );
+        $result = get_transient( $this->cache_key );
       }
 
       // prp_log( __( 'shortcode content', plugin_readme_parser_domain ), $content );
       // prp_log( __( 'shortcode parameters', plugin_readme_parser_domain ), $this->parameters );
+
+      // prp_log( __( 'result', plugin_readme_parser_domain ), $result );
 
       if ( !$result ) {
 
@@ -148,47 +155,13 @@ if ( !class_exists( 'Generate_Output' ) ) {
           $this->nofollow = ' rel="nofollow"';
         }
 
+        // Work out in advance whether links should be shown
+
         $this->should_links_be_shown();
 
-        // Work out in advance whether head should be shown
+        // Work out in advance whether the head should be shown
 
-        $this->show_head = false;
-        $this->show_meta = false;
-
-        $this->head_explicitly_excluded = prp_is_it_excluded( 'head', $exclude );
-        $this->head_explicitly_included = prp_is_it_excluded( 'head', $include );
-        $this->meta_explicitly_excluded = prp_is_it_excluded( 'meta', $exclude );
-        $this->meta_explicitly_included = prp_is_it_excluded( 'meta', $include );
-
-        // prp_log( __( 'head exp exc', plugin_readme_parser_domain ), ( $this->head_explicitly_excluded ? 'true' : 'false' ) );
-        // prp_log( __( 'head exp inc', plugin_readme_parser_domain ), ( $this->head_explicitly_included ? 'true' : 'false' ) );
-        // prp_log( __( 'meta exp exc', plugin_readme_parser_domain ), ( $this->meta_explicitly_excluded ? 'true' : 'false' ) );
-        // prp_log( __( 'meta exp inc', plugin_readme_parser_domain ), ( $this->meta_explicitly_included ? 'true' : 'false' ) );
-
-        if ( !$this->head_explicitly_excluded ) {
-          if ( !$this->meta_explicitly_excluded ) {
-            if ( $this->meta_explicitly_included ) {
-              $new_include = str_replace( 'meta', 'head', $this->include );
-              // prp_log( __( "Cannot include the meta data part of the head without the summary part.\n  Parameters supplied:   include=\"" . $this->include . "\"\n  Parameters changed to: include=\"" . $new_include . "\"", plugin_readme_parser_domain ), '', true, false );
-              // Add the head to the include parameter value:
-              $this->include = $new_include;
-              // Set show_head to be true instead of false:
-              $this->show_head = true;
-              $this->show_meta = true;
-            } else {
-              $this->show_head = true;
-              $this->show_meta = true;
-            }
-          }
-        }
-        if ( !$this->head_explicitly_included ) {
-          if ( $this->meta_explicitly_excluded ) {
-            $this->show_head = true;
-            $this->show_meta = false;
-          }
-        }
-        // prp_log( __( 'show head', plugin_readme_parser_domain ), ( $this->show_head ? 'true' : 'false' ) );
-        // prp_log( __( 'show meta', plugin_readme_parser_domain ), ( $show_meta ? 'true' : 'false' ) );
+        $this->should_head_be_shown();
 
         // Ensure EXCLUDE and INCLUDE parameters aren't both included
 
@@ -219,24 +192,16 @@ if ( !class_exists( 'Generate_Output' ) ) {
           $this->file_array = preg_split( "/((\r(?!\n))|((?<!\r)\n)|(\r\n))/", $this->file_data[ 'file' ] );
           // prp_log( __( 'file_array', plugin_readme_parser_domain ), $this->file_array, false, true );
 
-          // // Set initial variables // Initialised with these values
-
-          // $this->section = '';
-          // $this->prev_section = '';
-          $last_line_blank = true;
-          $div_written = false;
-          // $this->code = false;
-          // self::LINE_END = "\r\n";
-          // $this->file_combined = '';
-
           // Count the number of lines and read through the array
+
+
 
           $count = count( $this->file_array );
           // prp_log( __( 'readme file has ' . $count . ' lines', plugin_readme_parser_domain ) );
           for ( $i = 0; $i < $count; $i++ ) {
             // prp_log_truncated_line( $this->file_array[ $i ], $i );
 
-            $add_to_output = true;
+            $this->add_to_output = true;
 
             // Remove non-visible character from input - various characters can sneak into
             // text files and this can affect output
@@ -290,7 +255,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
               }
 
               $this->plugin_title = $this->section;
-              $add_to_output = false;
+              $this->add_to_output = false;
               $this->section = 'head';
               // prp_log( __( 'section', plugin_readme_parser_domain ), $this->section );
 
@@ -304,17 +269,17 @@ if ( !class_exists( 'Generate_Output' ) ) {
                 // prp_log( __( 'included', plugin_readme_parser_domain ), $this->section );
 
                 if ( $this->section != $this->prev_section ) {
-                  if ( $div_written ) {
+                  if ( $this->div_written ) {
                     $this->file_combined .= '</div>' . self::LINE_END;
                   }
                   $this->file_combined .= self::LINE_END . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $this->section ) ) ) . '">' . self::LINE_END;
-                  $div_written = true;
+                  $this->div_written = true;
                   if ( 'Description' === $this->section ) {
                     // prp_log( 'A. ADD TO OUTPUT', $add_to_output );
                   }
                 }
               } else {
-                $add_to_output = false;
+                $this->add_to_output = false;
                 if ( 'Description' === $this->section ) {
                   // prp_log( 'B. ADD TO OUTPUT', $add_to_output );
                 }
@@ -325,18 +290,18 @@ if ( !class_exists( 'Generate_Output' ) ) {
               // Is this an excluded section?
 
               if ( prp_is_it_excluded( $this->section, $this->exclude ) ) {
-                $add_to_output = false;
+                $this->add_to_output = false;
                 // prp_log( __( 'excluded', plugin_readme_parser_domain ), $this->section );
                 if ( 'Description' === $this->section ) {
                   // prp_log( 'C. ADD TO OUTPUT', $add_to_output );
                 }
               } else {
                 if ( $this->section != $this->prev_section ) {
-                  if ( $div_written ) {
+                  if ( $this->div_written ) {
                     $this->file_combined .= '</div>' . self::LINE_END;
                   }
                   $this->file_combined .= self::LINE_END . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $this->section ) ) ) . '">' . self::LINE_END;
-                  $div_written = true;
+                  $this->div_written = true;
                   if ( 'Description' === $this->section ) {
                     // prp_log( 'D. ADD TO OUTPUT', $add_to_output );
                   }
@@ -346,11 +311,11 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
             // Is it an excluded line?
 
-            if ( $add_to_output ) {
+            if ( $this->add_to_output ) {
               $exclude_loop = 1;
               while ( $exclude_loop <= $this->ignore[ 0 ] ) {
                 if ( false !== strpos( $this->file_array[ $i ], $this->ignore[ $exclude_loop ], 0 ) ) {
-                  $add_to_output = false;
+                  $this->add_to_output = false;
                 }
               $exclude_loop++;
               }
@@ -377,19 +342,19 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
             }
 
-            if ( $add_to_output ) {
+            if ( $this->add_to_output ) {
 
               // prp_log( __( 'SECTION', plugin_readme_parser_domain ), $this->section );
 
               if ( 'head' === $this->section ) {
-                $metadata = array(
+                $this->metadata = array(
                   'exclude' => $this->exclude,
                   'nofollow' => $this->nofollow,
                   'version' => $this->version,
                   'download' => isset( $this->download ) ? $this->download : '',
                   'target' => $this->target,
                 );
-                $add_to_output = prp_add_head_meta_data_to_output( $this->show_head, $this->show_meta, $this->file_array[ $i ], $this->metadata );
+                $this->add_to_output = prp_add_head_meta_data_to_output( $this->show_head, $this->show_meta, $this->file_array[ $i ], $this->metadata );
               }
             }
 
@@ -399,7 +364,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
             if ( 'Screenshots' === $this->section ) {
               // Do not display screenshots: any attempt to access the screenshots on WordPress' SVN servers is met with an HTTP 403 (forbidden) error.
-              $add_to_output = false;
+              $this->add_to_output = false;
             }
 
             // Add current line to output, assuming not compressed and not a second blank line
@@ -407,20 +372,20 @@ if ( !class_exists( 'Generate_Output' ) ) {
             // prp_log( __( 'test', plugin_readme_parser_domain ), array(
             //   'line no.'        => $i,
             //   'line'            => $this->file_array[ $i ],
-            //   'last line blank' => $last_line_blank,
+            //   'last line blank' => $this->last_line_blank,
             //   'add to output'   => $this->add_to_output
             // ) );
 
-            if ( ( '' != $this->file_array[ $i ] or !$last_line_blank ) &&
-               $add_to_output ) {
+            if ( ( '' != $this->file_array[ $i ] or !$this->last_line_blank ) &&
+               $this->add_to_output ) {
               $this->file_combined .= $this->file_array[ $i ] . self::LINE_END;
               // prp_log_truncated_line( 'Adding l.' . $i . ' ' . $this->file_array[ $i ] );
 
               if ( '' == $this->file_array[ $i ] ) {
-                $last_line_blank = true;
+                $this->last_line_blank = true;
 
               } else {
-                $last_line_blank = false;
+                $this->last_line_blank = false;
               }
 
             } else {
@@ -571,6 +536,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       // prp_log( __( 'Readme banner:', plugin_readme_parser_domain ) );
 
+      $this->reset();
 
       prp_toggle_global_shortcodes( $content );
 
@@ -667,6 +633,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       // prp_log( __( 'Readme Info', plugin_readme_parser_domain ) );
 
+      $this->reset();
 
       prp_toggle_global_shortcodes( $content );
 
@@ -848,8 +815,6 @@ if ( !class_exists( 'Generate_Output' ) ) {
      */
     private function should_links_be_shown(): void {
 
-      // Work out in advance whether links should be shown
-
       $this->show_links = false;
       if ( '' != $this->include ) {
         if ( prp_is_it_excluded( 'links', $this->include ) ) {
@@ -863,6 +828,94 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // prp_log( __( 'show links', plugin_readme_parser_domain ), ( $this->show_links ? 'true' : 'false' ) );
     }
 
+    /**
+     */
+    private function should_head_be_shown(): void {
+
+      $this->show_head = false;
+      $this->show_meta = false;
+
+      $this->head_explicitly_excluded = prp_is_it_excluded( 'head', $this->exclude );
+      $this->head_explicitly_included = prp_is_it_excluded( 'head', $this->include );
+      $this->meta_explicitly_excluded = prp_is_it_excluded( 'meta', $this->exclude );
+      $this->meta_explicitly_included = prp_is_it_excluded( 'meta', $this->include );
+
+      // prp_log( __( 'head exp exc', plugin_readme_parser_domain ), ( $this->head_explicitly_excluded ? 'true' : 'false' ) );
+      // prp_log( __( 'head exp inc', plugin_readme_parser_domain ), ( $this->head_explicitly_included ? 'true' : 'false' ) );
+      // prp_log( __( 'meta exp exc', plugin_readme_parser_domain ), ( $this->meta_explicitly_excluded ? 'true' : 'false' ) );
+      // prp_log( __( 'meta exp inc', plugin_readme_parser_domain ), ( $this->meta_explicitly_included ? 'true' : 'false' ) );
+
+      if ( !$this->head_explicitly_excluded ) {
+        if ( !$this->meta_explicitly_excluded ) {
+          if ( $this->meta_explicitly_included ) {
+            $new_include = str_replace( 'meta', 'head', $this->include );
+            // prp_log( __( "Cannot include the meta data part of the head without the summary part.\n  Parameters supplied:   include=\"" . $this->include . "\"\n  Parameters changed to: include=\"" . $new_include . "\"", plugin_readme_parser_domain ), '', true, false );
+            // Add the head to the include parameter value:
+            $this->include = $new_include;
+            // Set show_head to be true instead of false:
+            $this->show_head = true;
+            $this->show_meta = true;
+          } else {
+            $this->show_head = true;
+            $this->show_meta = true;
+          }
+        }
+      }
+      if ( !$this->head_explicitly_included ) {
+        if ( $this->meta_explicitly_excluded ) {
+          $this->show_head = true;
+          $this->show_meta = false;
+        }
+      }
+      // prp_log( __( 'show head', plugin_readme_parser_domain ), ( $this->show_head ? 'true' : 'false' ) );
+      // prp_log( __( 'show meta', plugin_readme_parser_domain ), ( $this->show_meta ? 'true' : 'false' ) );
+    }
+
+    private function reset() {
+      $this->parameters = array();
+      $this->content = '';
+
+      $this->file_array = array();
+      $this->file_data = '';
+
+      $this->plugin_url = '';
+      $this->plugin_name = '';
+      $this->plugin_title = '';
+
+      $this->cache = '';
+      $this->cache_key = '';
+      $this->exclude = '';
+      $this->include = '';
+      $this->hide = '';
+      $this->links = '';
+      $this->ignore = '';
+      $this->mirror = '';
+      $this->nofollow = '';
+      $this->version = '';
+      $this->target = '';
+      $this->download = '';
+      $this->metadata = '';
+
+      $this->show_links = false;
+      $this->show_head = false;
+      $this->show_meta = false;
+
+      $this->head_explicitly_excluded = false;
+      $this->head_explicitly_included = false;
+      $this->meta_explicitly_excluded = false;
+      $this->meta_explicitly_included = false;
+
+      $this->section = '';
+      $this->prev_section = '';'';
+      $this->last_line_blank = true;
+      $this->div_written = false;
+      $this->code = false;
+      $this->file_combined = '';
+
+      $this->my_html = '';
+
+      // prp_log( __('all the things have been reset', plugin_readme_parser_domain), $this );
+    }
 
   }
 
