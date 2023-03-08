@@ -40,25 +40,31 @@ function prp_log( $message_name, $message = '', $error = false, $echo = false ) 
     //   print_r( '$echo:            ' . ($echo ? 'true' : 'false' ), true ) .
     //  '</pre>';
 
-    if ( $error ) {
-      return prp_report_error( $message, plugin_readme_parser_name );
+    $header = ( '' === $message_name ) ? '' : $message_name;
+    $divider = ( '' === $message ) ? '' : ': ';
+    $message_type = gettype( $message );
+    $output = '';
+    switch ( $message_type ) {
+      case 'string':
+      case 'integer':
+        $output = print_r( $header . $divider . $message, true );
+      break;
+      default:
+        $output = print_r( $header . $divider, true ) . var_export( $message, true );
+      break;
+    }
+
+    if ( $error && $echo ) {
+      return prp_report_error( $output, plugin_readme_parser_name, $echo );
 
     } else {
-      $prefix = 'PRP | ' . ( $error ? 'Error: ' : '' );
-      $header = ( '' === $message_name ) ? '' : $message_name;
-      $divider = ( '' === $message ) ? '' : ': ';
-      $message_type = gettype( $message );
-      $output = '';
-      switch ( $message_type ) {
-        case 'string':
-        case 'integer':
-          $output = print_r( $header . $divider . $message, true );
-        break;
-        default:
-          $output = print_r( $header . $divider, true ) . var_export( $message, true );
-        break;
-      }
+      // $prefix = 'PRP | ';
+      $prefix = plugin_readme_parser_name . ' | ';
 
+      if ( ( $debugging && $log_file ) ||
+           ( $error && !$echo ) ) {
+        error_log( $prefix . $output );
+      }
       if ( ( $debugging && $log_display ) ||
            ( $echo ) ) {
         $delim = ':';
@@ -76,9 +82,7 @@ function prp_log( $message_name, $message = '', $error = false, $echo = false ) 
           break;
         }
       }
-      if ( $debugging && $log_file ) {
-        error_log( $output );
-      }
+      return true;
     }
   }
 }
@@ -823,13 +827,17 @@ if ( !function_exists( 'prp_report_error' ) ) {
    */
   function prp_report_error( $error, $plugin_name, $echo = true ): string {
 
-    $output = '<p class="error">' . $plugin_name . ' error: ' . $error . '</p>';
 
     if ( $echo ) {
+
+      $output = '<p class="error">' . $plugin_name . ' error: ' . $error . '</p>';
+
       echo $output;
       return true;
+
     } else {
-      return $output;
+      prp_log( $plugin_name, $error, false, $echo );
+      return $error;
     }
 
   }
