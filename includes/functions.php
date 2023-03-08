@@ -47,11 +47,12 @@ function prp_log( $message_name, $message = '', $error = false, $echo = false ) 
     $message_type = gettype( $message );
     $output = '';
     switch ( $message_type ) {
-      case 'array':
-        $output = print_r( $header, true ) . $divider . print_r( $message, true );
+      case 'string':
+      case 'integer':
+        $output = $header . $divider . $message;
       break;
       default:
-        $output = $header . $divider . $message;
+        $output = $header . $divider . var_export( $message, true );
       break;
     }
 
