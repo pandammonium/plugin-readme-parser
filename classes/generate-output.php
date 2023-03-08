@@ -275,13 +275,13 @@ if ( !class_exists( 'Generate_Output' ) ) {
                   $this->file_combined .= self::LINE_END . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $this->section ) ) ) . '">' . self::LINE_END;
                   $this->div_written = true;
                   if ( 'Description' === $this->section ) {
-                    // prp_log( 'A. ADD TO OUTPUT', $add_to_output );
+                    // prp_log( 'A. ADD TO OUTPUT', $this->add_to_output );
                   }
                 }
               } else {
                 $this->add_to_output = false;
                 if ( 'Description' === $this->section ) {
-                  // prp_log( 'B. ADD TO OUTPUT', $add_to_output );
+                  // prp_log( 'B. ADD TO OUTPUT', $this->add_to_output );
                 }
               }
 
@@ -293,7 +293,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
                 $this->add_to_output = false;
                 // prp_log( __( 'excluded', plugin_readme_parser_domain ), $this->section );
                 if ( 'Description' === $this->section ) {
-                  // prp_log( 'C. ADD TO OUTPUT', $add_to_output );
+                  // prp_log( 'C. ADD TO OUTPUT', $this->add_to_output );
                 }
               } else {
                 if ( $this->section != $this->prev_section ) {
@@ -303,7 +303,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
                   $this->file_combined .= self::LINE_END . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $this->section ) ) ) . '">' . self::LINE_END;
                   $this->div_written = true;
                   if ( 'Description' === $this->section ) {
-                    // prp_log( 'D. ADD TO OUTPUT', $add_to_output );
+                    // prp_log( 'D. ADD TO OUTPUT', $this->add_to_output );
                   }
                 }
               }
@@ -342,6 +342,10 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
             }
 
+            // if ( 'head' === $this->section ) {
+            //   prp_log( 'Just before \'head\', $this->add_to_output===' . ( $this->add_to_output ? 'true' : 'false' ) );
+            // }
+
             if ( $this->add_to_output ) {
 
               // prp_log( __( 'SECTION', plugin_readme_parser_domain ), $this->section );
@@ -359,7 +363,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
             }
 
             // if ( 'Description' === $this->section ) {
-            //   prp_log( 'ADD TO OUTPUT', $add_to_output );
+            //   prp_log( 'ADD TO OUTPUT', $this->add_to_output );
             // }
 
             if ( 'Screenshots' === $this->section ) {
@@ -508,7 +512,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       } else {
 
-        // // prp_log( __( 'transient already cached', plugin_readme_parser_domain ) );
+        prp_log( __( 'transient already cached', plugin_readme_parser_domain ) );
 
         $this->content = $result;
       }
@@ -805,7 +809,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
         return $normalised_parameters;
 
       } else {
-        prp_log( 'Normalise: wanted a string or an array; got \'' . gettype( $parameters ) . '\'', $parameters, true );
+        // prp_log( 'Normalise: wanted a string or an array; got \'' . gettype( $parameters ) . '\'', $parameters, true );
         return $parameters;
       }
     }
@@ -825,7 +829,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
           $this->show_links = true;
         }
       }
-      // prp_log( __( 'show links', plugin_readme_parser_domain ), ( $this->show_links ? 'true' : 'false' ) );
+      // prp_log( __( 'show links (class)    ', plugin_readme_parser_domain ), ( $this->show_links ? 'true' : 'false' ) );
     }
 
     /**

@@ -93,7 +93,7 @@ if ( !function_exists( 'prp_log_truncated_line' ) ) {
     }
     $line = substr( $line, 0, $line_length ) . ( strlen( $line ) > $line_length ? '…' : '' );
 
-    prp_log( __( $line, plugin_readme_parser_domain ) );
+    // prp_log( __( $line, plugin_readme_parser_domain ) );
   }
 }
 
@@ -211,7 +211,7 @@ if ( !function_exists( 'prp_is_it_excluded' ) ) {
       }
     }
     // if ( 'description' === $tofind ) {
-    //   prp_log( __( '  \'' . $tofind . '\' is ' . ( $return ? 'explicitly excluded' : 'not explicitly excluded' ), plugin_readme_parser_domain ) );
+    //   // prp_log( __( '  \'' . $tofind . '\' is ' . ( $return ? 'explicitly excluded' : 'not explicitly excluded' ), plugin_readme_parser_domain ) );
     // }
     return $return;
   }
@@ -361,10 +361,10 @@ if ( !function_exists( 'prp_check_img_exists' ) ) {
     return false;
 
     // if ( $file_exists ) {
-    //   prp_log( __( '\'' . $filename . $ext . '\' exists: true', plugin_readme_parser_domain ) );
+    //   // prp_log( __( '\'' . $filename . $ext . '\' exists: true', plugin_readme_parser_domain ) );
     //   return $ext;
     // } else {
-    //   prp_log( __( '\'' . $filename . $ext . '\' exists: false', plugin_readme_parser_domain ) );
+    //   // prp_log( __( '\'' . $filename . $ext . '\' exists: false', plugin_readme_parser_domain ) );
     //   return false;
     // }
   }
@@ -699,6 +699,13 @@ if ( !function_exists( 'prp_add_head_meta_data_to_output' ) ) {
    */
   function prp_add_head_meta_data_to_output( $show_head, $show_meta, &$line_in_file, $metadata ) {
 
+    // prp_log( 'Args of prp_add_head_meta_data_to_output()', array(
+    //   'show head' => $show_head,
+    //   'show meta' => $show_meta,
+    //   'line in file' => $line_in_file,
+    //   'meta data' => $metadata
+    // ) );
+
     $add_to_output = true;
 
     if ( $show_head || $show_meta ) {
@@ -785,7 +792,8 @@ if ( !function_exists( 'prp_add_head_meta_data_to_output' ) ) {
 
         $line_in_file .= '<br/>';
       } else {
-        // prp_log( __( 'line is not meta data; add to output', plugin_readme_parser_domain ), ( $add_to_output ? 'true' : 'false' ) );
+        // prp_log( __( 'line is not meta data but is in head; add to output', plugin_readme_parser_domain ), ( $add_to_output ? 'true' : 'false' ) );
+        return $show_head;
       }
     } else {
       $add_to_out = false;
@@ -813,18 +821,16 @@ if ( !function_exists( 'prp_report_error' ) ) {
    * formatted error message instead of echoing it.
    * @return     string / true  If $echo === true, the function outputs the error message using echo and returns true. If $echo is false, the function returns the formatted error message instead of echoing it.
    */
-  function prp_report_error( $error, $plugin_name, $echo = true ) {
+  function prp_report_error( $error, $plugin_name, $echo = true ): string {
 
-    prp_log( $plugin_name, $error, true, false );
+    $output = '<p class="error">' . $plugin_name . ' error: ' . $error . '</p>';
 
-    // $output = '<p class="error">' . $plugin_name . ': ' . $error . '</p>';
-
-    // if ( $echo ) {
-    //   echo $output;
-    //   return true;
-    // } else {
-    //   return $output;
-    // }
+    if ( $echo ) {
+      echo $output;
+      return true;
+    } else {
+      return $output;
+    }
 
   }
 }
