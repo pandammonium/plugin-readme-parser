@@ -40,43 +40,44 @@ function prp_log( $message_name, $message = '', $error = false, $echo = false ) 
     //   print_r( '$echo:            ' . ($echo ? 'true' : 'false' ), true ) .
     //  '</pre>';
 
-    $prefix = 'PRP | ' . ( $error ? 'Error: ' : '' );
-    $header = ( '' === $message_name ) ? '' : $message_name;
-    $error_style = $error ? ' class="error"' : '';
-    $divider = ( '' === $message ) ? '' : ': ';
-    $message_type = gettype( $message );
-    $output = '';
-    switch ( $message_type ) {
-      case 'string':
-      case 'integer':
-        $output = $header . $divider . $message;
-      break;
-      default:
-        $output = $header . $divider . var_export( $message, true );
-      break;
-    }
+    if ( $error ) {
+      return prp_report_error( $message, plugin_readme_parser_name );
 
-    if ( $debugging ||
-         ( $error && $echo ) ) {
-      if ( $log_file ||
-           ( $error && $echo ) ) {
-        error_log( $prefix . $output );
-        // return $echo ? true : $output;
+    } else {
+      $prefix = 'PRP | ' . ( $error ? 'Error: ' : '' );
+      $header = ( '' === $message_name ) ? '' : $message_name;
+      $divider = ( '' === $message ) ? '' : ': ';
+      $message_type = gettype( $message );
+      $output = '';
+      switch ( $message_type ) {
+        case 'string':
+        case 'integer':
+          $output = print_r( $header . $divider . $message, true );
+        break;
+        default:
+          $output = print_r( $header . $divider, true ) . var_export( $message, true );
+        break;
       }
-      if ( $log_display ||
-           ( $error && $echo ) ) {
 
+      if ( ( $debugging && $log_display ) ||
+           ( $echo ) ) {
         $delim = ':';
         $pos = strpos( $output, $delim );
         if ( $pos !== false ) {
           $output = '<b>' . str_replace( $delim, $delim . '</b>', $output );
         }
-        if ( 'array' === $message_type ) {
-          echo '<pre' . $error_style . '>' . $output . '</pre>';
-        } else {
-          echo '<p' . $error_style . '>' . $output . '</p>';
+        switch ( $message_type ) {
+          case 'string':
+          case 'integer':
+            echo '<p>' . $output . '</p>';
+          break;
+          default:
+            echo '<pre>' . $output . '</pre>';
+          break;
         }
-        // return $echo ? true : $output;
+      }
+      if ( $debugging && $log_file ) {
+        error_log( $output );
       }
     }
   }
