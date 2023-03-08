@@ -211,71 +211,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
           // Count lines of code and process one at a time
 
-          $titles_found = 0;
-          $count = count( $this->file_array );
-
-          for ( $i = 0; $i < $count; $i++ ) {
-
-            // If Content Reveal plugin is active
-
-            include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-            if ( is_plugin_active( 'simple-content-reveal/simple-content-reveal.php' ) ) {
-
-              // If line is a sub-heading add the first part of the code
-
-              if ( '<h2>' == substr( $this->file_array[ $i ], 0, 4 ) ) {
-
-                // Extract title and check if it should be hidden or shown by default
-
-                $this->title = substr( $this->file_array[ $i ], 4, strpos( $this->file_array[ $i ], '</h2>' ) - 4 );
-                if ( prp_is_it_excluded( strtolower( $this->title ), $this->hide ) ) {
-                  $state = 'hide';
-                } else {
-                  $state = 'show';
-                }
-
-                // Call Content Reveal with heading details and replace current line
-
-                $this->file_array[ $i ] = acr_start( '<h2>%image% ' . $this->title . '</h2>', $this->title, $this->state, $scr_url, $scr_ext );
-                $titles_found++;
-              }
-
-              // If a DIV is found and previous section is not hidden add the end part of code
-
-              if ( ( '</div>' == $this->file_array[ $i ] ) && ( 0 < $titles_found ) ) {
-                $this->file_array[ $i ] = acr_end() . self::LINE_END . $this->file_array[ $i ];
-              }
-            }
-
-            // If first line of code multi-line, replace CODE with PRE tag
-
-            if ( ( strpos( $this->file_array[ $i ], '<code>', 0 ) ) && ( !strpos( $this->file_array[ $i ], '</code>', 0 ) ) ) {
-              $this->file_array[ $i ] = str_replace( '<code>', '<pre>', $this->file_array[ $i ] );
-            }
-
-            // If final line to code multi-line, replace /CODE with /PRE tag
-
-            if ( ( strpos( $this->file_array[ $i ], '</code>', 0 ) ) && ( !strpos( $this->file_array[ $i ], '<code>', 0 ) ) ) {
-              $this->file_array[ $i ] = str_replace( '</code>', '</pre>', $this->file_array[ $i ] );
-            }
-
-            // If all code is one line, replace CODE with PRE tags
-
-            if ( ( strpos( $this->file_array[ $i ], '<code>', 0 ) ) && ( strpos( $this->file_array[ $i ], '</code>', 0 ) ) ) {
-              if ( '' == ltrim( strip_tags( substr( $this->file_array[ $i ], 0, strpos( $this->file_array[ $i ], '<code>', 0 ) ) ) ) ) {
-                $this->file_array[ $i ] = str_replace( 'code>', 'pre>', $this->file_array[ $i ] );
-              }
-            }
-
-            if ( '' != $this->file_array[ $i ] ) {
-              $this->my_html .= $this->file_array[ $i ] . self::LINE_END;
-            }
-          }
-
-          // Modify <CODE> and <PRE> with class to suppress translation
-
-          $this->my_html = str_replace( '<code>', '<code class="notranslate">', str_replace( '<pre>', '<pre class="notranslate">', $this->my_html ) );
-
+          $this->process_html();
 
         } else {
 
@@ -890,6 +826,74 @@ if ( !class_exists( 'Generate_Output' ) ) {
            ( 'bottom' == $this->links ) ) {
         $this->file_combined .= prp_display_links( $this->download, $this->target, $this->nofollow, $this->version, $this->mirror, $this->plugin_name );
       }
+    }
+
+    private function process_html() {
+
+      $titles_found = 0;
+      $count = count( $this->file_array );
+
+      for ( $i = 0; $i < $count; $i++ ) {
+
+        // If Content Reveal plugin is active
+
+        include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+        if ( is_plugin_active( 'simple-content-reveal/simple-content-reveal.php' ) ) {
+
+          // If line is a sub-heading add the first part of the code
+
+          if ( '<h2>' == substr( $this->file_array[ $i ], 0, 4 ) ) {
+
+            // Extract title and check if it should be hidden or shown by default
+
+            $this->title = substr( $this->file_array[ $i ], 4, strpos( $this->file_array[ $i ], '</h2>' ) - 4 );
+            if ( prp_is_it_excluded( strtolower( $this->title ), $this->hide ) ) {
+              $state = 'hide';
+            } else {
+              $state = 'show';
+            }
+
+            // Call Content Reveal with heading details and replace current line
+
+            $this->file_array[ $i ] = acr_start( '<h2>%image% ' . $this->title . '</h2>', $this->title, $this->state, $scr_url, $scr_ext );
+            $titles_found++;
+          }
+
+          // If a DIV is found and previous section is not hidden add the end part of code
+
+          if ( ( '</div>' == $this->file_array[ $i ] ) && ( 0 < $titles_found ) ) {
+            $this->file_array[ $i ] = acr_end() . self::LINE_END . $this->file_array[ $i ];
+          }
+        }
+
+        // If first line of code multi-line, replace CODE with PRE tag
+
+        if ( ( strpos( $this->file_array[ $i ], '<code>', 0 ) ) && ( !strpos( $this->file_array[ $i ], '</code>', 0 ) ) ) {
+          $this->file_array[ $i ] = str_replace( '<code>', '<pre>', $this->file_array[ $i ] );
+        }
+
+        // If final line to code multi-line, replace /CODE with /PRE tag
+
+        if ( ( strpos( $this->file_array[ $i ], '</code>', 0 ) ) && ( !strpos( $this->file_array[ $i ], '<code>', 0 ) ) ) {
+          $this->file_array[ $i ] = str_replace( '</code>', '</pre>', $this->file_array[ $i ] );
+        }
+
+        // If all code is one line, replace CODE with PRE tags
+
+        if ( ( strpos( $this->file_array[ $i ], '<code>', 0 ) ) && ( strpos( $this->file_array[ $i ], '</code>', 0 ) ) ) {
+          if ( '' == ltrim( strip_tags( substr( $this->file_array[ $i ], 0, strpos( $this->file_array[ $i ], '<code>', 0 ) ) ) ) ) {
+            $this->file_array[ $i ] = str_replace( 'code>', 'pre>', $this->file_array[ $i ] );
+          }
+        }
+
+        if ( '' != $this->file_array[ $i ] ) {
+          $this->my_html .= $this->file_array[ $i ] . self::LINE_END;
+        }
+      }
+
+      // Modify <CODE> and <PRE> with class to suppress translation
+
+      $this->my_html = str_replace( '<code>', '<code class="notranslate">', str_replace( '<pre>', '<pre class="notranslate">', $this->my_html ) );
     }
 
     private function reset() {
