@@ -111,7 +111,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       // Extract parameters
 
-      $this->parameters = $this->normalise_parameters( $paras );
+      $this->normalise_parameters( $paras );
 
       extract( shortcode_atts( array( 'exclude' => '', 'hide' => '', 'include' => '', 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $this->parameters ) );
 
@@ -784,7 +784,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
      * @param  $parameters  array  The text to normalise the quotation marks in.
      * @return        array  The text containing normalised quotation marks.
      */
-    private function normalise_parameters( array $parameters ): array {
+    private function normalise_parameters( array $parameters ): void {
 
       // prp_log( __( 'Parameters (raw)', plugin_readme_parser_domain), $parameters );
 
@@ -806,11 +806,11 @@ if ( !class_exists( 'Generate_Output' ) ) {
           unset( $normalised_parameters[0] );
         }
         // prp_log( __( 'Parameters (normalised)', plugin_readme_parser_domain), $this->parameters );
-        return $normalised_parameters;
+        $this->parameters = $normalised_parameters;
 
       } else {
         // prp_log( 'Normalise: wanted a string or an array; got \'' . gettype( $parameters ) . '\'', $parameters, true );
-        return $parameters;
+        $this->parameters = $parameters;
       }
     }
 
