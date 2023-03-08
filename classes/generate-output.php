@@ -165,9 +165,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         // Ensure EXCLUDE and INCLUDE parameters aren't both included
 
-        if ( ( '' != $this->exclude ) &&
-             ( '' != $this->include ) ) {
-          return prp_report_error( __( '\'include\' and \'exclude\' parameters cannot both be specified', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
+        $invalid = $this->check_parameters();
+        if ( '' !== $invalid ) {
+          return $invalid;
         }
 
         // Work out filename and fetch the contents
@@ -870,6 +870,17 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // prp_log( __( 'show head', plugin_readme_parser_domain ), ( $this->show_head ? 'true' : 'false' ) );
       // prp_log( __( 'show meta', plugin_readme_parser_domain ), ( $this->show_meta ? 'true' : 'false' ) );
     }
+
+    private function check_parameters(): string {
+
+      if ( ( '' != $this->exclude ) &&
+           ( '' != $this->include ) ) {
+        return prp_report_error( __( '\'include\' and \'exclude\' parameters cannot both be specified', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
+      } else {
+        return '';
+      }
+    }
+
 
     private function reset() {
       $this->parameters = array();
