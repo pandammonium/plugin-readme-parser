@@ -107,7 +107,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       $this->content = $content;
       prp_toggle_global_shortcodes( $this->content );
 
-      $this->my_html = '';
+      // $this->my_html = '';
 
       // Extract parameters
 
@@ -178,53 +178,10 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         if ( false !== $this->file_data ) {
 
-          // prp_log( __( 'file_data', plugin_readme_parser_domain ), $file_data );
-
-          if ( isset( $this->file_data[ 'name' ] ) ) {
-            $this->plugin_name = $this->file_data[ 'name' ];
-          } else {
-            $this->plugin_name = '';
-          }
-          // prp_log( __( 'plugin name', plugin_readme_parser_domain ), $plugin_name );
-
-          // Split file into array based on CRLF
-
-          $this->file_array = preg_split( "/((\r(?!\n))|((?<!\r)\n)|(\r\n))/", $this->file_data[ 'file' ] );
-          // prp_log( __( 'file_array', plugin_readme_parser_domain ), $this->file_array, false, true );
-
-          // Count the number of lines and read through the array
-
-          $this->read_file_array();
-
-          // Display links section
-
-          $this->display_links_section();
-
-          // Call Markdown code to convert
-
-          $this->my_html = \Michelf\MarkdownExtra::defaultTransform( $this->file_combined );
-
-          // Split HTML again
-
-          $this->file_array = preg_split( "/((\r(?!\n))|((?<!\r)\n)|(\r\n))/", $this->my_html );
-          $this->my_html = '';
-
-          // Count lines of code and process one at a time
-
-          $this->process_html();
+          $this->process_valid_file();
 
         } else {
-
-          if ( ( 0 < strlen( $this->file_data[ 'file' ] ) ) &&
-               ( 0 == substr_count( $this->file_data[ 'file' ], "\n" ) ) ) {
-
-            $this->my_html = prp_report_error( __( 'invalid readme file: no carriage returns found', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
-
-          } else {
-
-            $this->my_html = prp_report_error( __( 'the readme file for the ' . $this->plugin_url . ' plugin is either missing or invalid: \'' . $this->file_data[ 'file' ] . '\'', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
-
-          }
+          $this->process_invalid_file();
         }
 
         // Send the resultant code back, plus encapsulating DIV and version comments. Use double quotes to permit linebreaks (\n)
@@ -233,10 +190,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         // Cache the results
 
-        if ( is_numeric( $this->cache ) ) {
-          // // prp_log( __( 'caching transient', plugin_readme_parser_domain ) );
-          set_transient( $this->cache_key, $this->content, 3600 * $this->cache );
-        }
+        $this->cache_the_results();
 
       } else {
 
@@ -547,7 +501,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
      */
     private function should_links_be_shown(): void {
 
-      $this->show_links = false;
+      // $this->show_links = false;
       if ( '' != $this->include ) {
         if ( prp_is_it_excluded( 'links', $this->include ) ) {
           $this->show_links = true;
@@ -564,8 +518,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
      */
     private function should_head_be_shown(): void {
 
-      $this->show_head = false;
-      $this->show_meta = false;
+      // $this->show_head = false;
+      // $this->show_meta = false;
 
       $this->head_explicitly_excluded = prp_is_it_excluded( 'head', $this->exclude );
       $this->head_explicitly_included = prp_is_it_excluded( 'head', $this->include );
@@ -643,23 +597,23 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         $this->track_current_section();
 
-        $this->process_section();
+        $this->read_section();
 
         // Get the download link for the most recent version
 
-        $this->process_download_link( $i );
+        $this->read_download_link( $i );
 
         // if ( 'head' === $this->section ) {
         //   prp_log( 'Just before \'head\', $this->add_to_output===' . ( $this->add_to_output ? 'true' : 'false' ) );
         // }
 
-        $this->process_head( $i );
+        $this->read_head( $i );
 
         // if ( 'Description' === $this->section ) {
         //   prp_log( 'ADD TO OUTPUT', $this->add_to_output );
         // }
 
-        $this->process_screenshots();
+        $this->read_screenshots();
 
         // Add current line to output, assuming not compressed and not a second blank line
 
@@ -684,7 +638,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
     }
 
-    private function process_html(): void {
+    private function write_html(): void {
 
       $titles_found = 0;
       $count = count( $this->file_array );
@@ -693,7 +647,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         // If Content Reveal plugin is active
 
-        $this->process_content_reveal_plugin( $i, $titles_found );
+        $titles_found = $this->write_content_reveal_plugin( $i, $titles_found );
 
         $this->normalise_html_code_tags( $i );
 
@@ -808,55 +762,70 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
     }
 
-    private function process_section(): void {
+    private function read_section(): void {
 
       if ( '' != $this->include ) {
+        $this->read_included_sections();
+      } else {
+        $this->read_excluded_sections();
+      }
+      $this->read_excluded_line();
+      $this->read_links();
+      $this->prev_section = $this->section;
 
-        // Is this an included section?
+      // prp_log( __( '(previous) section', plugin_readme_parser_domain ), $this->prev_section );
+    }
 
-        if ( prp_is_it_excluded( $this->section, $this->include ) ) {
-          // prp_log( __( 'included', plugin_readme_parser_domain ), $this->section );
+    private function read_included_sections(): void {
 
-          if ( $this->section != $this->prev_section ) {
-            if ( $this->div_written ) {
-              $this->file_combined .= '</div>' . self::LINE_END;
-            }
-            $this->file_combined .= self::LINE_END . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $this->section ) ) ) . '">' . self::LINE_END;
-            $this->div_written = true;
-            if ( 'Description' === $this->section ) {
-              // prp_log( 'A. ADD TO OUTPUT', $this->add_to_output );
-            }
+      // Is this an included section?
+
+      if ( prp_is_it_excluded( $this->section, $this->include ) ) {
+        // prp_log( __( 'included', plugin_readme_parser_domain ), $this->section );
+
+        if ( $this->section != $this->prev_section ) {
+          if ( $this->div_written ) {
+            $this->file_combined .= '</div>' . self::LINE_END;
           }
-        } else {
-          $this->add_to_output = false;
+          $this->file_combined .= self::LINE_END . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $this->section ) ) ) . '">' . self::LINE_END;
+          $this->div_written = true;
           if ( 'Description' === $this->section ) {
-            // prp_log( 'B. ADD TO OUTPUT', $this->add_to_output );
+            // prp_log( 'A. ADD TO OUTPUT', $this->add_to_output );
           }
         }
-
       } else {
+        $this->add_to_output = false;
+        if ( 'Description' === $this->section ) {
+          // prp_log( 'B. ADD TO OUTPUT', $this->add_to_output );
+        }
+      }
+    }
 
-        // Is this an excluded section?
+    private function read_excluded_sections(): void {
 
-        if ( prp_is_it_excluded( $this->section, $this->exclude ) ) {
-          $this->add_to_output = false;
-          // prp_log( __( 'excluded', plugin_readme_parser_domain ), $this->section );
-          if ( 'Description' === $this->section ) {
-            // prp_log( 'C. ADD TO OUTPUT', $this->add_to_output );
+      // Is this an excluded section?
+
+      if ( prp_is_it_excluded( $this->section, $this->exclude ) ) {
+        $this->add_to_output = false;
+        // prp_log( __( 'excluded', plugin_readme_parser_domain ), $this->section );
+        if ( 'Description' === $this->section ) {
+          // prp_log( 'C. ADD TO OUTPUT', $this->add_to_output );
+        }
+      } else {
+        if ( $this->section != $this->prev_section ) {
+          if ( $this->div_written ) {
+            $this->file_combined .= '</div>' . self::LINE_END;
           }
-        } else {
-          if ( $this->section != $this->prev_section ) {
-            if ( $this->div_written ) {
-              $this->file_combined .= '</div>' . self::LINE_END;
-            }
-            $this->file_combined .= self::LINE_END . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $this->section ) ) ) . '">' . self::LINE_END;
-            $this->div_written = true;
-            if ( 'Description' === $this->section ) {
-              // prp_log( 'D. ADD TO OUTPUT', $this->add_to_output );
-            }
+          $this->file_combined .= self::LINE_END . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $this->section ) ) ) . '">' . self::LINE_END;
+          $this->div_written = true;
+          if ( 'Description' === $this->section ) {
+            // prp_log( 'D. ADD TO OUTPUT', $this->add_to_output );
           }
         }
       }
+    }
+
+    private function read_excluded_line(): void {
 
       // Is it an excluded line?
 
@@ -869,6 +838,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
         $exclude_loop++;
         }
       }
+    }
+
+    private function read_links(): void {
 
       if ( ( $this->links == strtolower( $this->section ) ) &&
            ( $this->section != $this->prev_section ) ) {
@@ -876,12 +848,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
           $this->file_array[ $i ] = prp_display_links( $this->download, $this->target, $this->nofollow, $this->version, $this->mirror, $this->plugin_name ) . $this->file_array[ $i ];
         }
       }
-
-      $this->prev_section = $this->section;
-      // prp_log( __( '(previous) section', plugin_readme_parser_domain ), $this->prev_section );
     }
 
-    private function process_download_link( $i ): void {
+    private function read_download_link( $i ): void {
 
       if ( 'Stable tag:' == substr( $this->file_array[ $i ], 0, 11 ) ) {
 
@@ -893,7 +862,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
     }
 
-    private function process_head( $i ): void {
+    private function read_head( $i ): void {
 
       if ( $this->add_to_output ) {
 
@@ -912,7 +881,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
     }
 
-    private function process_screenshots(): void {
+    private function read_screenshots(): void {
 
       if ( 'Screenshots' === $this->section ) {
         // Do not display screenshots: any attempt to access the screenshots on WordPress' SVN servers is met with an HTTP 403 (forbidden) error.
@@ -941,7 +910,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
         }
     }
 
-    private function process_html_title( $i ): void {
+    private function write_html_title( $i ): void {
 
       $this->title = substr( $this->file_array[ $i ], 4, strpos( $this->file_array[ $i ], '</h2>' ) - 4 );
       if ( prp_is_it_excluded( strtolower( $this->title ), $this->hide ) ) {
@@ -974,7 +943,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
     }
 
-    private function process_content_reveal_plugin( $i, $titles_found ): void {
+    private function write_content_reveal_plugin( $i, $titles_found ): int {
 
       include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
       if ( is_plugin_active( 'simple-content-reveal/simple-content-reveal.php' ) ) {
@@ -985,30 +954,93 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
           // Extract title and check if it should be hidden or shown by default
 
-          $this->process_html_title( $i );
+          $this->write_html_title( $i );
 
           // Call Content Reveal with heading details and replace current line
 
-          $titles_found = $this->process_content_reveal_heading( $i, $titles_found );
+          $titles_found = $this->write_content_reveal_heading( $i, $titles_found );
         }
 
         // If a DIV is found and previous section is not hidden add the end part of code
 
-        $this->process_content_reveal_end( $i, $titles_found );
+        $this->write_content_reveal_end( $i, $titles_found );
       }
+      return $titles_found;
     }
 
-    private function process_content_reveal_heading( $i, $titles_found ): int {
+    private function write_content_reveal_heading( $i, $titles_found ): int {
 
       $this->file_array[ $i ] = acr_start( '<h2>%image% ' . $this->title . '</h2>', $this->title, $this->state, $scr_url, $scr_ext );
       return ++$titles_found;
     }
 
-    private function process_content_reveal_end( $i, $titles_found ): void {
+    private function write_content_reveal_end( $i, $titles_found ): void {
 
       if ( ( '</div>' == $this->file_array[ $i ] ) && ( 0 < $titles_found ) ) {
         $this->file_array[ $i ] = acr_end() . self::LINE_END . $this->file_array[ $i ];
       }
+    }
+
+    private function process_valid_file(): void {
+
+      // prp_log( __( 'file_data', plugin_readme_parser_domain ), $file_data );
+
+      if ( isset( $this->file_data[ 'name' ] ) ) {
+        $this->plugin_name = $this->file_data[ 'name' ];
+      } else {
+        $this->plugin_name = '';
+      }
+      // prp_log( __( 'plugin name', plugin_readme_parser_domain ), $plugin_name );
+
+      // Split file into array based on CRLF
+
+      $this->file_array = preg_split( "/((\r(?!\n))|((?<!\r)\n)|(\r\n))/", $this->file_data[ 'file' ] );
+      // prp_log( __( 'file_array', plugin_readme_parser_domain ), $this->file_array, false, true );
+
+      // Count the number of lines and read through the array
+
+      $this->read_file_array();
+
+      // Display links section
+
+      $this->display_links_section();
+
+      // Call Markdown code to convert
+
+      $this->my_html = \Michelf\MarkdownExtra::defaultTransform( $this->file_combined );
+
+      // Split HTML again
+
+      $this->file_array = preg_split( "/((\r(?!\n))|((?<!\r)\n)|(\r\n))/", $this->my_html );
+      $this->my_html = '';
+
+      // Count lines of code and process one at a time
+
+      $this->write_html();
+    }
+
+    private function process_invalid_file(): void {
+
+      if ( ( 0 < strlen( $this->file_data[ 'file' ] ) ) &&
+           ( 0 == substr_count( $this->file_data[ 'file' ], "\n" ) ) ) {
+
+        $this->my_html = prp_report_error( __( 'invalid readme file: no carriage returns found', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
+
+      } else {
+
+        $this->my_html = prp_report_error( __( 'the readme file for the ' . $this->plugin_url . ' plugin is either missing or invalid: \'' . $this->file_data[ 'file' ] . '\'', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
+
+      }
+    }
+
+    private function cache_the_results(): void {
+
+      if ( is_numeric( $this->cache ) ) {
+        prp_log( __( 'caching transient', plugin_readme_parser_domain ) );
+        set_transient( $this->cache_key, $this->content, 3600 * $this->cache );
+      }
+      // prp_log( __( 'cache    ', plugin_readme_parser_domain ), $this->cache_key );
+      // prp_log( __( 'cache key', plugin_readme_parser_domain ), $this->cache );
     }
 
   }
