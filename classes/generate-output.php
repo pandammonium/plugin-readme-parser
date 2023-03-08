@@ -629,22 +629,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         // If the line begins with equal signs, replace with the standard hash equivalent
 
-        if ( '=== ' == substr( $this->file_array [$i ], 0, 4 ) ) {
-          $this->file_array[ $i ] = str_replace( '===', '#', $this->file_array[ $i ] );
-          $this->section = prp_get_section_name( $this->file_array[ $i ], 1 );
-          // // prp_log( __( 'section', plugin_readme_parser_domain ), $this->section );
-        } else {
-          if ( '== ' == substr( $this->file_array[ $i ], 0, 3 ) ) {
-            $this->file_array[ $i ] = str_replace( '==', '##' , $this->file_array[ $i ] );
-            $this->section = prp_get_section_name( $this->file_array[ $i ], 2 );
-            // // prp_log( __( 'section', plugin_readme_parser_domain ), $this->section );
-          } else {
-            if ( '= ' == substr( $this->file_array[ $i ], 0, 2 ) ) {
-              $this->file_array[ $i ] = str_replace( '=', '###', $this->file_array[ $i ] );
-              // // prp_log( __( 'section', plugin_readme_parser_domain ), $this->section );
-            }
-          }
-        }
+        $this->standardise_headings_markup( $i );
 
         // If an asterisk is used for a list, but it doesn't have a space after it, add one!
         // This only works if no other asterisks appear in the line
@@ -820,7 +805,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       $this->file_combined .= '</div>' . self::LINE_END;
     }
 
-    private function display_links_section() {
+    private function display_links_section(): void {
 
       if ( ( $this->show_links ) &&
            ( 'bottom' == $this->links ) ) {
@@ -828,7 +813,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
     }
 
-    private function process_html() {
+    private function process_html(): void {
 
       $titles_found = 0;
       $count = count( $this->file_array );
@@ -896,7 +881,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       $this->my_html = str_replace( '<code>', '<code class="notranslate">', str_replace( '<pre>', '<pre class="notranslate">', $this->my_html ) );
     }
 
-    private function reset() {
+    private function reset(): void {
       $this->parameters = array();
       $this->content = '';
 
@@ -942,6 +927,25 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // prp_log( __('all the things have been reset', plugin_readme_parser_domain), $this );
     }
 
+    private function standardise_headings_markup( $i ): void {
+
+      if ( '=== ' == substr( $this->file_array [$i ], 0, 4 ) ) {
+        $this->file_array[ $i ] = str_replace( '===', '#', $this->file_array[ $i ] );
+        $this->section = prp_get_section_name( $this->file_array[ $i ], 1 );
+        // // prp_log( __( 'section', plugin_readme_parser_domain ), $this->section );
+      } else {
+        if ( '== ' == substr( $this->file_array[ $i ], 0, 3 ) ) {
+          $this->file_array[ $i ] = str_replace( '==', '##' , $this->file_array[ $i ] );
+          $this->section = prp_get_section_name( $this->file_array[ $i ], 2 );
+          // // prp_log( __( 'section', plugin_readme_parser_domain ), $this->section );
+        } else {
+          if ( '= ' == substr( $this->file_array[ $i ], 0, 2 ) ) {
+            $this->file_array[ $i ] = str_replace( '=', '###', $this->file_array[ $i ] );
+            // // prp_log( __( 'section', plugin_readme_parser_domain ), $this->section );
+          }
+        }
+      }
+    }
   }
 
   $generator = new Generate_Output();
