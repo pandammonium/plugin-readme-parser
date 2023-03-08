@@ -634,11 +634,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
         // If an asterisk is used for a list, but it doesn't have a space after it, add one!
         // This only works if no other asterisks appear in the line
 
-        if ( ( '*' == substr( $this->file_array[ $i ], 0, 1 ) ) &&
-             ( ' ' != substr( $this->file_array[ $i ], 0, 2 ) ) &&
-             ( false === strpos( $this->file_array[ $i ], '*', 1 ) ) ) {
-          $this->file_array[ $i ] = '* ' . substr( $this->file_array[ $i ], 1 );
-        }
+        $this->standardise_lists( $i );
 
         // Track current section. If very top, make it "head" and save as plugin name
 
@@ -946,6 +942,16 @@ if ( !class_exists( 'Generate_Output' ) ) {
         }
       }
     }
+
+    private function standardise_lists( $i ) {
+
+      if ( ( '*' == substr( $this->file_array[ $i ], 0, 1 ) ) &&
+           ( ' ' != substr( $this->file_array[ $i ], 0, 2 ) ) &&
+           ( false === strpos( $this->file_array[ $i ], '*', 1 ) ) ) {
+        $this->file_array[ $i ] = '* ' . substr( $this->file_array[ $i ], 1 );
+      }
+    }
+
   }
 
   $generator = new Generate_Output();
