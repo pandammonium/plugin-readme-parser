@@ -198,10 +198,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
           // Display links section
 
-          if ( ( $this->show_links ) &&
-               ( 'bottom' == $this->links ) ) {
-            $this->file_combined .= prp_display_links( $this->download, $this->target, $this->nofollow, $this->version, $this->mirror, $this->plugin_name );
-          }
+          $this->display_links_section();
 
           // Call Markdown code to convert
 
@@ -887,6 +884,13 @@ if ( !class_exists( 'Generate_Output' ) ) {
       $this->file_combined .= '</div>' . self::LINE_END;
     }
 
+    private function display_links_section() {
+
+      if ( ( $this->show_links ) &&
+           ( 'bottom' == $this->links ) ) {
+        $this->file_combined .= prp_display_links( $this->download, $this->target, $this->nofollow, $this->version, $this->mirror, $this->plugin_name );
+      }
+    }
 
     private function reset() {
       $this->parameters = array();
