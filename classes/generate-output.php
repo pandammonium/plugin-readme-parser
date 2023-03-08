@@ -613,7 +613,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
     }
 
-    private function read_file_array() {
+    private function read_file_array(): void {
 
       $count = count( $this->file_array );
       // prp_log( __( 'readme file has ' . $count . ' lines', plugin_readme_parser_domain ) );
@@ -638,138 +638,25 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         // Track current section. If very top, make it "head" and save as plugin name
 
-        if ( ( $this->section != $this->prev_section ) &&
-             ( '' == $this->prev_section ) ) {
+        $this->track_current_section();
 
-          // If a plugin name was not specified attempt to use the name parameter. If that's not set, assume
-          // it's the one in the readme header
-
-          // // prp_log( __( 'name (from args)', plugin_readme_parser_domain ), $this->name );
-
-          if ( '' == $this->plugin_name ) {
-            if ( '' == $this->name ) {
-              $this->plugin_name = str_replace( ' ', '-', strtolower( $this->section ) );
-            } else {
-              $this->plugin_name = $this->name;
-            }
-          }
-
-          $this->plugin_title = $this->section;
-          $this->add_to_output = false;
-          $this->section = 'head';
-          // prp_log( __( 'section', plugin_readme_parser_domain ), $this->section );
-
-        }
-
-        if ( '' != $this->include ) {
-
-          // Is this an included section?
-
-          if ( prp_is_it_excluded( $this->section, $this->include ) ) {
-            // prp_log( __( 'included', plugin_readme_parser_domain ), $this->section );
-
-            if ( $this->section != $this->prev_section ) {
-              if ( $this->div_written ) {
-                $this->file_combined .= '</div>' . self::LINE_END;
-              }
-              $this->file_combined .= self::LINE_END . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $this->section ) ) ) . '">' . self::LINE_END;
-              $this->div_written = true;
-              if ( 'Description' === $this->section ) {
-                // prp_log( 'A. ADD TO OUTPUT', $this->add_to_output );
-              }
-            }
-          } else {
-            $this->add_to_output = false;
-            if ( 'Description' === $this->section ) {
-              // prp_log( 'B. ADD TO OUTPUT', $this->add_to_output );
-            }
-          }
-
-        } else {
-
-          // Is this an excluded section?
-
-          if ( prp_is_it_excluded( $this->section, $this->exclude ) ) {
-            $this->add_to_output = false;
-            // prp_log( __( 'excluded', plugin_readme_parser_domain ), $this->section );
-            if ( 'Description' === $this->section ) {
-              // prp_log( 'C. ADD TO OUTPUT', $this->add_to_output );
-            }
-          } else {
-            if ( $this->section != $this->prev_section ) {
-              if ( $this->div_written ) {
-                $this->file_combined .= '</div>' . self::LINE_END;
-              }
-              $this->file_combined .= self::LINE_END . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $this->section ) ) ) . '">' . self::LINE_END;
-              $this->div_written = true;
-              if ( 'Description' === $this->section ) {
-                // prp_log( 'D. ADD TO OUTPUT', $this->add_to_output );
-              }
-            }
-          }
-        }
-
-        // Is it an excluded line?
-
-        if ( $this->add_to_output ) {
-          $exclude_loop = 1;
-          while ( $exclude_loop <= $this->ignore[ 0 ] ) {
-            if ( false !== strpos( $this->file_array[ $i ], $this->ignore[ $exclude_loop ], 0 ) ) {
-              $this->add_to_output = false;
-            }
-          $exclude_loop++;
-          }
-        }
-
-        if ( ( $this->links == strtolower( $this->section ) ) &&
-             ( $this->section != $this->prev_section ) ) {
-          if ( $this->show_links ) {
-            $this->file_array[ $i ] = prp_display_links( $this->download, $this->target, $this->nofollow, $this->version, $this->mirror, $this->plugin_name ) . $this->file_array[ $i ];
-          }
-        }
-
-        $this->prev_section = $this->section;
-        // prp_log( __( '(previous) section', plugin_readme_parser_domain ), $this->prev_section );
+        $this->process_section();
 
         // Get the download link for the most recent version
 
-        if ( 'Stable tag:' == substr( $this->file_array[ $i ], 0, 11 ) ) {
-
-          $this->version = substr( $this->file_array[ $i ], 12 );
-          // prp_log( __( 'version', plugin_readme_parser_domain ), $this->version );
-          $this->download = 'https://downloads.wordpress.org/plugin/' . $this->plugin_name . '.' . $this->version . '.zip';
-          // // prp_log( __( 'download link', plugin_readme_parser_domain ), $this->download );
-
-        }
+        $this->process_download_link( $i );
 
         // if ( 'head' === $this->section ) {
         //   prp_log( 'Just before \'head\', $this->add_to_output===' . ( $this->add_to_output ? 'true' : 'false' ) );
         // }
 
-        if ( $this->add_to_output ) {
-
-          // prp_log( __( 'SECTION', plugin_readme_parser_domain ), $this->section );
-
-          if ( 'head' === $this->section ) {
-            $this->metadata = array(
-              'exclude' => $this->exclude,
-              'nofollow' => $this->nofollow,
-              'version' => $this->version,
-              'download' => isset( $this->download ) ? $this->download : '',
-              'target' => $this->target,
-            );
-            $this->add_to_output = prp_add_head_meta_data_to_output( $this->show_head, $this->show_meta, $this->file_array[ $i ], $this->metadata );
-          }
-        }
+        $this->process_head( $i );
 
         // if ( 'Description' === $this->section ) {
         //   prp_log( 'ADD TO OUTPUT', $this->add_to_output );
         // }
 
-        if ( 'Screenshots' === $this->section ) {
-          // Do not display screenshots: any attempt to access the screenshots on WordPress' SVN servers is met with an HTTP 403 (forbidden) error.
-          $this->add_to_output = false;
-        }
+        $this->process_screenshots();
 
         // Add current line to output, assuming not compressed and not a second blank line
 
@@ -780,22 +667,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
         //   'add to output'   => $this->add_to_output
         // ) );
 
-        if ( ( '' != $this->file_array[ $i ] or !$this->last_line_blank ) &&
-           $this->add_to_output ) {
-          $this->file_combined .= $this->file_array[ $i ] . self::LINE_END;
-          // prp_log_truncated_line( 'Adding l.' . $i . ' ' . $this->file_array[ $i ] );
-
-          if ( '' == $this->file_array[ $i ] ) {
-            $this->last_line_blank = true;
-
-          } else {
-            $this->last_line_blank = false;
-          }
-
-        } else {
-          // prp_log_truncated_line( 'Not adding l.' . $i . ' ' . $this->file_array[ $i ] );
-
-        }
+        $this->add_current_line_to_output( $i );
 
       }
       $this->file_combined .= '</div>' . self::LINE_END;
@@ -943,13 +815,172 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
     }
 
-    private function standardise_lists( $i ) {
+    private function standardise_lists( $i ): void {
 
       if ( ( '*' == substr( $this->file_array[ $i ], 0, 1 ) ) &&
            ( ' ' != substr( $this->file_array[ $i ], 0, 2 ) ) &&
            ( false === strpos( $this->file_array[ $i ], '*', 1 ) ) ) {
         $this->file_array[ $i ] = '* ' . substr( $this->file_array[ $i ], 1 );
       }
+    }
+
+    private function track_current_section(): void {
+
+      if ( ( $this->section != $this->prev_section ) &&
+           ( '' == $this->prev_section ) ) {
+
+        // If a plugin name was not specified attempt to use the name parameter. If that's not set, assume
+        // it's the one in the readme header
+
+        // // prp_log( __( 'name (from args)', plugin_readme_parser_domain ), $this->name );
+
+        if ( '' == $this->plugin_name ) {
+          if ( '' == $this->name ) {
+            $this->plugin_name = str_replace( ' ', '-', strtolower( $this->section ) );
+          } else {
+            $this->plugin_name = $this->name;
+          }
+        }
+
+        $this->plugin_title = $this->section;
+        $this->add_to_output = false;
+        $this->section = 'head';
+        // prp_log( __( 'section', plugin_readme_parser_domain ), $this->section );
+
+      }
+    }
+
+    private function process_section(): void {
+
+      if ( '' != $this->include ) {
+
+        // Is this an included section?
+
+        if ( prp_is_it_excluded( $this->section, $this->include ) ) {
+          // prp_log( __( 'included', plugin_readme_parser_domain ), $this->section );
+
+          if ( $this->section != $this->prev_section ) {
+            if ( $this->div_written ) {
+              $this->file_combined .= '</div>' . self::LINE_END;
+            }
+            $this->file_combined .= self::LINE_END . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $this->section ) ) ) . '">' . self::LINE_END;
+            $this->div_written = true;
+            if ( 'Description' === $this->section ) {
+              // prp_log( 'A. ADD TO OUTPUT', $this->add_to_output );
+            }
+          }
+        } else {
+          $this->add_to_output = false;
+          if ( 'Description' === $this->section ) {
+            // prp_log( 'B. ADD TO OUTPUT', $this->add_to_output );
+          }
+        }
+
+      } else {
+
+        // Is this an excluded section?
+
+        if ( prp_is_it_excluded( $this->section, $this->exclude ) ) {
+          $this->add_to_output = false;
+          // prp_log( __( 'excluded', plugin_readme_parser_domain ), $this->section );
+          if ( 'Description' === $this->section ) {
+            // prp_log( 'C. ADD TO OUTPUT', $this->add_to_output );
+          }
+        } else {
+          if ( $this->section != $this->prev_section ) {
+            if ( $this->div_written ) {
+              $this->file_combined .= '</div>' . self::LINE_END;
+            }
+            $this->file_combined .= self::LINE_END . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $this->section ) ) ) . '">' . self::LINE_END;
+            $this->div_written = true;
+            if ( 'Description' === $this->section ) {
+              // prp_log( 'D. ADD TO OUTPUT', $this->add_to_output );
+            }
+          }
+        }
+      }
+
+      // Is it an excluded line?
+
+      if ( $this->add_to_output ) {
+        $exclude_loop = 1;
+        while ( $exclude_loop <= $this->ignore[ 0 ] ) {
+          if ( false !== strpos( $this->file_array[ $i ], $this->ignore[ $exclude_loop ], 0 ) ) {
+            $this->add_to_output = false;
+          }
+        $exclude_loop++;
+        }
+      }
+
+      if ( ( $this->links == strtolower( $this->section ) ) &&
+           ( $this->section != $this->prev_section ) ) {
+        if ( $this->show_links ) {
+          $this->file_array[ $i ] = prp_display_links( $this->download, $this->target, $this->nofollow, $this->version, $this->mirror, $this->plugin_name ) . $this->file_array[ $i ];
+        }
+      }
+
+      $this->prev_section = $this->section;
+      // prp_log( __( '(previous) section', plugin_readme_parser_domain ), $this->prev_section );
+    }
+
+    private function process_download_link( $i ): void {
+
+      if ( 'Stable tag:' == substr( $this->file_array[ $i ], 0, 11 ) ) {
+
+        $this->version = substr( $this->file_array[ $i ], 12 );
+        // prp_log( __( 'version', plugin_readme_parser_domain ), $this->version );
+        $this->download = 'https://downloads.wordpress.org/plugin/' . $this->plugin_name . '.' . $this->version . '.zip';
+        // // prp_log( __( 'download link', plugin_readme_parser_domain ), $this->download );
+
+      }
+    }
+
+    private function process_head( $i ): void {
+
+      if ( $this->add_to_output ) {
+
+        // prp_log( __( 'SECTION', plugin_readme_parser_domain ), $this->section );
+
+        if ( 'head' === $this->section ) {
+          $this->metadata = array(
+            'exclude' => $this->exclude,
+            'nofollow' => $this->nofollow,
+            'version' => $this->version,
+            'download' => isset( $this->download ) ? $this->download : '',
+            'target' => $this->target,
+          );
+          $this->add_to_output = prp_add_head_meta_data_to_output( $this->show_head, $this->show_meta, $this->file_array[ $i ], $this->metadata );
+        }
+      }
+    }
+
+    private function process_screenshots(): void {
+
+      if ( 'Screenshots' === $this->section ) {
+        // Do not display screenshots: any attempt to access the screenshots on WordPress' SVN servers is met with an HTTP 403 (forbidden) error.
+        $this->add_to_output = false;
+        // prp_log( __( 'Can\'t output screenshots.', plugin_readme_parser_domain ) );
+      }
+    }
+
+    private function add_current_line_to_output( $i ): void {
+
+      if ( ( '' != $this->file_array[ $i ] or !$this->last_line_blank ) &&
+         $this->add_to_output ) {
+        $this->file_combined .= $this->file_array[ $i ] . self::LINE_END;
+        // prp_log_truncated_line( 'Adding l.' . $i . ' ' . $this->file_array[ $i ] );
+
+        if ( '' == $this->file_array[ $i ] ) {
+          $this->last_line_blank = true;
+
+        } else {
+          $this->last_line_blank = false;
+        }
+
+      // } else {
+        // prp_log_truncated_line( 'Not adding l.' . $i . ' ' . $this->file_array[ $i ] );
+
+        }
     }
 
   }
