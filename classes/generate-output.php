@@ -207,103 +207,6 @@ if ( !class_exists( 'Generate_Output' ) ) {
     }
 
     /**
-     * Display a readme banner
-     *
-     * Function to output a banner associated with a readme
-     *
-     * @uses   prp_check_img_exists  Check if an image exists
-     * @uses   prp_report_error    Return a formatted error message
-     *
-     * @param  string    $para     Parameters
-     * @param  string    $content  Plugin name or URL
-     * @param  string          Output
-     */
-    public function readme_banner( $paras = '', $content = '' ): string {
-
-      // prp_log( __( 'Readme banner:', plugin_readme_parser_domain ) );
-
-      $this->reset();
-
-      prp_toggle_global_shortcodes( $content );
-
-      $this->parameters = $this->normalise_parameters( $paras );
-
-      extract( shortcode_atts( array( 'nofollow' => '' ), $this->parameters ) );
-
-      $output = '';
-
-      // Validate the plugin name
-
-      if ( '' == $content ) {
-
-        // Report error if no name found
-
-        return prp_report_error( __( 'No plugin name was supplied for banner', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
-
-      } else {
-
-        $file_found = true;
-
-        if ( 'yes' == strtolower( $nofollow ) ) { $nofollow = ' rel="nofollow"'; }
-
-        $name = str_replace( ' ', '-', strtolower( $content ) );
-
-        // Build the 1544 banner URL
-
-        $url = 'https://plugins.svn.wordpress.org/' . $name . '/assets/banner-1544x500.';
-        $ext = 'png';
-
-        // Check if the PNG banner exists
-
-        $img_check = prp_check_img_exists( $url, $ext );
-
-        // Check if the JPG banner exists
-
-        if ( !$img_check ) {
-
-          $ext = 'jpg';
-          $img_check = prp_check_img_exists( $url, $ext );
-
-          if ( !$img_check ) {
-
-            // Build the banner 772 URL
-
-            $url = 'https://plugins.svn.wordpress.org/' . $name . '/assets/banner-772x250.';
-            $ext = 'png';
-
-            // Check if the PNG banner exists
-
-            $img_check = prp_check_img_exists( $url, $ext );
-
-            // Check if the JPG banner exists
-
-            if ( !$img_check ) {
-
-              $ext = 'jpg';
-              $img_check = prp_check_img_exists( $url, $ext );
-
-              if ( !$img_check ) {
-                $file_found = false;
-              }
-
-            }
-          }
-        }
-
-        // If the file was found now return the correct image HTML
-
-        if ( $file_found ) {
-
-            $output = '<div style="max-width: 100%;"><img src="' . $url . $ext . '" alt="' . $content . ' Banner" title="' . $content . ' Banner" /></div>';
-        }
-      }
-
-      prp_toggle_global_shortcodes( $content );
-
-      return $output;
-    }
-
-    /**
      * readme information
      *
      * Function to output a piece of requested readme information
@@ -1054,14 +957,6 @@ if ( !class_exists( 'Generate_Output' ) ) {
       return $generator->readme_parser( $paras, $content );
     }
   add_shortcode( 'readme', 'readme_parser' );
-  }
-  if ( !function_exists( 'readme_banner' )) {
-    function readme_banner( $paras = '', $content = '' ) {
-      global $generator;
-      // $generator = new Generate_Output();
-      return $generator->readme_banner( $paras, $content );
-    }
-  add_shortcode( 'readme_banner', 'readme_banner' );
   }
   if ( !function_exists( 'readme_info' )) {
     function readme_info( $paras = '', $content = '' ) {

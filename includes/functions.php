@@ -543,8 +543,8 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
  * they're used to provide examples of use of the plugin's shortcode.
  *
  * Some plugins change this filter’s priority, so clear the global list of
- * registered shortcodes temporarily, except for this plugin's readme_info
- * and readme_banner, which are needed.
+ * registered shortcodes temporarily, except for this plugin's readme_info,
+ * which is needed.
  *
  * @since  2.0.0
  * @link   https://wordpress.stackexchange.com/a/115176
@@ -595,20 +595,10 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
 
             $GLOBALS['shortcode_tags']['readme'] = 'readme_parser';
             $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
-            $GLOBALS['shortcode_tags']['readme_banner'] = 'readme_banner';
 
           } else if  ( str_contains( $content, '[readme_info' ) ) {
             // prp_log( __( 'Content contains \'[readme_info\'', plugin_readme_parser_domain ) );
 
-            $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
-
-          } else if  ( str_contains( $content, '[readme_banner' ) ) {
-            // prp_log( __( 'Content contains \'[readme_banner\'', plugin_readme_parser_domain ) );
-
-            // Need to check this combo once banner display is working.
-
-            $GLOBALS['shortcode_tags']['readme'] = 'readme_parser';
-            $GLOBALS['shortcode_tags']['readme_banner'] = 'readme_banner';
             $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
 
           } else {
