@@ -256,51 +256,18 @@ if ( !class_exists( 'Generate_Output' ) ) {
         $this->file_data = $this->get_readme( $this->name );
         $this->plugin_name = $this->file_data[ 'name' ];
 
-        if ( false !== $this->file_data ) {
+        // prp_log( 'file data', $this->file_data );
 
-          // Split file into array based on CRLF
+        if ( false && false !== $this->file_data ) {
 
-          $this->file_array = preg_split( "/((\r(?!\n))|((?<!\r)\n)|(\r\n))/", $this->file_data[ 'file' ] );
-
-          // Loop through the array
-
-          $count = count( $this->file_array );
-          for ( $i = 0; $i < $count; $i++ ) {
-
-            // Remove non-visible character from input - various characters can sneak into
-            // text files and this can affect output
-
-            $this->file_array[ $i ] = rtrim( ltrim( ltrim( $this->file_array[ $i ], "\x80..\xFF" ), "\x00..\x1F" ) );
-
-            // If first record extract plugin name
-
-            if ( ( '' == $this->plugin_name ) &&
-                 ( 0 == $i ) ) {
-
-              $pos = strpos( $this->file_array [ 0 ], ' ===' );
-              if ( false !== $pos ) {
-                $this->plugin_name = substr( $this->file_array[ 0 ], 4, $pos - 4 );
-                $this->plugin_name = str_replace( ' ', '-', strtolower( $this->plugin_name ) );
-              }
-            }
-
-            // Extract version number
-
-            if ( 'Stable tag:' == substr( $this->file_array[ $i ], 0, 11 ) ) {
-              $this->version = substr( $this->file_array[ $i ], 12 );
-            }
-          }
+          $this->read_file_info();
 
           // Save cache
 
-          if ( is_numeric( $this->cache ) ) {
-            $result[ 'version' ] = $this->version;
-            $result[ 'name' ] = $this->plugin_name;
-            set_transient( $this->cache_key, $result, 3600 * $this->cache );
-          }
+          cache_the_results( $result );
 
         } else {
-          prp_log( __( '*** PLUGIN URL', plugin_readme_parser_domain ), $this->plugin_url, true );
+          // prp_log( __( '*** PLUGIN URL', plugin_readme_parser_domain ), $this->plugin_url, true );
 
           $output = prp_report_error( __( 'readme file could not be found or is malformed; name: \'' . $this->plugin_name . '\'', plugin_readme_parser_domain ) . ' - ' . $this->name, plugin_readme_parser_name, false );
         }
@@ -942,10 +909,14 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
     }
 
-    private function cache_the_results(): void {
+    private function cache_the_results( $result = array() ): void {
 
       if ( is_numeric( $this->cache ) ) {
         // prp_log( __( 'caching transient', plugin_readme_parser_domain ) );
+        if ( !empty( $result ) ) {
+          $result[ 'version' ] = $this->version;
+          $result[ 'name' ] = $this->plugin_name;
+        }
         set_transient( $this->cache_key, $this->content, 3600 * $this->cache );
       }
       // prp_log( __( 'cache    ', plugin_readme_parser_domain ), $this->cache_key );
@@ -1020,6 +991,41 @@ if ( !class_exists( 'Generate_Output' ) ) {
         // If not valid, return false
 
         return false;
+      }
+    }
+
+    private function read_file_info(): void {
+      // Split file into array based on CRLF
+
+      $this->file_array = preg_split( "/((\r(?!\n))|((?<!\r)\n)|(\r\n))/", $this->file_data[ 'file' ] );
+
+      // Loop through the array
+
+      $count = count( $this->file_array );
+      for ( $i = 0; $i < $count; $i++ ) {
+
+        // Remove non-visible character from input - various characters can sneak into
+        // text files and this can affect output
+
+        $this->file_array[ $i ] = rtrim( ltrim( ltrim( $this->file_array[ $i ], "\x80..\xFF" ), "\x00..\x1F" ) );
+
+        // If first record extract plugin name
+
+        if ( ( '' == $this->plugin_name ) &&
+             ( 0 == $i ) ) {
+
+          $pos = strpos( $this->file_array [ 0 ], ' ===' );
+          if ( false !== $pos ) {
+            $this->plugin_name = substr( $this->file_array[ 0 ], 4, $pos - 4 );
+            $this->plugin_name = str_replace( ' ', '-', strtolower( $this->plugin_name ) );
+          }
+        }
+
+        // Extract version number
+
+        if ( 'Stable tag:' == substr( $this->file_array[ $i ], 0, 11 ) ) {
+          $this->version = substr( $this->file_array[ $i ], 12 );
+        }
       }
     }
 
