@@ -150,7 +150,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
         // prp_log( __( 'Sections to be included', plugin_readme_parser_domain), $include );
         // prp_log( __( 'Sections to be excluded', plugin_readme_parser_domain), $exclude );
 
-        if ( 'yes' == strtolower( $nofollow ) ) {
+        if ( 'yes' === strtolower( $nofollow ) ) {
           $this->nofollow = ' rel="nofollow"';
         }
 
@@ -235,20 +235,20 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // prp_log( 'user attributes', $attributes );
 
       $output = '';
-
-      $this->name = $name;
-      $this->target = $target;
-      if ( 'yes' == strtolower( $nofollow ) ) {
-        $this->nofollow = ' rel="nofollow"';
-      }
       $this->data = strtolower( $data );
-      $this->cache = $cache;
 
       // Get the cache
 
+      $this->cache = $cache;
       $result = $this->get_cached_output( 'prp_info_' . md5( $name . $this->cache ) );
 
       if ( !$result ) {
+
+        $this->name = $name;
+        $this->target = $target;
+        if ( 'yes' === strtolower( $nofollow ) ) {
+          $this->nofollow = ' rel="nofollow"';
+        }
 
         // Get the file
 
@@ -289,43 +289,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         // If download link requested build the URL
 
-        if ( 'download' == $this->data ) {
-          if ( ( '' != $this->plugin_name ) && ( '' != $this->version ) ) {
-            $output = '<a href="https://downloads.wordpress.org/plugin/' . $this->plugin_name . '.' . $this->version . '.zip" target="' . $target . '"' . $nofollow . '>' . $this->content. '</a>';
-          } else {
-            $output = prp_report_error( __( 'The name and/or version number could not be found in the readme', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
-          }
-        }
-
-        // If version number requested return it
-
-        if ( 'version' == $this->data ) {
-          if ( '' != $this->version ) {
-            $output = $this->version;
-          } else {
-            $output = prp_report_error( __( 'Version number not found in the readme', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
-          }
-        }
-
-        // If forum link requested build the URL
-
-        if ( 'forum' == $this->data ) {
-          if ( '' != $this->plugin_name ) {
-            $output = '<a href="https://wordpress.org/tags/' . $this->plugin_name . '" target="' . $target . '"' . $nofollow . '>' . $this->content . '</a>';
-          } else {
-            $output = prp_report_error( __( 'Plugin name not supplied', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
-          }
-        }
-
-        // If WordPress link requested build the URL
-
-        if ( 'wordpress' == $this->data ) {
-          if ( '' != $this->plugin_name ) {
-            $output = '<a href="https://wordpress.org/extend/plugins/' . $this->plugin_name . '/" target="' . $target . '"' . $nofollow . '>' .$this->content . '</a>';
-          } else {
-            $output = prp_report_error( __( 'Plugin name not supplied', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
-          }
-        }
+        $output = $this->read_the_data();
 
         // Report an error if the data parameter was invalid or missing
 
@@ -1026,6 +990,44 @@ if ( !class_exists( 'Generate_Output' ) ) {
           $this->version = substr( $this->file_array[ $i ], 12 );
         }
       }
+    }
+
+    private function read_the_data(): string {
+
+      $output = '';
+
+      if ( 'download' == $this->data ) {
+        if ( ( '' != $this->plugin_name ) && ( '' != $this->version ) ) {
+          $output = '<a href="https://downloads.wordpress.org/plugin/' . $this->plugin_name . '.' . $this->version . '.zip" target="' . $this->target . '"' . $this->nofollow . '>' . $this->content. '</a>';
+        } else {
+          $output = prp_report_error( __( 'The name and/or version number could not be found in the readme', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
+        }
+
+      } else if ( 'version' == $this->data ) {
+        if ( '' != $this->version ) {
+          $output = $this->version;
+        } else {
+          $output = prp_report_error( __( 'Version number not found in the readme', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
+        }
+
+      } else if ( 'forum' == $this->data ) {
+        if ( '' != $this->plugin_name ) {
+          $output = '<a href="https://wordpress.org/tags/' . $this->plugin_name . '" target="' . $this->target . '"' . $this->nofollow . '>' . $this->content . '</a>';
+        } else {
+          $output = prp_report_error( __( 'Plugin name not supplied', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
+        }
+
+      } else if ( 'wordpress' == $this->data ) {
+        if ( '' != $this->plugin_name ) {
+          $output = '<a href="https://wordpress.org/extend/plugins/' . $this->plugin_name . '/" target="' . $this->target . '"' . $this->nofollow . '>' .$this->content . '</a>';
+        } else {
+          $output = prp_report_error( __( 'Plugin name not supplied', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
+        }
+
+      } else {
+        $output = prp_report_error( __( 'Invalid data requested: ' . $this->data, plugin_readme_parser_domain ), plugin_readme_parser_name, false );
+      }
+      return $output;
     }
 
   }
