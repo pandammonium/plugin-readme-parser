@@ -226,7 +226,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       prp_toggle_global_shortcodes( $content );
 
-      $this->parameters = $this->normalise_parameters( $paras );
+      $this->normalise_parameters( $paras );
 
       extract( shortcode_atts( array( 'name' => '', 'target' => '_blank', 'nofollow' => '', 'data' => '', 'cache' => '5' ), $this->parameters ) );
 
