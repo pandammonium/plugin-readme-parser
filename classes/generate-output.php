@@ -59,6 +59,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private $my_html = '';
 
+    private $name = '';
+    private $data = '';
+
     private const QUOTES = array(
      '“' => '',
      '”' => '',
@@ -120,9 +123,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // Get cached output
 
       $this->cache = $cache;
-      $result = $this->get_cached_output( 'prp_' . md5( $exclude . $hide . $include . $target . $nofollow . $ignore . $this->cache . $version . $mirror . $content ) );
+      $result = $this->get_cached_output( 'prp_' . md5( $exclude . $hide . $include . $target . $nofollow . $ignore . $this->cache . $version . $mirror .$this->content ) );
 
-      // prp_log( __( 'shortcode content', plugin_readme_parser_domain ), $content );
+      // prp_log( __( 'shortcode content', plugin_readme_parser_domain ),$this->content );
       // prp_log( __( 'shortcode parameters', plugin_readme_parser_domain ), $this->parameters );
 
       // prp_log( __( 'result', plugin_readme_parser_domain ), $result );
@@ -133,7 +136,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         // Set parameter values
 
-        $this->plugin_url = $content;
+        $this->plugin_url =$this->content;
 
         $this->exclude = strtolower( $exclude );
         $this->include = strtolower( $include );
@@ -223,7 +226,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       $this->reset();
 
-      prp_toggle_global_shortcodes( $content );
+      $this->content = $content;
+      prp_toggle_global_shortcodes( $this->content );
 
       $this->normalise_parameters( $paras );
 
@@ -232,21 +236,24 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // prp_log( 'user attributes', $attributes );
 
       $output = '';
-      $data = strtolower( $data );
+
+      $this->name = $name;
+      $this->target = $target;
       if ( 'yes' == strtolower( $nofollow ) ) {
         $this->nofollow = ' rel="nofollow"';
       }
+      $this->data = strtolower( $data );
+      $this->cache = $cache;
 
       // Get the cache
 
-      $this->cache = $cache;
       $result = $this->get_cached_output( 'prp_info_' . md5( $name . $this->cache ) );
 
       if ( !$result ) {
 
         // Get the file
 
-        $this->file_data = $this->get_readme( $name );
+        $this->file_data = $this->get_readme( $this->name );
         $this->plugin_name = $this->file_data[ 'name' ];
 
         if ( false !== $this->file_data ) {
@@ -293,9 +300,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
           }
 
         } else {
-          // prp_log( __( '*** PLUGIN URL', plugin_readme_parser_domain ), $plugin_url, true );
+          prp_log( __( '*** PLUGIN URL', plugin_readme_parser_domain ), $this->plugin_url, true );
 
-          $output = prp_report_error( __( 'readme file could not be found or is malformed; name: \'' . $this->file_data[ 'name' ] . '\'', plugin_readme_parser_domain ) . ' - ' . $name, plugin_readme_parser_name, false );
+          $output = prp_report_error( __( 'readme file could not be found or is malformed; name: \'' . $this->plugin_name . '\'', plugin_readme_parser_domain ) . ' - ' . $this->name, plugin_readme_parser_name, false );
         }
       } else {
 
@@ -318,7 +325,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         if ( 'download' == $data ) {
           if ( ( '' != $this->plugin_name ) && ( '' != $this->version ) ) {
-            $output = '<a href="https://downloads.wordpress.org/plugin/' . $this->plugin_name . '.' . $this->version . '.zip" target="' . $target . '"' . $nofollow . '>' . $content. '</a>';
+            $output = '<a href="https://downloads.wordpress.org/plugin/' . $this->plugin_name . '.' . $this->version . '.zip" target="' . $target . '"' . $nofollow . '>' . $this->content. '</a>';
           } else {
             $output = prp_report_error( __( 'The name and/or version number could not be found in the readme', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
           }
@@ -338,7 +345,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         if ( 'forum' == $data ) {
           if ( '' != $this->plugin_name ) {
-            $output = '<a href="https://wordpress.org/tags/' . $this->plugin_name . '" target="' . $target . '"' . $nofollow . '>' . $content . '</a>';
+            $output = '<a href="https://wordpress.org/tags/' . $this->plugin_name . '" target="' . $target . '"' . $nofollow . '>' . $this->content . '</a>';
           } else {
             $output = prp_report_error( __( 'Plugin name not supplied', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
           }
@@ -348,7 +355,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         if ( 'wordpress' == $data ) {
           if ( '' != $this->plugin_name ) {
-            $output = '<a href="https://wordpress.org/extend/plugins/' . $this->plugin_name . '/" target="' . $target . '"' . $nofollow . '>' . $content . '</a>';
+            $output = '<a href="https://wordpress.org/extend/plugins/' . $this->plugin_name . '/" target="' . $target . '"' . $nofollow . '>' .$this->content . '</a>';
           } else {
             $output = prp_report_error( __( 'Plugin name not supplied', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
           }
@@ -362,7 +369,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       }
 
-      prp_toggle_global_shortcodes( $content );
+      prp_toggle_global_shortcodes( $this->content );
 
       return do_shortcode( $output );
     }
@@ -614,6 +621,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
       $this->file_combined = '';
 
       $this->my_html = '';
+
+      $this->name = '';
+      $this->data = '';
 
       // prp_log( __('all the things have been reset', plugin_readme_parser_domain), $this );
     }
@@ -953,7 +963,6 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // prp_log( 'transient', $result ? $result : 'not found' );
       return $result;
     }
-
 
     /**
      * Get the readme file
