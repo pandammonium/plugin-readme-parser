@@ -113,18 +113,14 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       $this->normalise_parameters( $paras );
 
-      extract( shortcode_atts( array( 'exclude' => '', 'hide' => '', 'include' => '', 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $this->parameters ) );
+      extract( shortcode_atts( array( 'exclude' => '', 'hide' => '', 'include' => '', 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '5', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $this->parameters ) );
 
       // prp_log( 'cache', $cache );
 
       // Get cached output
 
-      $result = false;
       $this->cache = $cache;
-      if ( is_numeric( $this->cache ) ) {
-        $this->cache_key = 'prp_' . md5( $exclude . $hide . $include . $target . $nofollow . $ignore . $this->cache . $version . $mirror . $content );
-        $result = get_transient( $this->cache_key );
-      }
+      $result = $this->get_cached_output( 'prp_' . md5( $exclude . $hide . $include . $target . $nofollow . $ignore . $this->cache . $version . $mirror . $content ) );
 
       // prp_log( __( 'shortcode content', plugin_readme_parser_domain ), $content );
       // prp_log( __( 'shortcode parameters', plugin_readme_parser_domain ), $this->parameters );
@@ -244,15 +240,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // Get the cache
 
       $this->cache = $cache;
-      // prp_log( 'this cache', $this->cache );
-      // prp_log( 'cache is numeric', is_numeric( $this->cache ) );
-      $result = false;
-      if ( is_numeric( $this->cache ) ) {
-        $this->cache_key = 'prp_info_' . md5( $name . $this->cache );
-        // prp_log( 'cache key', $this->cache_key );
-        $result = get_transient( $this->cache_key );
-      }
-      // prp_log( 'transient exists', $result ? 'true' : 'false' );
+      $result = $this->get_cached_output( 'prp_info_' . md5( $name . $this->cache ) );
 
       if ( !$result ) {
 
@@ -952,6 +940,18 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
       // prp_log( __( 'cache    ', plugin_readme_parser_domain ), $this->cache_key );
       // prp_log( __( 'cache key', plugin_readme_parser_domain ), $this->cache );
+    }
+
+    private function get_cached_output( $cache_key ): mixed {
+      $result = false;
+      if ( is_numeric( $this->cache ) ) {
+        $this->cache_key = $cache_key;
+        $result = get_transient( $this->cache_key );
+      }
+      // prp_log( 'cache', $this->cache );
+      // prp_log( 'cache is numeric', is_numeric( $this->cache ) );
+      // prp_log( 'transient', $result ? $result : 'not found' );
+      return $result;
     }
 
 
