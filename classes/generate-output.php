@@ -290,7 +290,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         // If download link requested build the URL
 
-        if ( 'download' == $data ) {
+        if ( 'download' == $this->data ) {
           if ( ( '' != $this->plugin_name ) && ( '' != $this->version ) ) {
             $output = '<a href="https://downloads.wordpress.org/plugin/' . $this->plugin_name . '.' . $this->version . '.zip" target="' . $target . '"' . $nofollow . '>' . $this->content. '</a>';
           } else {
@@ -300,7 +300,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         // If version number requested return it
 
-        if ( 'version' == $data ) {
+        if ( 'version' == $this->data ) {
           if ( '' != $this->version ) {
             $output = $this->version;
           } else {
@@ -310,7 +310,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         // If forum link requested build the URL
 
-        if ( 'forum' == $data ) {
+        if ( 'forum' == $this->data ) {
           if ( '' != $this->plugin_name ) {
             $output = '<a href="https://wordpress.org/tags/' . $this->plugin_name . '" target="' . $target . '"' . $nofollow . '>' . $this->content . '</a>';
           } else {
@@ -320,7 +320,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         // If WordPress link requested build the URL
 
-        if ( 'wordpress' == $data ) {
+        if ( 'wordpress' == $this->data ) {
           if ( '' != $this->plugin_name ) {
             $output = '<a href="https://wordpress.org/extend/plugins/' . $this->plugin_name . '/" target="' . $target . '"' . $nofollow . '>' .$this->content . '</a>';
           } else {
