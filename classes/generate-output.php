@@ -712,15 +712,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
           }
           $this->file_combined .= self::LINE_END . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $this->section ) ) ) . '">' . self::LINE_END;
           $this->div_written = true;
-          if ( 'Description' === $this->section ) {
-            // prp_log( 'A. ADD TO OUTPUT', $this->add_to_output );
-          }
         }
       } else {
         $this->add_to_output = false;
-        if ( 'Description' === $this->section ) {
-          // prp_log( 'B. ADD TO OUTPUT', $this->add_to_output );
-        }
       }
     }
 
@@ -731,9 +725,6 @@ if ( !class_exists( 'Generate_Output' ) ) {
       if ( prp_is_it_excluded( $this->section, $this->exclude ) ) {
         $this->add_to_output = false;
         // prp_log( __( 'excluded', plugin_readme_parser_domain ), $this->section );
-        if ( 'Description' === $this->section ) {
-          // prp_log( 'C. ADD TO OUTPUT', $this->add_to_output );
-        }
       } else {
         if ( $this->section != $this->prev_section ) {
           if ( $this->div_written ) {
@@ -741,9 +732,6 @@ if ( !class_exists( 'Generate_Output' ) ) {
           }
           $this->file_combined .= self::LINE_END . '<div markdown="1" class="np-' . htmlspecialchars( str_replace( ' ', '-', strtolower( $this->section ) ) ) . '">' . self::LINE_END;
           $this->div_written = true;
-          if ( 'Description' === $this->section ) {
-            // prp_log( 'D. ADD TO OUTPUT', $this->add_to_output );
-          }
         }
       }
     }
