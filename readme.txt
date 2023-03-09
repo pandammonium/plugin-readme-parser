@@ -222,7 +222,7 @@ plugin.
 
 = 2.0.0 =
 
-This reworking of WP README Parser has a new name and works with more recent versions of PHP. It also removes broken features (e.g. the display of screenshots). It os not backwards compatible WP README Parser.
+This reworking of WP README Parser has a new name and works with more recent versions of PHP. It also removes broken features (e.g. the display of screenshots). It is not backwards compatible WP README Parser.
 
 = 1.3.7 =
 
