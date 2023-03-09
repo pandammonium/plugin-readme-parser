@@ -172,7 +172,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         // Work out filename and fetch the contents
 
-        $this->file_data = prp_get_readme( $this->plugin_url, $this->version );
+        $this->file_data = $this->get_readme( $this->plugin_url, $this->version );
 
         // Ensure the file is valid
 
@@ -194,7 +194,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       } else {
 
-        prp_log( __( 'transient already cached', plugin_readme_parser_domain ) );
+        // prp_log( __( 'transient already cached', plugin_readme_parser_domain ) );
 
         $this->content = $result;
       }
@@ -218,9 +218,12 @@ if ( !class_exists( 'Generate_Output' ) ) {
      * @param  string    $content  Post content
      * @param  string          Output
      */
-    public function readme_info( $paras = '', $content = '' ): string {
+    public function readme_info( array $paras = array(), string $content = '' ): string {
 
-      // prp_log( __( 'Readme Info', plugin_readme_parser_domain ) );
+      // prp_log( __( '----------------- README INFO -----------------', plugin_readme_parser_domain ) );
+
+      // prp_log( 'readme_info arg1: parameters', $paras );
+      // prp_log( 'readme_info arg2: content', $content );
 
       $this->reset();
 
@@ -228,34 +231,41 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       $this->normalise_parameters( $paras );
 
-      extract( shortcode_atts( array( 'name' => '', 'target' => '_blank', 'nofollow' => '', 'data' => '', 'cache' => '5' ), $this->parameters ) );
+      $attributes = shortcode_atts( array( 'name' => '', 'target' => '_blank', 'nofollow' => '', 'data' => '', 'cache' => '5' ), $this->parameters );
+      extract( $attributes );
+      // prp_log( 'user attributes', $attributes );
 
-      $result = false;
       $output = '';
       $data = strtolower( $data );
       if ( 'yes' == strtolower( $nofollow ) ) {
-        $nofollow = ' rel="nofollow"';
+        $this->nofollow = ' rel="nofollow"';
       }
 
       // Get the cache
 
+      $this->cache = $cache;
+      // prp_log( 'this cache', $this->cache );
+      // prp_log( 'cache is numeric', is_numeric( $this->cache ) );
+      $result = false;
       if ( is_numeric( $this->cache ) ) {
         $this->cache_key = 'prp_info_' . md5( $name . $this->cache );
+        // prp_log( 'cache key', $this->cache_key );
         $result = get_transient( $this->cache_key );
       }
+      // prp_log( 'transient exists', $result ? 'true' : 'false' );
 
       if ( !$result ) {
 
         // Get the file
 
-        $file_data = prp_get_readme( $name );
-        $plugin_name = $file_data[ 'name' ];
+        $this->file_data = $this->get_readme( $name );
+        $this->plugin_name = $this->file_data[ 'name' ];
 
-        if ( false !== $file_data ) {
+        if ( false !== $this->file_data ) {
 
           // Split file into array based on CRLF
 
-          $this->file_array = preg_split( "/((\r(?!\n))|((?<!\r)\n)|(\r\n))/", $file_data[ 'file' ] );
+          $this->file_array = preg_split( "/((\r(?!\n))|((?<!\r)\n)|(\r\n))/", $this->file_data[ 'file' ] );
 
           // Loop through the array
 
@@ -269,52 +279,58 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
             // If first record extract plugin name
 
-            if ( ( '' == $plugin_name ) &&
+            if ( ( '' == $this->plugin_name ) &&
                  ( 0 == $i ) ) {
 
               $pos = strpos( $this->file_array [ 0 ], ' ===' );
               if ( false !== $pos ) {
-                $plugin_name = substr( $this->file_array[ 0 ], 4, $pos - 4 );
-                $plugin_name = str_replace( ' ', '-', strtolower( $plugin_name ) );
+                $this->plugin_name = substr( $this->file_array[ 0 ], 4, $pos - 4 );
+                $this->plugin_name = str_replace( ' ', '-', strtolower( $this->plugin_name ) );
               }
             }
 
             // Extract version number
 
             if ( 'Stable tag:' == substr( $this->file_array[ $i ], 0, 11 ) ) {
-              $version = substr( $this->file_array[ $i ], 12 );
+              $this->version = substr( $this->file_array[ $i ], 12 );
             }
           }
 
           // Save cache
 
           if ( is_numeric( $this->cache ) ) {
-            $result[ 'version' ] = $version;
-            $result[ 'name' ] = $plugin_name;
+            $result[ 'version' ] = $this->version;
+            $result[ 'name' ] = $this->plugin_name;
             set_transient( $this->cache_key, $result, 3600 * $this->cache );
           }
 
         } else {
           // prp_log( __( '*** PLUGIN URL', plugin_readme_parser_domain ), $plugin_url, true );
 
-          $output = prp_report_error( __( 'readme file could not be found or is malformed; name: \'' . $file_data[ 'name' ] . '\'', plugin_readme_parser_domain ) . ' - ' . $name, plugin_readme_parser_name, false );
+          $output = prp_report_error( __( 'readme file could not be found or is malformed; name: \'' . $this->file_data[ 'name' ] . '\'', plugin_readme_parser_domain ) . ' - ' . $name, plugin_readme_parser_name, false );
         }
       } else {
 
         // Cache retrieved, so get information from resulting array
 
-        $version = $result[ 'version' ];
-        $plugin_name = $result[ 'name' ];
+        // prp_log( 'result', $result );
 
+        $this->version = $result[ 'version' ];
+        $this->plugin_name = $result[ 'name' ];
+
+        // prp_log( 'version', $this->version );
+        // prp_log( 'plugin name', $this->plugin_name );
       }
 
       if ( $output == '' ) {
 
+        // prp_log( 'data', $data );
+
         // If download link requested build the URL
 
         if ( 'download' == $data ) {
-          if ( ( '' != $plugin_name ) && ( '' != $version ) ) {
-            $output = '<a href="https://downloads.wordpress.org/plugin/' . $plugin_name . '.' . $version . '.zip" target="' . $target . '"' . $nofollow . '>' . $content. '</a>';
+          if ( ( '' != $this->plugin_name ) && ( '' != $this->version ) ) {
+            $output = '<a href="https://downloads.wordpress.org/plugin/' . $this->plugin_name . '.' . $this->version . '.zip" target="' . $target . '"' . $nofollow . '>' . $content. '</a>';
           } else {
             $output = prp_report_error( __( 'The name and/or version number could not be found in the readme', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
           }
@@ -323,8 +339,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
         // If version number requested return it
 
         if ( 'version' == $data ) {
-          if ( '' != $version ) {
-            $output = $version;
+          if ( '' != $this->version ) {
+            $output = $this->version;
           } else {
             $output = prp_report_error( __( 'Version number not found in the readme', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
           }
@@ -333,8 +349,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
         // If forum link requested build the URL
 
         if ( 'forum' == $data ) {
-          if ( '' != $plugin_name ) {
-            $output = '<a href="https://wordpress.org/tags/' . $plugin_name . '" target="' . $target . '"' . $nofollow . '>' . $content . '</a>';
+          if ( '' != $this->plugin_name ) {
+            $output = '<a href="https://wordpress.org/tags/' . $this->plugin_name . '" target="' . $target . '"' . $nofollow . '>' . $content . '</a>';
           } else {
             $output = prp_report_error( __( 'Plugin name not supplied', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
           }
@@ -343,8 +359,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
         // If WordPress link requested build the URL
 
         if ( 'wordpress' == $data ) {
-          if ( '' != $plugin_name ) {
-            $output = '<a href="https://wordpress.org/extend/plugins/' . $plugin_name . '/" target="' . $target . '"' . $nofollow . '>' . $content . '</a>';
+          if ( '' != $this->plugin_name ) {
+            $output = '<a href="https://wordpress.org/extend/plugins/' . $this->plugin_name . '/" target="' . $target . '"' . $nofollow . '>' . $content . '</a>';
           } else {
             $output = prp_report_error( __( 'Plugin name not supplied', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
           }
@@ -366,7 +382,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     /**
      * Normalises the quotation marks to straight ones from curly ones.
      * Fixes the erroneous array member created by having a space in 'Upgrade
-     * Notice'.
+     * Notice' and names of plugins.
      *
      * @param  $parameters  array  The text to normalise the quotation marks in.
      * @return        array  The text containing normalised quotation marks.
@@ -387,6 +403,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
             $normalised_parameters['exclude'] .= ' ' . $normalised_parameters[0];
           } else if ( isset( $normalised_parameters[ 'include' ] ) ) {
             $normalised_parameters['include'] .= ' ' . $normalised_parameters[0];
+          } else if ( isset( $normalised_parameters[ 'name' ] ) ) {
+            $normalised_parameters['name'] .= ' ' . $normalised_parameters[0];
           } else {
             // prp_log( __( 'Erroneous parameter found', plugin_readme_parser_domain ) );
           }
@@ -791,7 +809,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       if ( 'Screenshots' === $this->section ) {
         // Do not display screenshots: any attempt to access the screenshots on WordPress' SVN servers is met with an HTTP 403 (forbidden) error.
         $this->add_to_output = false;
-        // prp_log( __( 'Can\'t output screenshots.', plugin_readme_parser_domain ) );
+        // prp_log( __( 'Can\'t output screenshots.', plugin_readme_parser_domain ), '', true, false );
       }
     }
 
@@ -888,14 +906,14 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function process_valid_file(): void {
 
-      // prp_log( __( 'file_data', plugin_readme_parser_domain ), $file_data );
+      // prp_log( __( 'file_data', plugin_readme_parser_domain ), $this->file_data );
 
       if ( isset( $this->file_data[ 'name' ] ) ) {
         $this->plugin_name = $this->file_data[ 'name' ];
       } else {
         $this->plugin_name = '';
       }
-      // prp_log( __( 'plugin name', plugin_readme_parser_domain ), $plugin_name );
+      // prp_log( __( 'plugin name', plugin_readme_parser_domain ), $this->plugin_name );
 
       // Split file into array based on CRLF
 
@@ -941,11 +959,71 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function cache_the_results(): void {
 
       if ( is_numeric( $this->cache ) ) {
-        prp_log( __( 'caching transient', plugin_readme_parser_domain ) );
+        // prp_log( __( 'caching transient', plugin_readme_parser_domain ) );
         set_transient( $this->cache_key, $this->content, 3600 * $this->cache );
       }
       // prp_log( __( 'cache    ', plugin_readme_parser_domain ), $this->cache_key );
       // prp_log( __( 'cache key', plugin_readme_parser_domain ), $this->cache );
+    }
+
+
+    /**
+     * Get the readme file
+     *
+     * Function to work out the filename of the readme and get it
+     *
+     * @since  1.2
+     *
+     * @param  $plugin_url   string  readme name or URL
+     * @return       string  False or array containing readme and plugin name
+     */
+    private function get_readme( $plugin_url, $version = '' ): mixed {
+
+      // prp_log( __( '  Get readme:', plugin_readme_parser_domain ) );
+      // prp_log( __( '  title:      \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
+
+      // Work out filename and fetch the contents
+
+      if ( strpos( $plugin_url, '://' ) === false ) {
+        $array[ 'name' ] = str_replace( ' ', '-', strtolower( $plugin_url ) );
+        $this->plugin_url = 'https://plugins.svn.wordpress.org/' . $array[ 'name' ] . '/';
+        // prp_log( __( '  url:        \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
+      if ( is_numeric( $version ) ) {
+        $this->plugin_url .= 'tags/' . $version;
+        // prp_log( __( '  tag url:    \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
+      } else {
+        $this->plugin_url .= 'trunk';
+        // prp_log( __( '  trunk url:  \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
+      }
+      $this->plugin_url .= '/readme.txt';
+      // prp_log( __( '  readme.txt: \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
+      }
+
+      $this->file_data = prp_get_file( $this->plugin_url );
+      // prp_log( __( '  file data:   contents of readme file', plugin_readme_parser_domain ) );
+      // prp_log( $this->file_data, '  file data:' );
+
+      // Ensure the file is valid
+
+      if ( ( $this->file_data[ 'rc' ] == 0 ) &&
+           ( $this->file_data[ 'file' ] != '' ) &&
+           ( substr( $this->file_data[ 'file' ], 0, 9 ) != '<!DOCTYPE' ) &&
+           ( substr_count( $this->file_data[ 'file' ], "\n" ) != 0 ) ) {
+
+        // Return values
+
+        $array[ 'file' ] = $this->file_data[ 'file' ];
+
+        return $array;
+
+      } else {
+
+        // prp_log( __( '  readme file is invalid', plugin_readme_parser_domain ) );
+
+        // If not valid, return false
+
+        return false;
+      }
     }
 
   }
@@ -958,7 +1036,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // $generator = new Generate_Output();
       return $generator->readme_parser( $paras, $content );
     }
-  add_shortcode( 'readme', 'readme_parser' );
+    add_shortcode( 'readme', 'readme_parser' );
   }
   if ( !function_exists( 'readme_info' )) {
     function readme_info( $paras = '', $content = '' ) {

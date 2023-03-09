@@ -101,67 +101,6 @@ if ( !function_exists( 'prp_log_truncated_line' ) ) {
   }
 }
 
-if ( !function_exists( 'prp_get_readme' ) ) {
-/**
- * Get the readme file
- *
- * Function to work out the filename of the readme and get it
- *
- * @since  1.2
- *
- * @param  $plugin_url   string  readme name or URL
- * @return       string  False or array containing readme and plugin name
- */
-  function prp_get_readme( $plugin_url, $version = '' ) {
-
-    // prp_log( __( '  Get readme:', plugin_readme_parser_domain ) );
-    // prp_log( __( '  title:      \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
-
-    // Work out filename and fetch the contents
-
-    if ( strpos( $plugin_url, '://' ) === false ) {
-      $array[ 'name' ] = str_replace( ' ', '-', strtolower( $plugin_url ) );
-      $plugin_url = 'https://plugins.svn.wordpress.org/' . $array[ 'name' ] . '/';
-      // prp_log( __( '  url:        \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
-    if ( is_numeric( $version ) ) {
-      $plugin_url .= 'tags/' . $version;
-      // prp_log( __( '  tag url:    \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
-    } else {
-      $plugin_url .= 'trunk';
-      // prp_log( __( '  trunk url:  \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
-    }
-    $plugin_url .= '/readme.txt';
-    // prp_log( __( '  readme.txt: \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
-    }
-
-    $file_data = prp_get_file( $plugin_url );
-    // prp_log( __( '  file data:   contents of readme file', plugin_readme_parser_domain ) );
-    // prp_log( $file_data, '  file data:' );
-
-    // Ensure the file is valid
-
-    if ( ( $file_data[ 'rc' ] == 0 ) &&
-         ( $file_data[ 'file' ] != '' ) &&
-         ( substr( $file_data[ 'file' ], 0, 9 ) != '<!DOCTYPE' ) &&
-         ( substr_count( $file_data[ 'file' ], "\n" ) != 0 ) ) {
-
-      // Return values
-
-      $array[ 'file' ] = $file_data[ 'file' ];
-
-      return $array;
-
-    } else {
-
-      // prp_log( __( '  readme file is invalid', plugin_readme_parser_domain ) );
-
-      // If not valid, return false
-
-      return false;
-    }
-  }
-}
-
 if ( !function_exists( 'prp_is_it_excluded' ) ) {
   /**
    * Is It Excluded?
