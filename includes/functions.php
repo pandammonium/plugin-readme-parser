@@ -58,8 +58,8 @@ function prp_log( $message_name, $message = '', $error = false, $echo = false ) 
       return prp_report_error( $output, plugin_readme_parser_name, $echo );
 
     } else {
-      // $prefix = 'PRP | ';
-      $prefix = plugin_readme_parser_name . ' | ';
+      $prefix = 'PRP | ';
+      // $prefix = plugin_readme_parser_name . ' | ';
 
       if ( ( $debugging && $log_file ) ||
            ( $error && !$echo ) ) {
@@ -215,7 +215,7 @@ if ( !function_exists( 'prp_is_it_excluded' ) ) {
       }
     }
     // if ( 'description' === $tofind ) {
-    //   // prp_log( __( '  \'' . $tofind . '\' is ' . ( $return ? 'explicitly excluded' : 'not explicitly excluded' ), plugin_readme_parser_domain ) );
+    //   prp_log( __( '  \'' . $tofind . '\' is ' . ( $return ? 'explicitly excluded' : 'not explicitly excluded' ), plugin_readme_parser_domain ) );
     // }
     return $return;
   }
@@ -365,10 +365,10 @@ if ( !function_exists( 'prp_check_img_exists' ) ) {
     return false;
 
     // if ( $file_exists ) {
-    //   // prp_log( __( '\'' . $filename . $ext . '\' exists: true', plugin_readme_parser_domain ) );
+    //   prp_log( __( '\'' . $filename . $ext . '\' exists: true', plugin_readme_parser_domain ) );
     //   return $ext;
     // } else {
-    //   // prp_log( __( '\'' . $filename . $ext . '\' exists: false', plugin_readme_parser_domain ) );
+    //   prp_log( __( '\'' . $filename . $ext . '\' exists: false', plugin_readme_parser_domain ) );
     //   return false;
     // }
   }
@@ -401,7 +401,7 @@ if ( !function_exists( 'prp_strip_list' ) ) {
     } else if ( $type == 't' ) {
       $url = 'https://wordpress.org/extend/plugins/tags/';
     } else {
-      // prp_log( __( 'Invalid type found.', '', plugin_readme_parser_domain ), true );
+      prp_log( __( 'Invalid type found.', '', plugin_readme_parser_domain ), true, false );
       $url = '';
     }
 
@@ -561,10 +561,9 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
 
       static $original_shortcodes = array();
 
-      // prp_log( __( '# original shortcodes: ', plugin_readme_parser_domain ) . count ( $original_shortcodes ) );
-      // prp_log( __( '# global shortcodes:   ' . count ( $GLOBALS['shortcode_tags', plugin_readme_parser_domain )] ) );
-
-      // prp_log( __( 'Shortcode content: ', plugin_readme_parser_domain ) . $content );
+      // prp_log( __( 'no. original shortcodes', plugin_readme_parser_domain ), count ( $original_shortcodes ) );
+      // prp_log( __( 'no. global shortcodes', plugin_readme_parser_domain ), count ( $GLOBALS['shortcode_tags'] ) );
+      // prp_log( __( 'shortcode content', plugin_readme_parser_domain ), $content );
 
       if ( count ( $original_shortcodes ) === 0 ) {
         // Toggle the shortcodes OFF
@@ -575,61 +574,63 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
         $current_theme_supports_blocks = wp_is_block_theme();
 
         if ( $current_theme_supports_blocks ) {
-          // prp_log( __( 'This theme DOES support blocks', plugin_readme_parser_domain ) );
-          //   // prp_log( __( 'Toggling ALL global shortcodes OFF', plugin_readme_parser_domain ) );
+          // prp_log( __( 'this theme DOES support blocks', plugin_readme_parser_domain ) );
+          //   prp_log( __( 'Toggling ALL global shortcodes OFF', plugin_readme_parser_domain ) );
           if  ( str_contains( $content, '[readme_info' ) ) {
-            // prp_log( __( 'Content contains \'[readme_info\'', plugin_readme_parser_domain ) );
-            $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
-            // prp_log( __( 'Toggling global shortcodes OFF except for:', plugin_readme_parser_domain ) );
-            // prp_log( $GLOBALS['shortcode_tags'], 'Global shortcodes:' );
+            // prp_log( __( 'content contains \'[readme_info\'', plugin_readme_parser_domain ) );
+            // $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
+            // prp_log( __( 'toggling global shortcodes OFF except for:', plugin_readme_parser_domain ) );
+            // prp_log( 'global shortcodes', $GLOBALS['shortcode_tags'] );
           }
 
         } else {
-          // prp_log( __( 'This theme DOES NOT support blocks', plugin_readme_parser_domain ) );
+          // prp_log( __( 'this theme DOES NOT support blocks', plugin_readme_parser_domain ) );
 
           // Need to put some of this plugin's ones back, otherwise it all breaks; it's unclear as to why and as to why these combinations work:
 
           if ( ( str_contains( $content, '[readme ' ) ) ||
                ( str_contains( $content, '[readme]' ) ) ) {
-            // prp_log( __( 'Content contains \'[readme \' or \'[readme]\'', plugin_readme_parser_domain ) );
+            // prp_log( __( 'content contains \'[readme \' or \'[readme]\'', plugin_readme_parser_domain ) );
 
             $GLOBALS['shortcode_tags']['readme'] = 'readme_parser';
             $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
 
           } else if  ( str_contains( $content, '[readme_info' ) ) {
-            // prp_log( __( 'Content contains \'[readme_info\'', plugin_readme_parser_domain ) );
+            // prp_log( __( 'content contains \'[readme_info\'', plugin_readme_parser_domain ) );
 
             $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
 
           } else {
-            // prp_log( __( 'Failed to find Plugin-readme Parser shortcode', plugin_readme_parser_domain ) );
+            // prp_log( __( 'failed to find ' . plugin_readme_parser_name . ' shortcode', plugin_readme_parser_domain ) );
 
             // We're in the wild, not writing out a readme with this plugin, so all the shortcodes need to be functional:
-            // prp_log( __( 'Toggling ALL global shortcodes ON', plugin_readme_parser_domain ) );
-            // prp_log( __( '# original shortcodes: ', plugin_readme_parser_domain ) . count ( $original_shortcodes ) );
-            // prp_log( __( '# global shortcodes:   ' . count ( $GLOBALS['shortcode_tags'] ), plugin_readme_parser_domain ) );
+            // prp_log( __( 'toggling ALL global shortcodes ON', plugin_readme_parser_domain ) );
+            // prp_log( __( 'no. original shortcodes', plugin_readme_parser_domain ) . count ( $original_shortcodes ) );
+            // prp_log( __( 'no. global shortcodes' . count ( $GLOBALS['shortcode_tags'] ), plugin_readme_parser_domain ) );
             $GLOBALS['shortcode_tags'] = $original_shortcodes;
             return $content;
 
           }
 
-          // prp_log( __( 'Toggling global shortcodes OFF except for:', plugin_readme_parser_domain ) );
-          // prp_log( $GLOBALS['shortcode_tags'], 'Global shortcodes:' );
+          // prp_log( __( 'toggling global shortcodes OFF except for:', plugin_readme_parser_domain ) );
+          // prp_log( 'global shortcodes', $GLOBALS['shortcode_tags'] );
         }
 
       } else {
         // Toggle the shortcodes ON
 
-        // prp_log( __( 'Toggling global shortcodes ON', plugin_readme_parser_domain ) );
+        // prp_log( __( 'toggling global shortcodes ON', plugin_readme_parser_domain ) );
 
         $GLOBALS['shortcode_tags'] = $original_shortcodes;
         $original_shortcodes = array();
-        // prp_log( __( 'Repopulating GLOBAL shortcodes with original shortcodes', plugin_readme_parser_domain ) );
+        // prp_log( __( 'repopulating GLOBAL shortcodes with original shortcodes', plugin_readme_parser_domain ) );
 
       }
     } else {
-      prp_report_error( __( 'wrong plugin supplied', plugin_readme_parser_domain), plugin_readme_parser_name );
-      // prp_log( __( '***** Wrong plugin supplied *****', plugin_readme_parser_domain ) );
+      // prp_report_error( __( 'wrong plugin supplied', plugin_readme_parser_domain), plugin_readme_parser_name );
+      prp_log( __( 'Wrong plugin:', plugin_readme_parser_domain ), '', true, false );
+      prp_log( __( 'expected', plugin_readme_parser_domain ), plugin_readme_parser_name, true, false );
+      prp_log( __( 'got', plugin_readme_parser_domain ), $file, true, false );
     }
     return $content;
   }
