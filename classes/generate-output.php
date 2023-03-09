@@ -331,7 +331,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
         // Report an error if the data parameter was invalid or missing
 
         if ( '' == $output ) {
-          $output = prp_report_error( __( 'The data parameter was invalid or missing', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
+          $output = prp_report_error( __( 'The data parameter is invalid or missing', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
         }
 
       }
