@@ -231,8 +231,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       $this->normalise_parameters( $paras );
 
-      $attributes = shortcode_atts( array( 'name' => '', 'target' => '_blank', 'nofollow' => '', 'data' => '', 'cache' => '5' ), $this->parameters );
-      extract( $attributes );
+      extract( shortcode_atts( array( 'name' => '', 'target' => '_blank', 'nofollow' => '', 'data' => '', 'cache' => '5' ), $this->parameters ) );
       // prp_log( 'user attributes', $attributes );
 
       $output = '';
