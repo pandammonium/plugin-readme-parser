@@ -458,7 +458,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
         if ( !$this->meta_explicitly_excluded ) {
           if ( $this->meta_explicitly_included ) {
             $new_include = str_replace( 'meta', 'head', $this->include );
-            prp_log( __( 'Cannot include the meta data part of the head without the summary part', plugin_readme_parser_domain ), '', true, false );
+            prp_log( __( 'Cannot include the meta data part of the head without the summary part:', plugin_readme_parser_domain ), '', true, false );
             prp_log( __( '  Parameters supplied', plugin_readme_parser_domain ), 'include="' . $this->include . '"', true, false );
             prp_log( __( '  Parameters changed to', plugin_readme_parser_domain ), 'include="' . $new_include . '"', true, false );
             // prp_log( __( 'Cannot include the meta data part of the head without the summary part.\n  Parameters supplied:   include="' . $this->include . '"\n  Parameters changed to: include="' . $new_include . '"', plugin_readme_parser_domain ), '', true, true );
