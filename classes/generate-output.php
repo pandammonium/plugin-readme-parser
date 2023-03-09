@@ -1053,6 +1053,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // $generator = new Generate_Output();
       return $generator->readme_parser( $paras, $content );
     }
+  add_shortcode( 'readme', 'readme_parser' );
   }
   if ( !function_exists( 'readme_banner' )) {
     function readme_banner( $paras = '', $content = '' ) {
@@ -1060,6 +1061,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // $generator = new Generate_Output();
       return $generator->readme_banner( $paras, $content );
     }
+  add_shortcode( 'readme_banner', 'readme_banner' );
   }
   if ( !function_exists( 'readme_info' )) {
     function readme_info( $paras = '', $content = '' ) {
@@ -1067,11 +1069,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // $generator = new Generate_Output();
       return $generator->readme_info( $paras, $content);
     }
+    add_shortcode( 'readme_info', 'readme_info' );
   }
-
-  add_shortcode( 'readme', 'readme_parser' );
-  add_shortcode( 'readme_banner', 'readme_banner' );
-  add_shortcode( 'readme_info', 'readme_info' );
 
 }
 ?>
