@@ -23,19 +23,19 @@ if ( !function_exists( 'prp_log' ) ) {
 function prp_log( $message_name, $message = '', $error = false, $echo = false ) {
 
     $debugging = defined( 'WP_DEBUG' ) && WP_DEBUG;
-    $log_file = defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG;
-    $log_display = defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
+    $debug_logfile = defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG;
+    $debug_display = defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
 
     // error_log( print_r( '  WP_DEBUG:         ' . ($debugging ? 'true' : 'false' ), true ) );
-    // error_log( print_r( '  WP_DEBUG_LOG:     ' . ($log_file ? 'true' : 'false' ), true ) );
-    // error_log( print_r( '  WP_DEBUG_DISPLAY: ' . ($log_display ? 'true' : 'false' ), true ) );
+    // error_log( print_r( '  WP_DEBUG_LOG:     ' . ($debug_logfile ? 'true' : 'false' ), true ) );
+    // error_log( print_r( '  WP_DEBUG_DISPLAY: ' . ($debug_display ? 'true' : 'false' ), true ) );
     // error_log( print_r( '  error:            ' . ($error ? 'true' : 'false' ), true ) );
     // error_log( print_r( '  echo:             ' . ($echo ? 'true' : 'false' ), true ) );
 
     // echo '<pre>' .
     //   print_r( 'WP_DEBUG:         ' . ($debugging ? 'true' : 'false' ), true ) . '<br>' .
-    //   print_r( 'WP_DEBUG_LOG:     ' . ($log_file ? 'true' : 'false' ), true ) . '<br>' .
-    //   print_r( 'WP_DEBUG_DISPLAY: ' . ($log_display ? 'true' : 'false' ), true ) . '<hr>' .
+    //   print_r( 'WP_DEBUG_LOG:     ' . ($debug_logfile ? 'true' : 'false' ), true ) . '<br>' .
+    //   print_r( 'WP_DEBUG_DISPLAY: ' . ($debug_display ? 'true' : 'false' ), true ) . '<hr>' .
     //   print_r( '$error:           ' . ($error ? 'true' : 'false' ), true ) . '<br>' .
     //   print_r( '$echo:            ' . ($echo ? 'true' : 'false' ), true ) .
     //  '</pre>';
@@ -58,14 +58,15 @@ function prp_log( $message_name, $message = '', $error = false, $echo = false ) 
       return prp_report_error( $output, plugin_readme_parser_name, $echo );
 
     } else {
-      $prefix = 'PRP | ';
+
+      $prefix = ( strncmp( $output, plugin_readme_parser_name, strlen( plugin_readme_parser_name ) ) === 0 ) ? '' : 'PRP | ';
       // $prefix = plugin_readme_parser_name . ' | ';
 
-      if ( ( $debugging && $log_file ) ||
+      if ( ( $debugging && $debug_logfile ) ||
            ( $error && !$echo ) ) {
         error_log( $prefix . $output );
       }
-      if ( ( $debugging && $log_display ) ||
+      if ( ( $debugging && $debug_display ) ||
            ( $echo ) ) {
         $delim = ':';
         $pos = strpos( $output, $delim );
