@@ -258,7 +258,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         // prp_log( 'file data', $this->file_data );
 
-        if ( false && false !== $this->file_data ) {
+        if ( false !== $this->file_data ) {
 
           $this->read_file_info();
 
