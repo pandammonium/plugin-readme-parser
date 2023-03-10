@@ -242,6 +242,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
       $this->cache = $cache;
       $result = $this->get_cached_output( 'prp_info_' . md5( $name . $this->cache ) );
 
+      // prp_log( 'result', $result );
+
       if ( !$result ) {
 
         $this->name = $name;
@@ -274,13 +276,15 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         // Cache retrieved, so get information from resulting array
 
-        // prp_log( 'result', $result );
+        if ( is_string( $result ) ) {
+          $output = prp_report_error( __( 'The parameters are invalid. Check the spelling.', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
+        } else {
+          $this->version = $result[ 'version' ];
+          $this->plugin_name = $result[ 'name' ];
 
-        $this->version = $result[ 'version' ];
-        $this->plugin_name = $result[ 'name' ];
-
-        // prp_log( 'version', $this->version );
-        // prp_log( 'plugin name', $this->plugin_name );
+          prp_log( 'version', $this->version );
+          prp_log( 'plugin name', $this->plugin_name );
+        }
       }
 
       if ( $output == '' ) {
