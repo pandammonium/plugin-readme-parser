@@ -14,7 +14,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
    */
   class Generate_Output {
 
-    private array $parameters = array();
+    private string|array|null $parameters = null;
     private $content = '';
 
     private array $file_array = array();
@@ -99,7 +99,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
      * @param  string    $paras  Parameters
      * @return   string          Output
      */
-    public function readme_parser( array $paras = array(), string $content = '' ): string {
+    public function readme_parser( string|array|null $paras = null, string $content = '' ): string {
 
 
       // prp_log( __( '---------------- README PARSER ----------------', plugin_readme_parser_domain ) );
@@ -117,6 +117,15 @@ if ( !class_exists( 'Generate_Output' ) ) {
       $this->normalise_parameters( $paras );
 
       extract( shortcode_atts( array( 'exclude' => '', 'hide' => '', 'include' => '', 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '5', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $this->parameters ) );
+
+      // Ensure EXCLUDE and INCLUDE parameters aren't both included
+      $this->exclude = strtolower( $exclude );
+      $this->include = strtolower( $include );
+
+      $valid = $this->validate_parameters();
+      if ( '' !== $valid ) {
+        return $valid;
+      }
 
       // prp_log( 'cache', $cache );
 
@@ -138,8 +147,6 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         $this->plugin_url =$this->content;
 
-        $this->exclude = strtolower( $exclude );
-        $this->include = strtolower( $include );
         $this->hide = strtolower( $hide );
         $this->links = strtolower( $links );
         $this->ignore = prp_get_list( $ignore, ',,', 'ignore' );
@@ -161,13 +168,6 @@ if ( !class_exists( 'Generate_Output' ) ) {
         // Work out in advance whether the head should be shown
 
         $this->should_head_be_shown();
-
-        // Ensure EXCLUDE and INCLUDE parameters aren't both included
-
-        $valid = $this->validate_parameters();
-        if ( true !== $valid ) {
-          return $valid;
-        }
 
         // Work out filename and fetch the contents
 
@@ -312,35 +312,47 @@ if ( !class_exists( 'Generate_Output' ) ) {
      * @param  $parameters  array  The text to normalise the quotation marks in.
      * @return        array  The text containing normalised quotation marks.
      */
-    private function normalise_parameters( array $parameters ): void {
+    private function normalise_parameters( string|array|null $parameters = null ): void {
 
       // prp_log( __( 'Parameters (raw)', plugin_readme_parser_domain), $parameters );
 
-      if ( is_array($parameters ) ) {
-        $normalised_parameters = array();
-        foreach ( $parameters as $key => $value ) {
-          // prp_log( $key . ': ' . $value );
-          $normalised_parameters[$key] = str_replace(array_keys(self::QUOTES), array_values(self::QUOTES), $parameters[$key]);
-          // prp_log( $key . ': ' . $normalised_parameters[$key] );
-        }
-        if ( isset( $normalised_parameters[0] ) ) {
-          if ( isset( $normalised_parameters[ 'exclude' ] ) ) {
-            $normalised_parameters['exclude'] .= ' ' . $normalised_parameters[0];
-          } else if ( isset( $normalised_parameters[ 'include' ] ) ) {
-            $normalised_parameters['include'] .= ' ' . $normalised_parameters[0];
-          } else if ( isset( $normalised_parameters[ 'name' ] ) ) {
-            $normalised_parameters['name'] .= ' ' . $normalised_parameters[0];
-          } else {
-            // prp_log( __( 'Erroneous parameter found', plugin_readme_parser_domain ) );
-          }
-          unset( $normalised_parameters[0] );
-        }
-        // prp_log( __( 'Parameters (normalised)', plugin_readme_parser_domain), $this->parameters );
-        $this->parameters = $normalised_parameters;
-
-      } else {
-        // prp_log( 'Normalise: wanted a string or an array; got \'' . gettype( $parameters ) . '\'', $parameters, true );
+      if ( null === $parameters ) {
         $this->parameters = $parameters;
+        // prp_log( 'Parameters are null', $parameters );
+      } else {
+        switch( gettype( $parameters ) ) {
+          case 'array':
+            $normalised_parameters = array();
+            foreach ( $parameters as $key => $value ) {
+              // prp_log( $key . ': ' . $value );
+              $normalised_parameters[$key] = str_replace(array_keys(self::QUOTES), array_values(self::QUOTES), $parameters[$key]);
+              // prp_log( $key . ': ' . $normalised_parameters[$key] );
+            }
+            if ( isset( $normalised_parameters[0] ) ) {
+              if ( isset( $normalised_parameters[ 'exclude' ] ) ) {
+                $normalised_parameters['exclude'] .= ' ' . $normalised_parameters[0];
+              } else if ( isset( $normalised_parameters[ 'include' ] ) ) {
+                $normalised_parameters['include'] .= ' ' . $normalised_parameters[0];
+              } else if ( isset( $normalised_parameters[ 'name' ] ) ) {
+                $normalised_parameters['name'] .= ' ' . $normalised_parameters[0];
+              } else {
+                // prp_log( __( 'Erroneous parameter found', plugin_readme_parser_domain ) );
+              }
+              unset( $normalised_parameters[0] );
+            }
+            $this->parameters = $normalised_parameters;
+            // prp_log( __( 'Parameter array (normalised)', plugin_readme_parser_domain), $this->parameters );
+          break;
+          case 'string':
+            $normalised_parameters = str_replace(array_keys(self::QUOTES), array_values(self::QUOTES), $parameters);
+            $this->parameters = $parameters;
+            // prp_log( __( 'Parameter string (normalised)', plugin_readme_parser_domain), '\'' . $this->parameters . '\'' );
+          break;
+          default:
+            $this->parameters = $parameters;
+            prp_log( 'Shortcode parameters: wanted string|array|null; got ' . gettype( $parameters ), $this->parameters, true );
+          break;
+        }
       }
     }
 
@@ -408,13 +420,13 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // prp_log( __( 'show meta', plugin_readme_parser_domain ), ( $this->show_meta ? 'true' : 'false' ) );
     }
 
-    private function validate_parameters(): mixed {
+    private function validate_parameters(): string {
 
       if ( ( '' != $this->exclude ) &&
            ( '' != $this->include ) ) {
         return prp_report_error( __( 'Parameters \'include\' and \'exclude\' cannot both be specified', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
       } else {
-        return true;
+        return '';
       }
     }
 
@@ -510,7 +522,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     }
 
     private function reset(): void {
-      $this->parameters = array();
+      $this->parameters = null;
       $this->content = '';
 
       $this->file_array = array();
