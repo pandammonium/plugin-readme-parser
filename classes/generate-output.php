@@ -4,63 +4,64 @@
  *
  * Functions to generate required output
  *
- * @package  Pandammonium-Readme-Parser
+ * @package Pandammonium-Readme-Parser
  * @since  1.0
  */
 
 if ( !class_exists( 'Generate_Output' ) ) {
   /**
-   * The plugin-readme parser.
+   * The plugin-readme parser and converter-to-HTML.
    */
   class Generate_Output {
 
-    private string|array|null $parameters = null;
-    private $content = '';
+    private string|array|null $parameters;
+    private $content;
 
-    private array $file_array = array();
-    private $file_data = '';
+    private array $file_array;
+    private $file_data;
 
-    private $plugin_url = '';
-    private $plugin_name = '';
-    private $plugin_title = '';
+    private $plugin_url;
+    private $plugin_name;
+    private $plugin_title;
 
-    private $cache = '';
-    private $cache_key = '';
+    private $cache;
+    private $cache_key;
 
-    private $exclude = '';
-    private $include = '';
-    private $hide = '';
-    private $links = '';
-    private $ignore = '';
-    private $mirror = '';
-    private $nofollow = '';
-    private $version = '';
-    private $target = '';
-    private $download = '';
-    private $metadata = '';
+    private $exclude;
+    private $include;
+    private $hide;
+    private $links;
+    private $ignore;
+    private $mirror;
+    private $nofollow;
+    private $version;
+    private $target;
+    private $download;
+    private $metadata;
 
-    private $show_links = false;
-    private $show_head = false;
-    private $show_meta = false;
+    private $show_links;
+    private $show_head;
+    private $show_meta;
 
-    private $head_explicitly_excluded = false;
-    private $head_explicitly_included = false;
-    private $meta_explicitly_excluded = false;
-    private $meta_explicitly_included = false;
+    private $head_explicitly_excluded;
+    private $head_explicitly_included;
+    private $meta_explicitly_excluded;
+    private $meta_explicitly_included;
 
-    private $section = '';
-    private $prev_section = '';
-    private $last_line_blank = true;
-    private $div_written = false;
-    private $add_to_output = true;
-    private $code = false;
-    private $file_combined = '';
+    private $section;
+    private $prev_section;
+    private $last_line_blank;
+    private $div_written;
+    private $add_to_output;
+    private $code;
+    private $file_combined;
+
+    private $my_html;
+
+    private $name;
+    private $data;
+
     private const LINE_END = "\r\n";
-
-    private $my_html = '';
-
-    private $name = '';
-    private $data = '';
 
     private const QUOTES = array(
      '“' => '',
@@ -79,6 +80,60 @@ if ( !class_exists( 'Generate_Output' ) ) {
     //   3 => 'green',
     //   4 => 'blue',
     // );
+
+    /**
+     * Construct an instance of Generate_Output.
+     *
+     * @since 2.0.0
+     */
+    public function __construct() {
+      $this->parameters = null;
+      $this->content = '';
+
+      $this->file_array = array();
+      $this->file_data = '';
+
+      $this->plugin_url = '';
+      $this->plugin_name = '';
+      $this->plugin_title = '';
+
+      $this->cache = '';
+      $this->cache_key = '';
+
+      $this->exclude = '';
+      $this->include = '';
+      $this->hide = '';
+      $this->links = '';
+      $this->ignore = '';
+      $this->mirror = '';
+      $this->nofollow = '';
+      $this->version = '';
+      $this->target = '';
+      $this->download = '';
+      $this->metadata = '';
+
+      $this->show_links = false;
+      $this->show_head = false;
+      $this->show_meta = false;
+
+      $this->head_explicitly_excluded = false;
+      $this->head_explicitly_included = false;
+      $this->meta_explicitly_excluded = false;
+      $this->meta_explicitly_included = false;
+
+      $this->section = '';
+      $this->prev_section = '';
+      $this->last_line_blank = true;
+      $this->div_written = false;
+      $this->add_to_output = true;
+      $this->code = false;
+      $this->file_combined = '';
+
+      $this->my_html = '';
+
+      $this->name = '';
+      $this->data = '';
+    }
 
     /**
      * Output the readme
