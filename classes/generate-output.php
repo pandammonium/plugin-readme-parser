@@ -1024,7 +1024,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       } else if ( 'forum' == $this->data ) {
         if ( '' != $this->plugin_name ) {
-          $output = '<a href="https://wordpress.org/tags/' . $this->plugin_name . '" target="' . $this->target . '"' . $this->nofollow . '>' . $this->content . '</a>';
+          $output = '<a href="https://wordpress.org/support/plugin/' . $this->plugin_name . '" target="' . $this->target . '"' . $this->nofollow . '>' . $this->content . '</a>';
         } else {
           $output = prp_report_error( __( 'Plugin name not supplied', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
         }
