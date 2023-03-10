@@ -23,60 +23,67 @@ if ( !function_exists( 'prp_log' ) ) {
 function prp_log( $message_name, $message = '', $error = false, $echo = false ) {
 
     $debugging = defined( 'WP_DEBUG' ) && WP_DEBUG;
-    $log_file = defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG;
-    $log_display = defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
+    $debug_logfile = defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG;
+    $debug_display = defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
 
     // error_log( print_r( '  WP_DEBUG:         ' . ($debugging ? 'true' : 'false' ), true ) );
-    // error_log( print_r( '  WP_DEBUG_LOG:     ' . ($log_file ? 'true' : 'false' ), true ) );
-    // error_log( print_r( '  WP_DEBUG_DISPLAY: ' . ($log_display ? 'true' : 'false' ), true ) );
+    // error_log( print_r( '  WP_DEBUG_LOG:     ' . ($debug_logfile ? 'true' : 'false' ), true ) );
+    // error_log( print_r( '  WP_DEBUG_DISPLAY: ' . ($debug_display ? 'true' : 'false' ), true ) );
     // error_log( print_r( '  error:            ' . ($error ? 'true' : 'false' ), true ) );
     // error_log( print_r( '  echo:             ' . ($echo ? 'true' : 'false' ), true ) );
 
     // echo '<pre>' .
     //   print_r( 'WP_DEBUG:         ' . ($debugging ? 'true' : 'false' ), true ) . '<br>' .
-    //   print_r( 'WP_DEBUG_LOG:     ' . ($log_file ? 'true' : 'false' ), true ) . '<br>' .
-    //   print_r( 'WP_DEBUG_DISPLAY: ' . ($log_display ? 'true' : 'false' ), true ) . '<hr>' .
+    //   print_r( 'WP_DEBUG_LOG:     ' . ($debug_logfile ? 'true' : 'false' ), true ) . '<br>' .
+    //   print_r( 'WP_DEBUG_DISPLAY: ' . ($debug_display ? 'true' : 'false' ), true ) . '<hr>' .
     //   print_r( '$error:           ' . ($error ? 'true' : 'false' ), true ) . '<br>' .
     //   print_r( '$echo:            ' . ($echo ? 'true' : 'false' ), true ) .
     //  '</pre>';
 
-    $prefix = 'PRP | ' . ( $error ? 'Error: ' : '' );
     $header = ( '' === $message_name ) ? '' : $message_name;
-    $error_style = $error ? ' class="error"' : '';
     $divider = ( '' === $message ) ? '' : ': ';
     $message_type = gettype( $message );
     $output = '';
     switch ( $message_type ) {
-      case 'array':
-        $output = print_r( $header, true ) . $divider . print_r( $message, true );
+      case 'string':
+      case 'integer':
+        $output = print_r( $header . $divider . $message, true );
       break;
       default:
-        $output = $header . $divider . $message;
+        $output = print_r( $header . $divider, true ) . var_export( $message, true );
       break;
     }
 
-    if ( $debugging ||
-         ( $error && $echo ) ) {
-      if ( $log_file ||
-           ( $error && $echo ) ) {
-        error_log( $prefix . $output );
-        // return $echo ? true : $output;
-      }
-      if ( $log_display ||
-           ( $error && $echo ) ) {
+    if ( $error && $echo ) {
+      return prp_report_error( $output, plugin_readme_parser_name, $echo );
 
+    } else {
+
+      $prefix = ( strncmp( $output, plugin_readme_parser_name, strlen( plugin_readme_parser_name ) ) === 0 ) ? '' : 'PRP | ';
+      // $prefix = plugin_readme_parser_name . ' | ';
+
+      if ( ( $debugging && $debug_logfile ) ||
+           ( $error && !$echo ) ) {
+        error_log( $prefix . $output );
+      }
+      if ( ( $debugging && $debug_display ) ||
+           ( $echo ) ) {
         $delim = ':';
         $pos = strpos( $output, $delim );
         if ( $pos !== false ) {
           $output = '<b>' . str_replace( $delim, $delim . '</b>', $output );
         }
-        if ( 'array' === $message_type ) {
-          echo '<pre' . $error_style . '>' . $output . '</pre>';
-        } else {
-          echo '<p' . $error_style . '>' . $output . '</p>';
+        switch ( $message_type ) {
+          case 'string':
+          case 'integer':
+            echo '<p>' . $output . '</p>';
+          break;
+          default:
+            echo '<pre>' . $output . '</pre>';
+          break;
         }
-        // return $echo ? true : $output;
       }
+      return true;
     }
   }
 }
@@ -91,68 +98,7 @@ if ( !function_exists( 'prp_log_truncated_line' ) ) {
     }
     $line = substr( $line, 0, $line_length ) . ( strlen( $line ) > $line_length ? '…' : '' );
 
-    prp_log( __( $line, plugin_readme_parser_domain ) );
-  }
-}
-
-if ( !function_exists( 'prp_get_readme' ) ) {
-/**
- * Get the readme file
- *
- * Function to work out the filename of the readme and get it
- *
- * @since  1.2
- *
- * @param  $plugin_url   string  readme name or URL
- * @return       string  False or array containing readme and plugin name
- */
-  function prp_get_readme( $plugin_url, $version = '' ) {
-
-    // prp_log( __( '  Get readme:', plugin_readme_parser_domain ) );
-    // prp_log( __( '  title:      \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
-
-    // Work out filename and fetch the contents
-
-    if ( strpos( $plugin_url, '://' ) === false ) {
-      $array[ 'name' ] = str_replace( ' ', '-', strtolower( $plugin_url ) );
-      $plugin_url = 'https://plugins.svn.wordpress.org/' . $array[ 'name' ] . '/';
-      // prp_log( __( '  url:        \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
-    if ( is_numeric( $version ) ) {
-      $plugin_url .= 'tags/' . $version;
-      // prp_log( __( '  tag url:    \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
-    } else {
-      $plugin_url .= 'trunk';
-      // prp_log( __( '  trunk url:  \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
-    }
-    $plugin_url .= '/readme.txt';
-    // prp_log( __( '  readme.txt: \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
-    }
-
-    $file_data = prp_get_file( $plugin_url );
-    // prp_log( __( '  file data:   contents of readme file', plugin_readme_parser_domain ) );
-    // prp_log( $file_data, '  file data:' );
-
-    // Ensure the file is valid
-
-    if ( ( $file_data[ 'rc' ] == 0 ) &&
-         ( $file_data[ 'file' ] != '' ) &&
-         ( substr( $file_data[ 'file' ], 0, 9 ) != '<!DOCTYPE' ) &&
-         ( substr_count( $file_data[ 'file' ], "\n" ) != 0 ) ) {
-
-      // Return values
-
-      $array[ 'file' ] = $file_data[ 'file' ];
-
-      return $array;
-
-    } else {
-
-      // prp_log( __( '  readme file is invalid', plugin_readme_parser_domain ) );
-
-      // If not valid, return false
-
-      return false;
-    }
+    // prp_log( __( $line, plugin_readme_parser_domain ) );
   }
 }
 
@@ -395,7 +341,7 @@ if ( !function_exists( 'prp_strip_list' ) ) {
     } else if ( $type == 't' ) {
       $url = 'https://wordpress.org/extend/plugins/tags/';
     } else {
-      // prp_log( __( 'Invalid type found.', '', plugin_readme_parser_domain ), true );
+      prp_log( __( 'Invalid type found.', '', plugin_readme_parser_domain ), true, false );
       $url = '';
     }
 
@@ -528,54 +474,6 @@ if ( !function_exists( 'prp_get_list' ) ) {
 }
 
 if ( !function_exists( 'prp_normalise_parameters' ) ) {
-/**
- * Normalises the quotation marks to straight ones from curly ones.
- * Fixes the erroneous array member created by having a space in 'Upgrade
- * Notice'.
- *
- * @param  $text  string  The text to normalise the quotation marks in.
- * @return        string  The text containing normalised quotation marks.
- */
-  define( 'QUOTES', array(
-   '“' => '',
-   '”' => '',
-   '‘' => '',
-   '’' => '',
-   '&#8220;' => '',
-   '&#8221;' => ''
-  ) );
-  function prp_normalise_parameters( $text ) {
-
-    if ( is_string( $text ) ) {
-      $normalised_text = str_replace(array_keys(QUOTES), array_values(QUOTES), $text);
-      // prp_log( __( 'Normalised ', plugin_readme_parser_domain ) . $text );
-      // prp_log( __( '        to ', plugin_readme_parser_domain ) . $normalised_text  );
-      return $normalised_text;
-
-    } else if ( is_array($text ) ) {
-      $normalised_text = array();
-      foreach ( $text as $key => $value ) {
-        // prp_log( $key . ': ' . $value );
-        $normalised_text[$key] = str_replace(array_keys(QUOTES), array_values(QUOTES), $text[$key]);
-        // prp_log( $key . ': ' . $normalised_text[$key] );
-      }
-      if ( isset( $normalised_text[0] ) ) {
-        if ( isset( $normalised_text[ 'exclude' ] ) ) {
-          $normalised_text['exclude'] .= ' ' . $normalised_text[0];
-        } else if ( isset( $normalised_text[ 'include' ] ) ) {
-          $normalised_text['include'] .= ' ' . $normalised_text[0];
-        } else {
-          // prp_log( __( 'Erroneous parameter found', plugin_readme_parser_domain ) );
-        }
-        unset( $normalised_text[0] );
-      }
-      return $normalised_text;
-
-    } else {
-      // prp_log( $text, 'Normalise: wanted a string or an array; got \'' . gettype( $text ) . '\':'  );
-      return $text;
-    }
-  }
 }
 
 if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
@@ -585,8 +483,8 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
  * they're used to provide examples of use of the plugin's shortcode.
  *
  * Some plugins change this filter’s priority, so clear the global list of
- * registered shortcodes temporarily, except for this plugin's readme_info
- * and readme_banner, which are needed.
+ * registered shortcodes temporarily, except for this plugin's readme_info,
+ * which is needed.
  *
  * @since  2.0.0
  * @link   https://wordpress.stackexchange.com/a/115176
@@ -603,10 +501,9 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
 
       static $original_shortcodes = array();
 
-      // prp_log( __( '# original shortcodes: ', plugin_readme_parser_domain ) . count ( $original_shortcodes ) );
-      // prp_log( __( '# global shortcodes:   ' . count ( $GLOBALS['shortcode_tags', plugin_readme_parser_domain )] ) );
-
-      // prp_log( __( 'Shortcode content: ', plugin_readme_parser_domain ) . $content );
+      // prp_log( __( 'no. original shortcodes', plugin_readme_parser_domain ), count ( $original_shortcodes ) );
+      // prp_log( __( 'no. global shortcodes', plugin_readme_parser_domain ), count ( $GLOBALS['shortcode_tags'] ) );
+      // prp_log( __( 'shortcode content', plugin_readme_parser_domain ), $content );
 
       if ( count ( $original_shortcodes ) === 0 ) {
         // Toggle the shortcodes OFF
@@ -617,71 +514,63 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
         $current_theme_supports_blocks = wp_is_block_theme();
 
         if ( $current_theme_supports_blocks ) {
-          // prp_log( __( 'This theme DOES support blocks', plugin_readme_parser_domain ) );
-          //   // prp_log( __( 'Toggling ALL global shortcodes OFF', plugin_readme_parser_domain ) );
+          // prp_log( __( 'this theme DOES support blocks', plugin_readme_parser_domain ) );
+          //   prp_log( __( 'Toggling ALL global shortcodes OFF', plugin_readme_parser_domain ) );
           if  ( str_contains( $content, '[readme_info' ) ) {
-            // prp_log( __( 'Content contains \'[readme_info\'', plugin_readme_parser_domain ) );
-            $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
-            // prp_log( __( 'Toggling global shortcodes OFF except for:', plugin_readme_parser_domain ) );
-            // prp_log( $GLOBALS['shortcode_tags'], 'Global shortcodes:' );
+            // prp_log( __( 'content contains \'[readme_info\'', plugin_readme_parser_domain ) );
+            // $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
+            // prp_log( __( 'toggling global shortcodes OFF except for:', plugin_readme_parser_domain ) );
+            // prp_log( 'global shortcodes', $GLOBALS['shortcode_tags'] );
           }
 
         } else {
-          // prp_log( __( 'This theme DOES NOT support blocks', plugin_readme_parser_domain ) );
+          // prp_log( __( 'this theme DOES NOT support blocks', plugin_readme_parser_domain ) );
 
           // Need to put some of this plugin's ones back, otherwise it all breaks; it's unclear as to why and as to why these combinations work:
 
           if ( ( str_contains( $content, '[readme ' ) ) ||
                ( str_contains( $content, '[readme]' ) ) ) {
-            // prp_log( __( 'Content contains \'[readme \' or \'[readme]\'', plugin_readme_parser_domain ) );
+            // prp_log( __( 'content contains \'[readme \' or \'[readme]\'', plugin_readme_parser_domain ) );
 
             $GLOBALS['shortcode_tags']['readme'] = 'readme_parser';
             $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
-            $GLOBALS['shortcode_tags']['readme_banner'] = 'readme_banner';
 
           } else if  ( str_contains( $content, '[readme_info' ) ) {
-            // prp_log( __( 'Content contains \'[readme_info\'', plugin_readme_parser_domain ) );
+            // prp_log( __( 'content contains \'[readme_info\'', plugin_readme_parser_domain ) );
 
-            $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
-
-          } else if  ( str_contains( $content, '[readme_banner' ) ) {
-            // prp_log( __( 'Content contains \'[readme_banner\'', plugin_readme_parser_domain ) );
-
-            // Need to check this combo once banner display is working.
-
-            $GLOBALS['shortcode_tags']['readme'] = 'readme_parser';
-            $GLOBALS['shortcode_tags']['readme_banner'] = 'readme_banner';
             $GLOBALS['shortcode_tags']['readme_info'] = 'readme_info';
 
           } else {
-            // prp_log( __( 'Failed to find Plugin-readme Parser shortcode', plugin_readme_parser_domain ) );
+            // prp_log( __( 'failed to find ' . plugin_readme_parser_name . ' shortcode', plugin_readme_parser_domain ) );
 
             // We're in the wild, not writing out a readme with this plugin, so all the shortcodes need to be functional:
-            // prp_log( __( 'Toggling ALL global shortcodes ON', plugin_readme_parser_domain ) );
-            // prp_log( __( '# original shortcodes: ', plugin_readme_parser_domain ) . count ( $original_shortcodes ) );
-            // prp_log( __( '# global shortcodes:   ' . count ( $GLOBALS['shortcode_tags'] ), plugin_readme_parser_domain ) );
+            // prp_log( __( 'toggling ALL global shortcodes ON', plugin_readme_parser_domain ) );
+            // prp_log( __( 'no. original shortcodes', plugin_readme_parser_domain ) . count ( $original_shortcodes ) );
+            // prp_log( __( 'no. global shortcodes' . count ( $GLOBALS['shortcode_tags'] ), plugin_readme_parser_domain ) );
             $GLOBALS['shortcode_tags'] = $original_shortcodes;
             return $content;
 
           }
 
-          // prp_log( __( 'Toggling global shortcodes OFF except for:', plugin_readme_parser_domain ) );
-          // prp_log( $GLOBALS['shortcode_tags'], 'Global shortcodes:' );
+          // prp_log( __( 'toggling global shortcodes OFF except for:', plugin_readme_parser_domain ) );
+          // prp_log( 'global shortcodes', $GLOBALS['shortcode_tags'] );
         }
 
       } else {
         // Toggle the shortcodes ON
 
-        // prp_log( __( 'Toggling global shortcodes ON', plugin_readme_parser_domain ) );
+        // prp_log( __( 'toggling global shortcodes ON', plugin_readme_parser_domain ) );
 
         $GLOBALS['shortcode_tags'] = $original_shortcodes;
         $original_shortcodes = array();
-        // prp_log( __( 'Repopulating GLOBAL shortcodes with original shortcodes', plugin_readme_parser_domain ) );
+        // prp_log( __( 'repopulating GLOBAL shortcodes with original shortcodes', plugin_readme_parser_domain ) );
 
       }
     } else {
-      prp_report_error( __( 'wrong plugin supplied', plugin_readme_parser_domain), plugin_readme_parser_name );
-      // prp_log( __( '***** Wrong plugin supplied *****', plugin_readme_parser_domain ) );
+      // prp_report_error( __( 'wrong plugin supplied', plugin_readme_parser_domain), plugin_readme_parser_name );
+      prp_log( __( 'Wrong plugin:', plugin_readme_parser_domain ), '', true, false );
+      prp_log( __( 'expected', plugin_readme_parser_domain ), plugin_readme_parser_name, true, false );
+      prp_log( __( 'got', plugin_readme_parser_domain ), $file, true, false );
     }
     return $content;
   }
@@ -744,6 +633,13 @@ if ( !function_exists( 'prp_add_head_meta_data_to_output' ) ) {
    * otherwise false.
    */
   function prp_add_head_meta_data_to_output( $show_head, $show_meta, &$line_in_file, $metadata ) {
+
+    // prp_log( 'Args of prp_add_head_meta_data_to_output()', array(
+    //   'show head' => $show_head,
+    //   'show meta' => $show_meta,
+    //   'line in file' => $line_in_file,
+    //   'meta data' => $metadata
+    // ) );
 
     $add_to_output = true;
 
@@ -831,7 +727,8 @@ if ( !function_exists( 'prp_add_head_meta_data_to_output' ) ) {
 
         $line_in_file .= '<br/>';
       } else {
-        // prp_log( __( 'line is not meta data; add to output', plugin_readme_parser_domain ), ( $add_to_output ? 'true' : 'false' ) );
+        // prp_log( __( 'line is not meta data but is in head; add to output', plugin_readme_parser_domain ), ( $add_to_output ? 'true' : 'false' ) );
+        return $show_head;
       }
     } else {
       $add_to_out = false;

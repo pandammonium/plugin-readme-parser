@@ -3,7 +3,7 @@ Contributors: pandammonium, dartiss
 Tags: embed, markdown, parser, plugin, readme
 Requires at least: 4.6
 Tested up to: 6.1.1
-Requires PHP: 7.4
+Requires PHP: 8.0
 Stable tag: 2.0.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -210,10 +210,10 @@ Semantic versioning is used, with the first release being 1.0.
 
 * Bug: updated markdown library; the old version broke the plugin when running on more recent versions of PHP.
 * Bug: corrected variable name; a typo led to a broken plugin in certain circumstances.
-* Bug: removed display of screenshots because they aren't accessible from the
-plugin.
+* Bug: removed display of screenshots and banners because they aren't accessible from the plugin.
 * Enhancement: adds support for block themes.
 * Enhancement: if parameter include="meta,…" is provided, it is changed to include="head,…", otherwise nothing is output. An error message is written to the error log to tell the user about the change.
+* Enhancement: refactored the code to reduce function size; moved most code into a class.
 * Maintenance: forked and now maintained by [Caity Ross](https://pandammonium.org/).
 
 [Previous version history](https://plugins.trac.wordpress.org/browser/plugin-readme-parser/trunk/changelog.txt)
