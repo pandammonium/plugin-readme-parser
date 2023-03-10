@@ -859,19 +859,18 @@ if ( !function_exists( 'prp_report_error' ) ) {
    * formatted error message instead of echoing it.
    * @return     string / true  If $echo === true, the function outputs the error message using echo and returns true. If $echo is false, the function returns the formatted error message instead of echoing it.
    */
-  function prp_report_error( $error, $plugin_name, $echo = true ) {
-
+  function prp_report_error( $error, $plugin_name, $echo = true ): bool|string {
     prp_log( $plugin_name, $error, true, false );
 
-    // $output = '<p class="error">' . $plugin_name . ': ' . $error . '</p>';
+    if ( $echo ) {
+      $output = '<p class="error">' . $plugin_name . ' error: ' . $error . '</p>';
+      echo print_r( $output, true );
+      return true;
 
-    // if ( $echo ) {
-    //   echo $output;
-    //   return true;
-    // } else {
-    //   return $output;
-    // }
-
+    } else {
+      prp_log( $plugin_name, $error, false, $echo );
+      return $plugin_name . ': ' . $error;
+    }
   }
 }
 ?>
