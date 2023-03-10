@@ -248,30 +248,10 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         $this->name = $name;
         $this->target = $target;
-        if ( 'yes' === strtolower( $nofollow ) ) {
-          $this->nofollow = ' rel="nofollow"';
-        }
+        $this->nofollow = 'yes' === strtolower( $nofollow ) ? ' rel="nofollow"' : '';
 
-        // Get the file
+        $output = $this->parse_readme_info();
 
-        $this->file_data = $this->get_readme( $this->name );
-        $this->plugin_name = $this->file_data[ 'name' ];
-
-        // prp_log( 'file data', $this->file_data );
-
-        if ( false !== $this->file_data ) {
-
-          $this->read_file_info();
-
-          // Save cache
-
-          $this->cache_the_results( $result );
-
-        } else {
-          // prp_log( __( '*** PLUGIN URL', plugin_readme_parser_domain ), $this->plugin_url, true );
-
-          $output = prp_report_error( __( 'readme file could not be found or is malformed; name: \'' . $this->plugin_name . '\'', plugin_readme_parser_domain ) . ' - ' . $this->name, plugin_readme_parser_name, false );
-        }
       } else {
 
         // Cache retrieved, so get information from resulting array
@@ -287,7 +267,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
         }
       }
 
-      if ( $output == '' ) {
+      if ( '' === $output ) {
 
         // prp_log( 'data', $data );
 
@@ -304,6 +284,33 @@ if ( !class_exists( 'Generate_Output' ) ) {
       prp_toggle_global_shortcodes( $this->content );
 
       return do_shortcode( $output );
+    }
+
+    private function parse_readme_info(): string {
+
+      $output = '';
+
+      // Get the file
+
+      $this->file_data = $this->get_readme( $this->name );
+      $this->plugin_name = $this->file_data[ 'name' ];
+
+      // prp_log( 'file data', $this->file_data );
+
+      if ( false !== $this->file_data ) {
+
+        $this->read_file_info();
+
+        // Save cache
+
+        $this->cache_the_results( $result );
+
+      } else {
+        // prp_log( __( '*** PLUGIN URL', plugin_readme_parser_domain ), $this->plugin_url, true );
+
+        $output = prp_report_error( __( 'readme file could not be found or is malformed; name: \'' . $this->plugin_name . '\'', plugin_readme_parser_domain ) . ' - ' . $this->name, plugin_readme_parser_name, false );
+      }
+      return $output;
     }
 
     /**
