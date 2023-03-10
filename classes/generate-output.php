@@ -132,7 +132,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // Get cached output
 
       $this->cache = $cache;
-      $result = $this->get_cached_output( 'prp_' . md5( $exclude . $hide . $include . $target . $nofollow . $ignore . $this->cache . $version . $mirror .$this->content ) );
+      $result = $this->get_cache( 'prp_' . md5( $exclude . $hide . $include . $target . $nofollow . $ignore . $this->cache . $version . $mirror .$this->content ) );
 
       // prp_log( __( 'shortcode content', plugin_readme_parser_domain ),$this->content );
       // prp_log( __( 'shortcode parameters', plugin_readme_parser_domain ), $this->parameters );
@@ -189,7 +189,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         // Cache the results
 
-        $this->cache_the_results();
+        $this->set_cache( true );
 
       } else {
 
@@ -240,9 +240,12 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // Get the cache
 
       $this->cache = $cache;
-      $result = $this->get_cached_output( 'prp_info_' . md5( $name . $this->cache ) );
+      $result = $this->get_cache( 'prp_info_' . md5( $name . $this->cache ) );
 
-      // prp_log( 'result', $result );
+      // prp_log( 'cache is', $this->cache );
+      // prp_log( 'result is of type', gettype( $result ) );
+      // prp_log( 'result is', $result );
+
 
       if ( !$result ) {
 
@@ -256,15 +259,11 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         // Cache retrieved, so get information from resulting array
 
-        if ( is_string( $result ) ) {
-          $output = prp_report_error( __( 'The parameters are invalid. Check the spelling.', plugin_readme_parser_domain ), plugin_readme_parser_name, false );
-        } else {
-          $this->version = $result[ 'version' ];
-          $this->plugin_name = $result[ 'name' ];
+        $this->version = $result[ 'version' ];
+        $this->plugin_name = $result[ 'name' ];
 
-          prp_log( 'version', $this->version );
-          prp_log( 'plugin name', $this->plugin_name );
-        }
+        // prp_log( 'version', $this->version );
+        // prp_log( 'plugin name', $this->plugin_name );
       }
 
       if ( '' === $output ) {
@@ -303,7 +302,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         // Save cache
 
-        $this->cache_the_results( $result );
+        $this->set_cache();
 
       } else {
         // prp_log( __( '*** PLUGIN URL', plugin_readme_parser_domain ), $this->plugin_url, true );
@@ -893,30 +892,30 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
     }
 
-    private function cache_the_results( $result = array() ): void {
+    private function set_cache( bool $save_this_content = false ): void {
 
+      $cached_info = array();
       if ( is_numeric( $this->cache ) ) {
-        // prp_log( __( 'caching transient', plugin_readme_parser_domain ) );
-        if ( !empty( $result ) ) {
-          $result[ 'version' ] = $this->version;
-          $result[ 'name' ] = $this->plugin_name;
+        if ( false === $save_this_content ) {
+          $cached_info = array(
+            'version' => $this->version,
+            'name'    => $this->plugin_name,
+          );
+        } else {
+          $cached_info = $this->content;
         }
-        set_transient( $this->cache_key, $this->content, 3600 * $this->cache );
+        set_transient( $this->cache_key, $cached_info, 60 * $this->cache );
       }
-      // prp_log( __( 'cache    ', plugin_readme_parser_domain ), $this->cache_key );
-      // prp_log( __( 'cache key', plugin_readme_parser_domain ), $this->cache );
     }
 
-    private function get_cached_output( $cache_key ): mixed {
-      $result = false;
+    private function get_cache( string $cache_key ): bool|array|string {
+
       if ( is_numeric( $this->cache ) ) {
         $this->cache_key = $cache_key;
         $result = get_transient( $this->cache_key );
+        return $result;
       }
-      // prp_log( 'cache', $this->cache );
-      // prp_log( 'cache is numeric', is_numeric( $this->cache ) );
-      // prp_log( 'transient', $result ? $result : 'not found' );
-      return $result;
+      return false;
     }
 
     /**
