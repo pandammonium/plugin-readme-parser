@@ -291,9 +291,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         // prp_log( 'data', $data );
 
-        // If download link requested build the URL
-
-        $output = $this->read_the_data();
+        $output = $this->parse_the_data_parameter();
 
         // Report an error if the data parameter was invalid or missing
 
@@ -1008,9 +1006,11 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
     }
 
-    private function read_the_data(): string {
+    private function parse_the_data_parameter(): string {
 
       $output = '';
+
+      // prp_log( 'data parameter', $this->data );
 
       if ( 'download' == $this->data ) {
         if ( ( '' != $this->plugin_name ) && ( '' != $this->version ) ) {
@@ -1041,7 +1041,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
         }
 
       } else {
-        $output = prp_report_error( __( 'Invalid data requested: ' . $this->data, plugin_readme_parser_domain ), plugin_readme_parser_name, false );
+        $output = prp_report_error( __( 'Invalid data requested' . ( '' === $this->data ? '' : ': ' . $this->data ), plugin_readme_parser_domain ), plugin_readme_parser_name, false );
       }
       return $output;
     }
