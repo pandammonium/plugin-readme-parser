@@ -263,7 +263,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
           // Save cache
 
-          cache_the_results( $result );
+          $this->cache_the_results( $result );
 
         } else {
           // prp_log( __( '*** PLUGIN URL', plugin_readme_parser_domain ), $this->plugin_url, true );
