@@ -37,14 +37,18 @@ define( 'plugin_readme_parser_name', 'Plugin-readme Parser' );
 */
 
 $functions_dir = plugin_dir_path( __FILE__ ) . 'includes/';
+$classes_dir = plugin_dir_path( __FILE__ ) . 'classes/';
 
 // Include all the various functions
 
 if ( is_admin() ) {
 
-    include_once( $functions_dir . 'admin-config.php' );			// Various admin. functions
+  include_once( $functions_dir . 'admin-config.php' );			// Various admin. functions
 
 }
+
+require_once( $classes_dir . 'exception_prp.php' );
+
 
 // This converts the markdown to XHTML, although I'm not convinced it can't be HTML5:
 include_once( $functions_dir . 'Michelf/MarkdownExtra.inc.php' );		// PHP Markdown Extra
@@ -52,6 +56,4 @@ include_once( $functions_dir . 'Michelf/MarkdownExtra.inc.php' );		// PHP Markdo
 include_once( $functions_dir . 'functions.php' );					// Various functions
 
 require_once('classes/generate-output.php');
-
-// include_once( $functions_dir . 'generate-output.php' );				// Generate the output
 ?>

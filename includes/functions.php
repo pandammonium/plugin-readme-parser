@@ -14,13 +14,14 @@ if ( !function_exists( 'prp_log' ) ) {
  *
  * @since 2.0.0
  *
- * @param string  message_name  (optional)  A name to associate with the
+ * @param string  message_name  A name to associate with the
  * message. This is useful if logging multiple messages.
  * @param string / array $message    The message to be logged.
- * @param bool  $error  Whether the message is about an error or not.
+ * @param bool  $error  (optional)  Whether the message is about an error or not. Default is false, the message is not about an error.
+ * @param bool  $echo  (optional) Forces the message name and message to be displayed on the web page; overrides WP_DEBUG_DISPLAY. Default is false, the message name and message will not be displayed on the web page.
  *
  */
-function prp_log( $message_name, $message = '', $error = false, $echo = false ) {
+  function prp_log( $message_name, $message = '', $error = false, $echo = false ) {
 
     $debugging = defined( 'WP_DEBUG' ) && WP_DEBUG;
     $debug_logfile = defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG;
@@ -336,13 +337,13 @@ if ( !function_exists( 'prp_strip_list' ) ) {
     // prp_log( __( '  target:   \'' . $target . '\'', plugin_readme_parser_domain ) );
     // prp_log( __( '  nofollow: \'' . $nofollow . '\'', plugin_readme_parser_domain ) );
 
-    if ( $type == 'c' ) {
+    if ( $type === 'c' ) {
       $url = 'https://profiles.wordpress.org/users/';
-    } else if ( $type == 't' ) {
+    } else if ( $type === 't' ) {
       $url = 'https://wordpress.org/extend/plugins/tags/';
     } else {
-      prp_log( __( 'Invalid type found.', '', plugin_readme_parser_domain ), true, false );
       $url = '';
+      throw new PRP_Exception( 'Invalid list type found: ' . $type, PRP_Exception::PRP_ERROR_BAD_DATA );
     }
 
     $startpos = 0;
@@ -381,48 +382,74 @@ if ( !function_exists( 'prp_get_file' ) ) {
    *
    * @since  [version number]
    *
-   * @param  string  $filein   File name to fetch
+   * @param  string  $file_url   The url of the file to fetch
    * @param  string  $header   Only get headers?
    * @return string    Array containing file contents and response
    */
-  function prp_get_file( $filein, $header = false ) {
+  function prp_get_file( $file_url, $header = false ) {
 
     // prp_log( __( '  Get file:', plugin_readme_parser_domain ) );
-    // prp_log( __( '  file in:     \'' . $filein. '\'', plugin_readme_parser_domain ) );
+    // prp_log( __( '  file in:     \'' . $file_url. '\'', plugin_readme_parser_domain ) );
     // prp_log( __( '  header:      ' . ( $header ? 'true' : 'false' ), plugin_readme_parser_domain ) );
 
+    $file_return = array();
     $rc = 0;
     $error = '';
     if ( $header ) {
-      $fileout = wp_remote_head( $filein );
-      if ( is_wp_error( $fileout ) ) {
-        $error = 'Header: ' . $fileout -> get_error_message();
+      $result = wp_remote_head( $file_url );
+      if ( is_wp_error( $result ) ) {
+        $error = 'Header: ' . $result -> get_error_message();
         $rc = -1;
       }
     } else {
-      $fileout = wp_remote_get( $filein );
-      if ( is_wp_error( $fileout ) ) {
-        $error = 'Body: ' . $fileout -> get_error_message();
+      $result = wp_remote_get( $file_url );
+      if ( is_wp_error( $result ) ) {
+        $error = 'Body: ' . $result -> get_error_message();
         $rc = -1;
       } else {
-        if ( isset( $fileout[ 'body' ] ) ) {
-        $file_return[ 'file' ] = $fileout[ 'body' ];
+        if ( isset( $result[ 'body' ] ) ) {
+          $file_return[ 'file' ] = $result[ 'body' ];
+          // prp_log( 'file', $file_return[ 'file' ] );
         }
       }
     }
+    // prp_log( '  error', $error );
+    // prp_log( '  rc', $rc );
 
     $file_return[ 'error' ] = $error;
     $file_return[ 'rc' ] = $rc;
-    if ( !is_wp_error( $fileout ) ) {
-      if ( isset( $fileout[ 'response' ][ 'code' ] ) ) {
-        $file_return[ 'response' ] = $fileout[ 'response' ][ 'code' ];
+    if ( is_wp_error( $result ) ) {
+      // prp_log( '  WP Error', $result );
+      throw new Exception( intval( $result->get_error_code() ), $result->get_error_message() );
+    } else {
+      // prp_log( 'type of response', gettype( $result[ 'response' ] ) );
+      // prp_log( 'response', $result[ 'response' ] );
+      // prp_log( 'type of http response', gettype( $result[ 'http_response' ] ) );
+      // prp_log( 'http response – null?', null === $result[ 'http_response' ] );
+      if ( isset( $result[ 'response' ][ 'code' ] ) ) {
+        $file_return[ 'response' ] = $result[ 'response' ][ 'code' ];
+        // prp_log( 'file return', $file_return );
+        // prp_log( 'response', $file_return[ 'response' ] );
+        // prp_log( 'rc', $file_return[ 'rc' ] );
+        // if ( isset( $file_return[ 'file' ] ) ) {
+        //   prp_log( 'file', $file_return[ 'file' ] );
+        // }
       }
+      $response = $result[ 'http_response' ]->get_response_object();
+      // prp_log( 'type of response object', gettype( $response ) );
+      try {
+        $response->throw_for_status( false );
+      } catch ( Exception $e) {
+        throw new PRP_Exception( 'The URL <samp>' . $file_url . '</samp> of the readme file returned a <samp>' . $e->getMessage() . '</samp> error', PRP_Exception::PRP_ERROR_BAD_URL );
+      // } finally {
+      }
+
     }
 
     // prp_log( __( '  file out:    contents of readme file', plugin_readme_parser_domain ) );
-    // prp_log( $fileout, '  file out:' );
+    // prp_log( '  file out', $result );
     // prp_log( __( '  file return: contents of readme file', plugin_readme_parser_domain ) );
-    // prp_log( $file_return, '  file return:' );
+    // prp_log( '  file return', $file_return );
 
     return $file_return;
   }
@@ -494,8 +521,10 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
  * @return array  The readme file content
  */
   function prp_toggle_global_shortcodes( $content ) {
+    prp_log( 'HERE', __FUNCTION__ );
 
     $file = plugin_dir_path( __DIR__ );
+    // $file = 'fish';
     // prp_log( __( 'Plugin directory: ', plugin_readme_parser_domain ) . $file );
     if ( str_contains( $file, plugin_readme_parser_filename ) ) {
 
@@ -548,7 +577,6 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
             // prp_log( __( 'no. original shortcodes', plugin_readme_parser_domain ) . count ( $original_shortcodes ) );
             // prp_log( __( 'no. global shortcodes' . count ( $GLOBALS['shortcode_tags'] ), plugin_readme_parser_domain ) );
             $GLOBALS['shortcode_tags'] = $original_shortcodes;
-            return $content;
 
           }
 
@@ -568,9 +596,16 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
       }
     } else {
       // prp_report_error( __( 'wrong plugin supplied', plugin_readme_parser_domain), plugin_readme_parser_name );
-      prp_log( __( 'Wrong plugin:', plugin_readme_parser_domain ), '', true, false );
-      prp_log( __( 'expected', plugin_readme_parser_domain ), plugin_readme_parser_name, true, false );
-      prp_log( __( 'got', plugin_readme_parser_domain ), $file, true, false );
+      // throw new Exception( 'Wrong plugin. Expected <samp><kbd>' . plugin_readme_parser_domain . '</kbd></samp>; got <samp><kbd>' . $file . '</kbd></samp>', 2 ); // 2 is a PHP error code for user error
+      $error = new WP_Error();
+
+      $error->add( PRP_Exception::get_error_code_as_string( PRP_Exception::PRP_ERROR_BAD_INPUT ), 'Wrong plugin. Expected <samp><kbd>' . plugin_readme_parser_domain . '</kbd></samp>; got <samp><kbd>' . $file . '</kbd></samp>' );
+
+      prp_log( 'has errors', $error->has_errors() );
+      // prp_log( 'error', $error );
+      prp_log( 'error code', $error->get_error_code() );
+      prp_log( 'error message', $error->get_error_message() );
+      return $error->has_errors() ? $error : null;
     }
     return $content;
   }
@@ -736,38 +771,6 @@ if ( !function_exists( 'prp_add_head_meta_data_to_output' ) ) {
 
     // prp_log( __( 'add head meta data to output', plugin_readme_parser_domain ), ( $add_to_output ? 'true' : 'false' ) );
     return $add_to_output;
-  }
-}
-
-if ( !function_exists( 'prp_report_error' ) ) {
-  /**
-   * Report an error (1.4)
-   *
-   * Logs an error message along with the plugin name and the error text, and
-   * returns an HTML-formatted error message.
-   *
-   * @since  1.0
-   *
-   * @param  $plugin_domain  string  The domain of the plugin where the error
-   * occurred.
-   * @param  $error    string  The error message to report.
-   * @param  $echo   string  A boolean value indicating whether to output the
-   * error message immediately using echo. If false, the function returns the
-   * formatted error message instead of echoing it.
-   * @return     string / true  If $echo === true, the function outputs the error message using echo and returns true. If $echo is false, the function returns the formatted error message instead of echoing it.
-   */
-  function prp_report_error( $error, $plugin_name, $echo = true ): bool|string {
-    prp_log( $plugin_name, $error, true, false );
-
-    if ( $echo ) {
-      $output = '<p class="error">' . $plugin_name . ' error: ' . $error . '</p>';
-      echo print_r( $output, true );
-      return true;
-
-    } else {
-      prp_log( $plugin_name, $error, false, $echo );
-      return $plugin_name . ': ' . $error;
-    }
   }
 }
 ?>
