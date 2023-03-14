@@ -88,6 +88,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
      */
     public function __construct() {
 
+      // prp_log( 'method', __FUNCTION__ );
 
       $this->initialise();
     }
@@ -112,13 +113,13 @@ if ( !class_exists( 'Generate_Output' ) ) {
      */
     public function readme_parser( string|array|null $paras = null, string $content = '' ): string {
 
+      // prp_log( 'method', __FUNCTION__ );
 
-      // prp_log( __( '---------------- README PARSER ----------------', plugin_readme_parser_domain ) );
+      // prp_log( __( '---------------- ' . __FUNCTION__ . ' ----------------', plugin_readme_parser_domain ) );
       // prp_log( __( '---------------- ' . self::COLOURS_DEBUG[ self::$c++ ], plugin_readme_parser_domain ) );
 
       $this->initialise();
 
-      prp_log( 'HERE', __FUNCTION__ );
       $this->content = $content;
       try {
         $result = prp_toggle_global_shortcodes( $this->content );
@@ -246,14 +247,15 @@ if ( !class_exists( 'Generate_Output' ) ) {
      */
     public function readme_info( array $paras = array(), string $content = '' ): string {
 
-      // prp_log( __( '----------------- README INFO -----------------', plugin_readme_parser_domain ) );
+      // prp_log( 'method', __FUNCTION__ );
+
+      // prp_log( __( '----------------- ' . __FUNCTION__ . ' -----------------', plugin_readme_parser_domain ) );
 
       // prp_log( 'readme_info arg1: parameters', $paras );
       // prp_log( 'readme_info arg2: content', $content );
 
       $this->initialise();
 
-      prp_log( 'HERE', __FUNCTION__ );
       $this->content = $content;
       try {
         $result = prp_toggle_global_shortcodes( $this->content );
@@ -359,6 +361,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
      */
     private function normalise_parameters( string|array|null $parameters = null ): null|WP_Error {
 
+      // prp_log( 'method', __FUNCTION__ );
+
       // prp_log( __( 'Parameters (raw)', plugin_readme_parser_domain), $parameters );
 
       // $parameters = array(
@@ -398,7 +402,6 @@ if ( !class_exists( 'Generate_Output' ) ) {
             // prp_log( __( 'Parameter string (normalised)', plugin_readme_parser_domain), '\'' . $this->parameters . '\'' );
           break;
           default:
-            prp_log( 'HERE', __FUNCTION__ );
             $this->parameters = null;//$parameters;
 
             $error = new WP_Error();
@@ -420,6 +423,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function should_links_be_shown(): void {
 
       // $this->show_links = false;
+      // prp_log( 'method', __FUNCTION__ );
       if ( '' !== $this->include ) {
         if ( prp_is_it_excluded( 'links', $this->include ) ) {
           $this->show_links = true;
@@ -480,6 +484,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function validate_parameters(): void {
 
+      // prp_log( 'method', __FUNCTION__ );
+
       if ( ( '' !== $this->exclude ) &&
            ( '' !== $this->include ) ) {
         throw new PRP_Exception( 'Parameters \'include\' and \'exclude\' cannot both be specified in the same shortcode', PRP_Exception::PRP_ERROR_BAD_INPUT );
@@ -489,6 +495,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
     }
 
     private function read_file_array(): void {
+
+      // prp_log( 'method', __FUNCTION__ );
 
       $count = count( $this->file_array );
       // prp_log( __( 'readme file has ' . $count . ' lines', plugin_readme_parser_domain ) );
@@ -550,6 +558,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function display_links_section(): void {
 
+      // prp_log( 'method', __FUNCTION__ );
+
       if ( ( $this->show_links ) &&
            ( 'bottom' === $this->links ) ) {
         $this->file_combined .= prp_display_links( $this->download, $this->target, $this->nofollow, $this->version, $this->mirror, $this->plugin_name );
@@ -557,6 +567,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
     }
 
     private function write_html(): void {
+
+      // prp_log( 'method', __FUNCTION__ );
 
       $titles_found = 0;
       $count = count( $this->file_array );
@@ -580,6 +592,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
     }
 
     private function initialise(): void {
+
+      // prp_log( 'method', __FUNCTION__ );
+
       $this->parameters = null;
       $this->content = '';
 
@@ -629,6 +644,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
     }
 
     private function standardise_headings_markup( $i ): void {
+
+      // prp_log( 'method', __FUNCTION__ );
 
       if ( '=== ' === substr( $this->file_array [$i ], 0, 4 ) ) {
         $this->file_array[ $i ] = str_replace( '===', '#', $this->file_array[ $i ] );
@@ -687,6 +704,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function read_section(): void {
 
+      // prp_log( 'method', __FUNCTION__ );
+
       if ( '' !== $this->include ) {
         $this->read_included_sections();
       } else {
@@ -700,6 +719,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
     }
 
     private function read_included_sections(): void {
+
+      // prp_log( 'method', __FUNCTION__ );
 
       // Is this an included section?
 
@@ -720,6 +741,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function read_excluded_sections(): void {
 
+      // prp_log( 'method', __FUNCTION__ );
+
       // Is this an excluded section?
 
       if ( prp_is_it_excluded( $this->section, $this->exclude ) ) {
@@ -738,6 +761,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function read_excluded_line(): void {
 
+      // prp_log( 'method', __FUNCTION__ );
+
       // Is it an excluded line?
 
       if ( $this->add_to_output ) {
@@ -753,6 +778,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function read_links(): void {
 
+      // prp_log( 'method', __FUNCTION__ );
+
       if ( ( $this->links === strtolower( $this->section ) ) &&
            ( $this->section !== $this->prev_section ) ) {
         if ( $this->show_links ) {
@@ -762,6 +789,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
     }
 
     private function read_download_link( $i ): void {
+
+      // prp_log( 'method', __FUNCTION__ );
 
       if ( 'Stable tag:' === substr( $this->file_array[ $i ], 0, 11 ) ) {
 
@@ -774,6 +803,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
     }
 
     private function read_head( $i ): void {
+
+      // prp_log( 'method', __FUNCTION__ );
 
       if ( $this->add_to_output ) {
 
@@ -794,6 +825,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function read_screenshots(): void {
 
+      // prp_log( 'method', __FUNCTION__ );
+
       if ( 'Screenshots' === $this->section ) {
         // Do not display screenshots: any attempt to access the screenshots on WordPress' SVN servers is met with an HTTP 403 (forbidden) error.
         $this->add_to_output = false;
@@ -802,6 +835,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
     }
 
     private function add_current_line_to_output( $i ): void {
+
+      // prp_log( 'method', __FUNCTION__ );
 
       if ( ( '' !== $this->file_array[ $i ] or !$this->last_line_blank ) &&
          $this->add_to_output ) {
@@ -823,6 +858,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function write_html_title( $i ): void {
 
+      // prp_log( 'method', __FUNCTION__ );
+
       $this->title = substr( $this->file_array[ $i ], 4, strpos( $this->file_array[ $i ], '</h2>' ) - 4 );
       if ( prp_is_it_excluded( strtolower( $this->title ), $this->hide ) ) {
         $state = 'hide';
@@ -832,6 +869,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
     }
 
     private function normalise_html_code_tags( $i ): void {
+
+      // prp_log( 'method', __FUNCTION__ );
 
       // If first line of code multi-line, replace CODE with PRE tag
 
@@ -855,6 +894,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
     }
 
     private function write_content_reveal_plugin( $i, $titles_found ): int {
+
+      // prp_log( 'method', __FUNCTION__ );
 
       include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
       if ( is_plugin_active( 'simple-content-reveal/simple-content-reveal.php' ) ) {
@@ -881,11 +922,15 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function write_content_reveal_heading( $i, $titles_found ): int {
 
+      // prp_log( 'method', __FUNCTION__ );
+
       $this->file_array[ $i ] = acr_start( '<h2>%image% ' . $this->title . '</h2>', $this->title, $this->state, $scr_url, $scr_ext );
       return ++$titles_found;
     }
 
     private function write_content_reveal_end( $i, $titles_found ): void {
+
+      // prp_log( 'method', __FUNCTION__ );
 
       if ( ( '</div>' === $this->file_array[ $i ] ) && ( 0 < $titles_found ) ) {
         $this->file_array[ $i ] = acr_end() . self::LINE_END . $this->file_array[ $i ];
@@ -893,6 +938,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
     }
 
     private function process_valid_file(): void {
+
+      // prp_log( 'method', __FUNCTION__ );
 
       // prp_log( __( 'file_data', plugin_readme_parser_domain ), $this->file_data );
 
@@ -932,6 +979,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function process_invalid_file(): void {
 
+      // prp_log( 'method', __FUNCTION__ );
+
       if ( ( 0 < strlen( $this->file_data[ 'file' ] ) ) &&
            ( 0 === substr_count( $this->file_data[ 'file' ], "\n" ) ) ) {
 
@@ -944,6 +993,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
     }
 
     private function set_cache( bool $save_this_content = false ): void {
+
+      // prp_log( 'method', __FUNCTION__ );
 
       $cached_info = array();
       if ( is_numeric( $this->cache ) ) {
@@ -960,6 +1011,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
     }
 
     private function get_cache( string $cache_key ): bool|array|string {
+
+      // prp_log( 'method', __FUNCTION__ );
 
       if ( is_numeric( $this->cache ) ) {
         $this->cache_key = $cache_key;
@@ -980,6 +1033,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
      * @return       string  False or array containing readme and plugin name
      */
     private function get_readme( $plugin_url, $version = '' ): mixed {
+
+      // prp_log( 'method', __FUNCTION__ );
 
       // prp_log( __( '  Get readme:', plugin_readme_parser_domain ) );
       // prp_log( __( '  title:      \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
@@ -1051,6 +1106,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function get_plugin_name_and_version(): void {
 
+      // prp_log( 'method', __FUNCTION__ );
+
       // Split file into array based on CRLF
 
       $this->file_array = preg_split( "/((\r(?!\n))|((?<!\r)\n)|(\r\n))/", $this->file_data[ 'file' ] );
@@ -1086,6 +1143,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
     }
 
     private function parse_the_data_parameter(): string {
+
+      // prp_log( 'method', __FUNCTION__ );
 
       $output = '';
 
@@ -1163,6 +1222,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
   if ( !function_exists( 'readme_parser' )) {
     function readme_parser( $paras = '', $content = '' ) {
+
+      // prp_log( 'method', __FUNCTION__ );
+
       try {
         global $generator;
         // $generator = new Generate_Output();
@@ -1177,6 +1239,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
   }
   if ( !function_exists( 'readme_info' )) {
     function readme_info( $paras = '', $content = '' ) {
+
+      // prp_log( 'method', __FUNCTION__ );
+
       try {
         global $generator;
         // $generator = new Generate_Output();

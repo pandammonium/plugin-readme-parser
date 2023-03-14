@@ -92,6 +92,8 @@ if ( !function_exists( 'prp_log' ) ) {
 if ( !function_exists( 'prp_log_truncated_line' ) ) {
   function prp_log_truncated_line( $line, $line_number = -1 ) {
 
+    // prp_log( 'function', __FUNCTION__ );
+
     $line_length = 46;
 
     if ( $line_number > -1 ) {
@@ -118,6 +120,8 @@ if ( !function_exists( 'prp_is_it_excluded' ) ) {
    * @return       string  true or false, depending on whether the section was valid
    */
   function prp_is_it_excluded( $tofind, $exclude ) {
+
+    // prp_log( 'function', __FUNCTION__ );
 
     $tofind = strtolower( $tofind );
     $return = true;
@@ -176,6 +180,8 @@ if ( !function_exists( 'prp_get_section_name' ) ) {
    */
   function prp_get_section_name( $readme_line, $start_pos ) {
 
+    // prp_log( 'function', __FUNCTION__ );
+
     $hash_pos = strpos( $readme_line, '#', $start_pos + 1 );
 
     if ( $hash_pos ) {
@@ -209,6 +215,8 @@ if ( !function_exists( 'prp_display_links' ) ) {
  * @return       string  Output
  */
   function prp_display_links( $download, $target, $nofollow, $version, $mirror, $plugin_name ) {
+
+    // prp_log( 'function', __FUNCTION__ );
 
     // prp_log( __( '  Display links:', plugin_readme_parser_domain ) );
     // prp_log( __( '  download link: \'' . $download . '\'', plugin_readme_parser_domain ) );
@@ -272,6 +280,8 @@ if ( !function_exists( 'prp_check_img_exists' ) ) {
    */
   function prp_check_img_exists( $filename, $ext ) {
 
+    // prp_log( 'function', __FUNCTION__ );
+
     // $file_url = $filename . $ext;
     // $file_exists = false;
 
@@ -331,6 +341,8 @@ if ( !function_exists( 'prp_strip_list' ) ) {
    */
   function prp_strip_list( $list, $type, $target, $nofollow ) {
 
+    // prp_log( 'function', __FUNCTION__ );
+
     // prp_log( __( '  Strip list:', plugin_readme_parser_domain ) );
     // prp_log( __( '  list:     \'' . $list. '\'', plugin_readme_parser_domain ) );
     // prp_log( __( '  type:     \'' . $type . '\'', plugin_readme_parser_domain ) );
@@ -387,6 +399,8 @@ if ( !function_exists( 'prp_get_file' ) ) {
    * @return string    Array containing file contents and response
    */
   function prp_get_file( $file_url, $header = false ) {
+
+    // prp_log( 'function', __FUNCTION__ );
 
     // prp_log( __( '  Get file:', plugin_readme_parser_domain ) );
     // prp_log( __( '  file in:     \'' . $file_url. '\'', plugin_readme_parser_domain ) );
@@ -472,6 +486,8 @@ if ( !function_exists( 'prp_get_list' ) ) {
    */
   function prp_get_list( $input, $separator = '', $type = '' ) {   // Version 1.2
 
+    // prp_log( 'function', __FUNCTION__ );
+
     // prp_log( __( '  Get \'' . $type . '\' list:', plugin_readme_parser_domain ) );
     // prp_log( __( '  input:     \'' . $input . '\'', plugin_readme_parser_domain ) );
     // prp_log( __( '  separator: \'' . $separator . '\'', plugin_readme_parser_domain ) );
@@ -521,7 +537,8 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
  * @return array  The readme file content
  */
   function prp_toggle_global_shortcodes( $content ) {
-    prp_log( 'HERE', __FUNCTION__ );
+
+    // prp_log( 'function', __FUNCTION__ );
 
     $file = plugin_dir_path( __DIR__ );
     // $file = 'fish';
@@ -671,6 +688,8 @@ if ( !function_exists( 'prp_add_head_meta_data_to_output' ) ) {
    * otherwise false.
    */
   function prp_add_head_meta_data_to_output( $show_head, $show_meta, &$line_in_file, $metadata ) {
+
+    // prp_log( 'function', __FUNCTION__ );
 
     // prp_log( 'Args of prp_add_head_meta_data_to_output()', array(
     //   'show head' => $show_head,
