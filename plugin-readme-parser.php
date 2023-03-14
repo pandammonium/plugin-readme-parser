@@ -55,5 +55,5 @@ include_once( $functions_dir . 'Michelf/MarkdownExtra.inc.php' );		// PHP Markdo
 
 include_once( $functions_dir . 'functions.php' );					// Various functions
 
-require_once('classes/generate-output.php');
+require_once( $classes_dir . 'generate-output.php' );
 ?>
