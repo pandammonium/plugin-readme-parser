@@ -87,52 +87,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
      * @since 2.0.0
      */
     public function __construct() {
-      $this->parameters = null;
-      $this->content = '';
 
-      $this->file_array = array();
-      $this->file_data = '';
 
-      $this->plugin_url = '';
-      $this->plugin_name = '';
-      $this->plugin_title = '';
-
-      $this->cache = '';
-      $this->cache_key = '';
-
-      $this->exclude = '';
-      $this->include = '';
-      $this->hide = '';
-      $this->links = '';
-      $this->ignore = '';
-      $this->mirror = '';
-      $this->nofollow = '';
-      $this->version = '';
-      $this->target = '';
-      $this->download = '';
-      $this->metadata = '';
-
-      $this->show_links = false;
-      $this->show_head = false;
-      $this->show_meta = false;
-
-      $this->head_explicitly_excluded = false;
-      $this->head_explicitly_included = false;
-      $this->meta_explicitly_excluded = false;
-      $this->meta_explicitly_included = false;
-
-      $this->section = '';
-      $this->prev_section = '';
-      $this->last_line_blank = true;
-      $this->div_written = false;
-      $this->add_to_output = true;
-      $this->code = false;
-      $this->file_combined = '';
-
-      $this->my_html = '';
-
-      $this->name = '';
-      $this->data = '';
+      $this->initialise();
     }
 
     /**
@@ -159,7 +116,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // prp_log( __( '---------------- README PARSER ----------------', plugin_readme_parser_domain ) );
       // prp_log( __( '---------------- ' . self::COLOURS_DEBUG[ self::$c++ ], plugin_readme_parser_domain ) );
 
-      $this->reset();
+      $this->initialise();
 
       prp_log( 'HERE', __FUNCTION__ );
       $this->content = $content;
@@ -294,7 +251,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // prp_log( 'readme_info arg1: parameters', $paras );
       // prp_log( 'readme_info arg2: content', $content );
 
-      $this->reset();
+      $this->initialise();
 
       prp_log( 'HERE', __FUNCTION__ );
       $this->content = $content;
@@ -622,7 +579,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       $this->my_html = str_replace( '<code>', '<code class="notranslate">', str_replace( '<pre>', '<pre class="notranslate">', $this->my_html ) );
     }
 
-    private function reset(): void {
+    private function initialise(): void {
       $this->parameters = null;
       $this->content = '';
 
@@ -668,7 +625,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       $this->name = '';
       $this->data = '';
 
-      // prp_log( __('all the things have been reset', plugin_readme_parser_domain), $this );
+      // prp_log( __('all the things have been initialised', plugin_readme_parser_domain), $this );
     }
 
     private function standardise_headings_markup( $i ): void {
