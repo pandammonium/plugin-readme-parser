@@ -21,7 +21,7 @@ if ( !function_exists( 'prp_log' ) ) {
  * @param bool  $echo  (optional) Forces the message name and message to be displayed on the web page; overrides WP_DEBUG_DISPLAY. Default is false, the message name and message will not be displayed on the web page.
  *
  */
-  function prp_log( $message_name, $message = '', $error = false, $echo = false ) {
+  function prp_log( string $message_name, string $message = '', bool $error = false, bool $echo = false ): string {
 
     $debugging = defined( 'WP_DEBUG' ) && WP_DEBUG;
     $debug_logfile = defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG;
@@ -48,44 +48,74 @@ if ( !function_exists( 'prp_log' ) ) {
     switch ( $message_type ) {
       case 'string':
       case 'integer':
-        $output = print_r( $header . $divider . $message, true );
+        $output = print_r( $header . $divider . trim( $message ), true );
       break;
+      case 'object':
+        if ( is_wp_error( $message ) ) {
+          $output = prp_get_wp_error_string( $message, $echo );
+          break;
+        } else {
+          // Fall through
+        }
       default:
         $output = print_r( $header . $divider, true ) . var_export( $message, true );
       break;
     }
 
-    if ( $error && $echo ) {
-      return prp_report_error( $output, plugin_readme_parser_name, $echo );
-
-    } else {
-
-      $prefix = ( strncmp( $output, plugin_readme_parser_name, strlen( plugin_readme_parser_name ) ) === 0 ) ? '' : 'PRP | ';
-      // $prefix = plugin_readme_parser_name . ' | ';
-
-      if ( ( $debugging && $debug_logfile ) ||
-           ( $error && !$echo ) ) {
-        error_log( $prefix . $output );
+    if ( $error ) {
+      $error_label = 'error';
+      if ( false === stripos( $output, 'error' ) ) {
+        $output = 'error' . $output;
+      } else {
+        // Make sure the error label is upper case
+        $count = 0;
+        $output = str_ireplace( $error_label, strtoupper($error_label), $output, $count);
+        error_log( 'Changed case of error label ' . $count . ' time' . (1 === $count ? '' : 's') );
       }
-      if ( ( $debugging && $debug_display ) ||
-           ( $echo ) ) {
-        $delim = ':';
-        $pos = strpos( $output, $delim );
-        if ( $pos !== false ) {
-          $output = '<b>' . str_replace( $delim, $delim . '</b>', $output );
-        }
-        switch ( $message_type ) {
-          case 'string':
-          case 'integer':
-            echo '<p>' . $output . '</p>';
-          break;
-          default:
-            echo '<pre>' . $output . '</pre>';
-          break;
-        }
-      }
-      return true;
     }
+
+    $prefix = ( strncmp( $output, plugin_readme_parser_name, strlen( plugin_readme_parser_name ) ) === 0 ) ? '' : 'PRP | ';
+    // $prefix = plugin_readme_parser_name . ' | ';
+
+    if ( ( $debugging && $debug_logfile ) ||
+         ( $error && !$echo ) ) {
+      error_log( $prefix . wp_strip_all_tags( trim( $output ) ) );
+    }
+
+    if ( ( $debugging && $debug_display ) ||
+         ( $error && $echo ) ||
+         ( $echo ) ) {
+
+      $delim = ':';
+      $pos = strpos( $output, $delim );
+      if ( $pos !== false ) {
+        $output = '<b>' . str_replace( $delim, $delim . '</b>', $output );
+      }
+      switch ( $message_type ) {
+        case 'string':
+        case 'integer':
+          $output = '<p>' . $output . '</p>';
+        break;
+        default:
+          $output = '<pre>' . $output . '</pre>';
+        break;
+      }
+    }
+    return $output;
+  }
+}
+
+if ( !function_exists( 'prp_get_wp_error_string' ) ) {
+  function prp_get_wp_error_string( WP_Error $error, bool $echo = false ):string {
+
+    $output = plugin_readme_parser_name .
+        ' error ' .
+        trim( print_r( $error->get_error_code(), true ) ).
+        ': ' .
+        trim( print_r( $error->get_error_message(), true ) ) .
+        ( empty( $error->get_error_data() ) ? '' : '. \'' . trim( print_r( $error->get_error_data(), true ) ) . '\'' );
+
+    return $echo ? '<p>' . $output . '.</p>' : $output;
   }
 }
 
