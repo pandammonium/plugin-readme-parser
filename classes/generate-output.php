@@ -124,8 +124,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
       try {
         $result = prp_toggle_global_shortcodes( $this->content );
         if ( is_wp_error( $result ) ) {
-          prp_log( 'result', $result );
-          // throw new PRP_Exception( PRP_Exception::set_error_code_as_string( $result->get_error_message() ), $result->get_error_code() );
+          // prp_log( 'result', $result );
+          // throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
         }
         $this->normalise_parameters( $paras );
 
@@ -221,8 +221,10 @@ if ( !class_exists( 'Generate_Output' ) ) {
       try {
         $result = prp_toggle_global_shortcodes( $this->content );
         if ( is_wp_error( $result ) ) {
-          prp_log( 'result', $result );
-          // throw new PRP_Exception( PRP_Exception::set_error_code_as_string( $result->get_error_message() ), $result->get_error_code() );
+          // prp_log( 'error code', $result->get_error_code() );
+          // prp_log( 'error message', $result->get_error_message() );
+          // prp_log( 'result', $result );
+          // throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
         }
       } catch ( PRP_Exception $e ) {
         throw $e;
@@ -260,8 +262,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
       try {
         $result = prp_toggle_global_shortcodes( $this->content );
         if ( is_wp_error( $result ) ) {
-          prp_log( 'result', $result );
-          // throw new PRP_Exception( PRP_Exception::set_error_code_as_string( $result->get_error_message() ), $result->get_error_code() );
+          // prp_log( 'result', $result );
+          // throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
         }
         $this->normalise_parameters( $paras );
         extract( shortcode_atts( array( 'name' => '', 'target' => '_blank', 'nofollow' => '', 'data' => '', 'cache' => '5' ), $this->parameters ) );
@@ -324,8 +326,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
       try {
         $result = prp_toggle_global_shortcodes( $this->content );
         if ( is_wp_error( $result ) ) {
-          prp_log( 'result', $result );
-          // throw new PRP_Exception( PRP_Exception::set_error_code_as_string( $result->get_error_message() ), $result->get_error_code() );
+          // prp_log( 'result', $result );
+          // throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
         }
       } catch ( PRP_Exception $e ) {
         throw $e;
@@ -402,16 +404,18 @@ if ( !class_exists( 'Generate_Output' ) ) {
             // prp_log( __( 'Parameter string (normalised)', plugin_readme_parser_domain), '\'' . $this->parameters . '\'' );
           break;
           default:
-            $this->parameters = null;//$parameters;
+            $this->parameters = null;
+            // Can't throw an exception here for reasons I don't fully understand. Use WP_Error instead
+            // $error = new WP_Error();
+            // $error->add( PRP_Exception::PRP_ERROR_BAD_INPUT, 'Wrong plugin. Expected <samp><kbd>' . plugin_readme_parser_domain . '</kbd></samp>; got <samp><kbd>' . $file . '</kbd></samp>' );
 
-            $error = new WP_Error();
-
-            $error->add( PRP_Exception::get_error_code_as_string( PRP_Exception::PRP_ERROR_BAD_INPUT ), 'Wrong plugin. Expected <samp><kbd>' . plugin_readme_parser_domain . '</kbd></samp>; got <samp><kbd>' . $file . '</kbd></samp>' );
-
+            // Can't seem to throw an exception here; don't know why.
             // throw new PRP_Exception( 'Shortcode parameters: wanted <samp><kbd>string|array|null</kbd></samp>; got <samp><kbd>' . gettype( $parameters ) . '</kbd></samp>: <pre>' . print_r( $parameters, true ) . '</pre>', PRP_Exception::PRP_ERROR_BAD_INPUT );
-          if ( $error->has_errors() ) {
-            return $error;
-          }
+          // if ( $error->has_errors() ) {
+          //   return $error;
+          // }
+          return null;
+          // break;
         }
       }
       return null;
@@ -422,8 +426,11 @@ if ( !class_exists( 'Generate_Output' ) ) {
      */
     private function should_links_be_shown(): void {
 
-      // $this->show_links = false;
       // prp_log( 'method', __FUNCTION__ );
+
+      // prp_log( 'show links (before)', $this->show_links );
+      // prp_log( 'include', $this->include );
+      // prp_log( 'exclude', $this->exclude );
       if ( '' !== $this->include ) {
         if ( prp_is_it_excluded( 'links', $this->include ) ) {
           $this->show_links = true;
@@ -433,7 +440,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
           $this->show_links = true;
         }
       }
-      // prp_log( __( 'show links (class)    ', plugin_readme_parser_domain ), ( $this->show_links ? 'true' : 'false' ) );
+      // prp_log( 'show links (before)', $this->show_links );
     }
 
     /**
@@ -984,7 +991,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       if ( ( 0 < strlen( $this->file_data[ 'file' ] ) ) &&
            ( 0 === substr_count( $this->file_data[ 'file' ], "\n" ) ) ) {
 
-        throw new PRP_Exception( 'The readme file for \'' . $this->name . '\' is invalid: there are no carriage returns', PRP_Exception::PRP_ERROR_BAD_FILE );
+        throw new PRP_Exception( 'The readme file for \'' . $this->name . '\' is invalid: there are no newlines', PRP_Exception::PRP_ERROR_BAD_FILE );
 
       } else {
         throw new PRP_Exception( 'The readme file for \'' . $this->name . '\' is either missing or invalid', PRP_Exception::PRP_ERROR_BAD_FILE );

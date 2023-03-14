@@ -464,7 +464,7 @@ if ( !function_exists( 'prp_get_file' ) ) {
     $file_return[ 'rc' ] = $rc;
     if ( is_wp_error( $result ) ) {
       // prp_log( '  WP Error', $result );
-      throw new Exception( intval( $result->get_error_code() ), $result->get_error_message() );
+      throw new PRP_Exception( $result->get_error_message(),intval( $result->get_error_code() ) );
     } else {
       // prp_log( 'type of response', gettype( $result[ 'response' ] ) );
       // prp_log( 'response', $result[ 'response' ] );
@@ -571,7 +571,6 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
     // prp_log( 'function', __FUNCTION__ );
 
     $file = plugin_dir_path( __DIR__ );
-    // $file = 'fish';
     // prp_log( __( 'Plugin directory: ', plugin_readme_parser_domain ) . $file );
     if ( str_contains( $file, plugin_readme_parser_filename ) ) {
 
@@ -642,17 +641,15 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
 
       }
     } else {
-      // prp_report_error( __( 'wrong plugin supplied', plugin_readme_parser_domain), plugin_readme_parser_name );
-      // throw new Exception( 'Wrong plugin. Expected <samp><kbd>' . plugin_readme_parser_domain . '</kbd></samp>; got <samp><kbd>' . $file . '</kbd></samp>', 2 ); // 2 is a PHP error code for user error
+      // Can't throw an exception here because it won't be caught by the plugin, presumably because it's used as a filter on `the_content`. Use WP_Error instead.
+
       $error = new WP_Error();
-
-      $error->add( PRP_Exception::get_error_code_as_string( PRP_Exception::PRP_ERROR_BAD_INPUT ), 'Wrong plugin. Expected <samp><kbd>' . plugin_readme_parser_domain . '</kbd></samp>; got <samp><kbd>' . $file . '</kbd></samp>' );
-
-      prp_log( 'has errors', $error->has_errors() );
+      $error->add( PRP_Exception::PRP_ERROR_BAD_INPUT, 'Wrong plugin. Expected <samp><kbd>' . plugin_readme_parser_domain . '</kbd></samp>; got <samp><kbd>' . $file . '</kbd></samp>' );
+      // prp_log( 'has errors', $error->has_errors() );
       // prp_log( 'error', $error );
-      prp_log( 'error code', $error->get_error_code() );
-      prp_log( 'error message', $error->get_error_message() );
-      return $error->has_errors() ? $error : null;
+      // prp_log( 'error code', $error->get_error_code() );
+      // prp_log( 'error message', $error->get_error_message() );
+      return prp_log( 'error', $error, true, true );
     }
     return $content;
   }
