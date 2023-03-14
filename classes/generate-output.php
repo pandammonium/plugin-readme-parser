@@ -420,7 +420,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function should_links_be_shown(): void {
 
       // $this->show_links = false;
-      if ( '' != $this->include ) {
+      if ( '' !== $this->include ) {
         if ( prp_is_it_excluded( 'links', $this->include ) ) {
           $this->show_links = true;
         }
@@ -480,8 +480,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function validate_parameters(): void {
 
-      if ( ( '' != $this->exclude ) &&
-           ( '' != $this->include ) ) {
+      if ( ( '' !== $this->exclude ) &&
+           ( '' !== $this->include ) ) {
         throw new PRP_Exception( 'Parameters \'include\' and \'exclude\' cannot both be specified in the same shortcode', PRP_Exception::PRP_ERROR_BAD_INPUT );
       // } else {
       //   return '';
@@ -551,7 +551,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function display_links_section(): void {
 
       if ( ( $this->show_links ) &&
-           ( 'bottom' == $this->links ) ) {
+           ( 'bottom' === $this->links ) ) {
         $this->file_combined .= prp_display_links( $this->download, $this->target, $this->nofollow, $this->version, $this->mirror, $this->plugin_name );
       }
     }
@@ -569,7 +569,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         $this->normalise_html_code_tags( $i );
 
-        if ( '' != $this->file_array[ $i ] ) {
+        if ( '' !== $this->file_array[ $i ] ) {
           $this->my_html .= $this->file_array[ $i ] . self::LINE_END;
         }
       }
@@ -630,17 +630,17 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function standardise_headings_markup( $i ): void {
 
-      if ( '=== ' == substr( $this->file_array [$i ], 0, 4 ) ) {
+      if ( '=== ' === substr( $this->file_array [$i ], 0, 4 ) ) {
         $this->file_array[ $i ] = str_replace( '===', '#', $this->file_array[ $i ] );
         $this->section = prp_get_section_name( $this->file_array[ $i ], 1 );
         // // prp_log( __( 'section', plugin_readme_parser_domain ), $this->section );
       } else {
-        if ( '== ' == substr( $this->file_array[ $i ], 0, 3 ) ) {
+        if ( '== ' === substr( $this->file_array[ $i ], 0, 3 ) ) {
           $this->file_array[ $i ] = str_replace( '==', '##' , $this->file_array[ $i ] );
           $this->section = prp_get_section_name( $this->file_array[ $i ], 2 );
           // // prp_log( __( 'section', plugin_readme_parser_domain ), $this->section );
         } else {
-          if ( '= ' == substr( $this->file_array[ $i ], 0, 2 ) ) {
+          if ( '= ' === substr( $this->file_array[ $i ], 0, 2 ) ) {
             $this->file_array[ $i ] = str_replace( '=', '###', $this->file_array[ $i ] );
             // // prp_log( __( 'section', plugin_readme_parser_domain ), $this->section );
           }
@@ -650,8 +650,10 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function standardise_lists( $i ): void {
 
-      if ( ( '*' == substr( $this->file_array[ $i ], 0, 1 ) ) &&
-           ( ' ' != substr( $this->file_array[ $i ], 0, 2 ) ) &&
+      // prp_log( 'method', __FUNCTION__ );
+
+      if ( ( '*' === substr( $this->file_array[ $i ], 0, 1 ) ) &&
+           ( ' ' !== substr( $this->file_array[ $i ], 0, 2 ) ) &&
            ( false === strpos( $this->file_array[ $i ], '*', 1 ) ) ) {
         $this->file_array[ $i ] = '* ' . substr( $this->file_array[ $i ], 1 );
       }
@@ -659,16 +661,16 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function track_current_section(): void {
 
-      if ( ( $this->section != $this->prev_section ) &&
-           ( '' == $this->prev_section ) ) {
+      if ( ( $this->section !== $this->prev_section ) &&
+           ( '' === $this->prev_section ) ) {
 
         // If a plugin name was not specified attempt to use the name parameter. If that's not set, assume
         // it's the one in the readme file header
 
         // // prp_log( __( 'name (from args)', plugin_readme_parser_domain ), $this->name );
 
-        if ( '' == $this->plugin_name ) {
-          if ( '' == $this->name ) {
+        if ( '' === $this->plugin_name ) {
+          if ( '' === $this->name ) {
             $this->plugin_name = str_replace( ' ', '-', strtolower( $this->section ) );
           } else {
             $this->plugin_name = $this->name;
@@ -685,7 +687,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function read_section(): void {
 
-      if ( '' != $this->include ) {
+      if ( '' !== $this->include ) {
         $this->read_included_sections();
       } else {
         $this->read_excluded_sections();
@@ -704,7 +706,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       if ( prp_is_it_excluded( $this->section, $this->include ) ) {
         // prp_log( __( 'included', plugin_readme_parser_domain ), $this->section );
 
-        if ( $this->section != $this->prev_section ) {
+        if ( $this->section !== $this->prev_section ) {
           if ( $this->div_written ) {
             $this->file_combined .= '</div>' . self::LINE_END;
           }
@@ -724,7 +726,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
         $this->add_to_output = false;
         // prp_log( __( 'excluded', plugin_readme_parser_domain ), $this->section );
       } else {
-        if ( $this->section != $this->prev_section ) {
+        if ( $this->section !== $this->prev_section ) {
           if ( $this->div_written ) {
             $this->file_combined .= '</div>' . self::LINE_END;
           }
@@ -751,8 +753,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function read_links(): void {
 
-      if ( ( $this->links == strtolower( $this->section ) ) &&
-           ( $this->section != $this->prev_section ) ) {
+      if ( ( $this->links === strtolower( $this->section ) ) &&
+           ( $this->section !== $this->prev_section ) ) {
         if ( $this->show_links ) {
           $this->file_array[ $i ] = prp_display_links( $this->download, $this->target, $this->nofollow, $this->version, $this->mirror, $this->plugin_name ) . $this->file_array[ $i ];
         }
@@ -761,7 +763,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function read_download_link( $i ): void {
 
-      if ( 'Stable tag:' == substr( $this->file_array[ $i ], 0, 11 ) ) {
+      if ( 'Stable tag:' === substr( $this->file_array[ $i ], 0, 11 ) ) {
 
         $this->version = substr( $this->file_array[ $i ], 12 );
         // prp_log( __( 'version', plugin_readme_parser_domain ), $this->version );
@@ -801,12 +803,12 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function add_current_line_to_output( $i ): void {
 
-      if ( ( '' != $this->file_array[ $i ] or !$this->last_line_blank ) &&
+      if ( ( '' !== $this->file_array[ $i ] or !$this->last_line_blank ) &&
          $this->add_to_output ) {
         $this->file_combined .= $this->file_array[ $i ] . self::LINE_END;
         // prp_log_truncated_line( 'Adding l.' . $i . ' ' . $this->file_array[ $i ] );
 
-        if ( '' == $this->file_array[ $i ] ) {
+        if ( '' === $this->file_array[ $i ] ) {
           $this->last_line_blank = true;
 
         } else {
@@ -846,7 +848,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // If all code is one line, replace CODE with PRE tags
 
       if ( ( strpos( $this->file_array[ $i ], '<code>', 0 ) ) && ( strpos( $this->file_array[ $i ], '</code>', 0 ) ) ) {
-        if ( '' == ltrim( strip_tags( substr( $this->file_array[ $i ], 0, strpos( $this->file_array[ $i ], '<code>', 0 ) ) ) ) ) {
+        if ( '' === ltrim( strip_tags( substr( $this->file_array[ $i ], 0, strpos( $this->file_array[ $i ], '<code>', 0 ) ) ) ) ) {
           $this->file_array[ $i ] = str_replace( 'code>', 'pre>', $this->file_array[ $i ] );
         }
       }
@@ -859,7 +861,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         // If line is a sub-heading add the first part of the code
 
-        if ( '<h2>' == substr( $this->file_array[ $i ], 0, 4 ) ) {
+        if ( '<h2>' === substr( $this->file_array[ $i ], 0, 4 ) ) {
 
           // Extract title and check if it should be hidden or shown by default
 
@@ -885,7 +887,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function write_content_reveal_end( $i, $titles_found ): void {
 
-      if ( ( '</div>' == $this->file_array[ $i ] ) && ( 0 < $titles_found ) ) {
+      if ( ( '</div>' === $this->file_array[ $i ] ) && ( 0 < $titles_found ) ) {
         $this->file_array[ $i ] = acr_end() . self::LINE_END . $this->file_array[ $i ];
       }
     }
@@ -931,7 +933,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function process_invalid_file(): void {
 
       if ( ( 0 < strlen( $this->file_data[ 'file' ] ) ) &&
-           ( 0 == substr_count( $this->file_data[ 'file' ], "\n" ) ) ) {
+           ( 0 === substr_count( $this->file_data[ 'file' ], "\n" ) ) ) {
 
         throw new PRP_Exception( 'The readme file for \'' . $this->name . '\' is invalid: there are no carriage returns', PRP_Exception::PRP_ERROR_BAD_FILE );
 
@@ -1012,8 +1014,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         if ( ( $this->file_data[ 'rc' ] === 0 ) &&
              ( $this->file_data[ 'file' ] !== '' ) &&
-             ( substr( $this->file_data[ 'file' ], 0, 9 ) != '<!DOCTYPE' ) &&
-             ( substr_count( $this->file_data[ 'file' ], "\n" ) != 0 ) ) {
+             ( substr( $this->file_data[ 'file' ], 0, 9 ) !== '<!DOCTYPE' ) &&
+             ( substr_count( $this->file_data[ 'file' ], "\n" ) !== 0 ) ) {
 
           // Return values
 
@@ -1143,7 +1145,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
         throw new PRP_Exception( 'The data parameter in the shortcode is invalid' . ( '' === $this->data ? '' : ': <samp><kbd>data="' . $this->data . '"</kbd></samp>' ), PRP_Exception::PRP_ERROR_BAD_INPUT );
 
       }
-      if ( '' == $output ) {
+      if ( '' === $output ) {
         $msg = 'The data parameter in the shortcode is invalid or missing' . ( '' === $this->data ? '' : ': <samp><kbd><kbd>data="' . $this->data . '"</kbd></samp>' );
         $code = PRP_Exception::PRP_ERROR_BAD_INPUT;
       }

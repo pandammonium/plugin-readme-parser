@@ -133,7 +133,7 @@ if ( !function_exists( 'prp_is_it_excluded' ) ) {
 
     } else {
 
-      if ( $tofind != $exclude ) {
+      if ( $tofind !== $exclude ) {
 
         // Search in the middle
 
@@ -220,7 +220,7 @@ if ( !function_exists( 'prp_display_links' ) ) {
 
     $output = '<div markdown="1" class="np-links">' . $crlf . '## Links ##' . $crlf . $crlf;
 
-    if ( $version != '' ) {
+    if ( $version !== '' ) {
       $output .= '<a class="np-download-link" href="' . $download . '" target="' . $target . '"' . $nofollow . '>Download the latest version</a> (' . $version . ')<br /><br />' . $crlf;
 
       // prp_log( __( '  version found; outputting download link', plugin_readme_parser_domain ) );
@@ -476,7 +476,7 @@ if ( !function_exists( 'prp_get_list' ) ) {
     // prp_log( __( '  input:     \'' . $input . '\'', plugin_readme_parser_domain ) );
     // prp_log( __( '  separator: \'' . $separator . '\'', plugin_readme_parser_domain ) );
 
-    if ( $separator == '' ) {
+    if ( $separator === '' ) {
       $separator = ',';
     }
     $comma = strpos( strtolower( $input ), $separator );
@@ -489,7 +489,7 @@ if ( !function_exists( 'prp_get_list' ) ) {
       $comma = strpos( $input, $separator );
     }
 
-    if ( $input != '' ) {
+    if ( $input !== '' ) {
       $item++;
       $content[ $item ] = substr( $input, 0 );
     }
@@ -624,15 +624,18 @@ if ( !function_exists( 'prp_line_is_head_meta_data' ) ) {
    * part of the head meta data, otherwise false.
    */
   function prp_line_is_head_meta_data( $line_in_file ) {
-    if ( ( 'Contributors:' == substr( $line_in_file, 0, 13 ) ) or
-         ( 'Donate link:' == substr( $line_in_file, 0, 12 ) ) or
-         ( 'Tags:' == substr( $line_in_file, 0, 5 ) ) or
-         ( 'Requires at least:' == substr( $line_in_file, 0, 18 ) ) or
-         ( 'Requires PHP:' == substr( $line_in_file, 0, 13 ) ) or
-         ( 'Tested up to:' == substr( $line_in_file, 0, 13 ) ) or
-         ( 'Stable tag:' == substr( $line_in_file, 0, 11 ) ) or
-         ( 'License URI:' == substr( $line_in_file, 0, 12 ) ) or
-         ( 'License:' == substr( $line_in_file, 0, 8 ) ) ) {
+
+    // prp_log( 'function', __FUNCTION__ );
+
+    if ( ( 'Contributors:' === substr( $line_in_file, 0, 13 ) ) or
+         ( 'Donate link:' === substr( $line_in_file, 0, 12 ) ) or
+         ( 'Tags:' === substr( $line_in_file, 0, 5 ) ) or
+         ( 'Requires at least:' === substr( $line_in_file, 0, 18 ) ) or
+         ( 'Requires PHP:' === substr( $line_in_file, 0, 13 ) ) or
+         ( 'Tested up to:' === substr( $line_in_file, 0, 13 ) ) or
+         ( 'Stable tag:' === substr( $line_in_file, 0, 11 ) ) or
+         ( 'License URI:' === substr( $line_in_file, 0, 12 ) ) or
+         ( 'License:' === substr( $line_in_file, 0, 8 ) ) ) {
       return true;
     } else {
       return false;
@@ -690,27 +693,27 @@ if ( !function_exists( 'prp_add_head_meta_data_to_output' ) ) {
           // prp_log( __( 'exclude all meta', plugin_readme_parser_domain ) );
           $add_to_output = false;
 
-        } else if ( ( 'Requires at least:' == substr( $line_in_file, 0, 18 ) ) &&
+        } else if ( ( 'Requires at least:' === substr( $line_in_file, 0, 18 ) ) &&
              ( prp_is_it_excluded( 'requires', $metadata[ 'exclude' ] ) ) ) {
           // prp_log( __( 'exclude WP req', plugin_readme_parser_domain ) );
           $add_to_output = false;
 
-        } else if ( ( 'Requires PHP:' == substr( $line_in_file, 0, 18 ) ) &&
+        } else if ( ( 'Requires PHP:' === substr( $line_in_file, 0, 18 ) ) &&
              ( prp_is_it_excluded( 'requires php', $metadata[ 'exclude' ] ) ) ) {
           // prp_log( __( 'exclude PHP req', plugin_readme_parser_domain ) );
           $add_to_output = false;
 
-        } else if ( ( 'Tested up to:' == substr( $line_in_file, 0, 13 ) ) &&
+        } else if ( ( 'Tested up to:' === substr( $line_in_file, 0, 13 ) ) &&
              ( prp_is_it_excluded( 'tested', $metadata[ 'exclude' ] ) ) ) {
           // prp_log( __( 'exclude test', plugin_readme_parser_domain ) );
           $add_to_output = false;
 
-        } else if ( ( 'License:' == substr( $line_in_file, 0, 8 ) ) &&
+        } else if ( ( 'License:' === substr( $line_in_file, 0, 8 ) ) &&
              ( prp_is_it_excluded( 'license', $metadata[ 'exclude' ] ) ) ) {
           // prp_log( __( 'exclude licence', plugin_readme_parser_domain ) );
           $add_to_output = false;
 
-        } else if ( 'Contributors:' == substr( $line_in_file, 0, 13 ) ) {
+        } else if ( 'Contributors:' === substr( $line_in_file, 0, 13 ) ) {
           if ( prp_is_it_excluded( 'contributors', $metadata[ 'exclude' ] ) ) {
           // prp_log( __( 'exclude contrib', plugin_readme_parser_domain ) );
             $add_to_output = false;
@@ -719,7 +722,7 @@ if ( !function_exists( 'prp_add_head_meta_data_to_output' ) ) {
             $line_in_file = substr( $line_in_file, 0, 14 ) . prp_strip_list( substr( $line_in_file, 14 ), 'c', $metadata[ 'target' ], $metadata[ 'nofollow' ] );
           }
 
-        } else if ( 'Tags:' == substr( $line_in_file, 0, 5 ) ) {
+        } else if ( 'Tags:' === substr( $line_in_file, 0, 5 ) ) {
           if ( prp_is_it_excluded( 'tags', $metadata[ 'exclude' ] ) ) {
           // prp_log( __( 'exclude tags', plugin_readme_parser_domain ) );
             $add_to_output = false;
@@ -727,7 +730,7 @@ if ( !function_exists( 'prp_add_head_meta_data_to_output' ) ) {
             $line_in_file = substr( $line_in_file, 0, 6 ) . prp_strip_list( substr( $line_in_file, 6 ), 't', $metadata[ 'target' ], $metadata[ 'nofollow' ] );
           }
 
-        } else if ( 'Donate link:' == substr( $line_in_file, 0, 12 ) ) {
+        } else if ( 'Donate link:' === substr( $line_in_file, 0, 12 ) ) {
           if ( prp_is_it_excluded( 'donate', $metadata[ 'exclude' ] ) ) {
           // prp_log( __( 'exclude donate', plugin_readme_parser_domain ) );
             $add_to_output = false;
@@ -737,7 +740,7 @@ if ( !function_exists( 'prp_add_head_meta_data_to_output' ) ) {
             $line_in_file = substr( $line_in_file, 0, 13 ) . '<a href="' . $text . '">' . $text . '</a>';
           }
 
-        } else if ( 'License URI:' == substr( $line_in_file, 0, 12 ) ) {
+        } else if ( 'License URI:' === substr( $line_in_file, 0, 12 ) ) {
           if ( prp_is_it_excluded( 'license uri', $metadata[ 'exclude' ] ) ) {
           // prp_log( __( 'exclude lic uri', plugin_readme_parser_domain ) );
             $add_to_output = false;
@@ -747,7 +750,7 @@ if ( !function_exists( 'prp_add_head_meta_data_to_output' ) ) {
             $line_in_file = substr( $line_in_file, 0, 13 ) . '<a href="' . $text . '">' . $text . '</a>';
           }
 
-        } else if ( 'Stable tag:' == substr( $line_in_file, 0, 11 ) ) {
+        } else if ( 'Stable tag:' === substr( $line_in_file, 0, 11 ) ) {
           if ( prp_is_it_excluded( 'stable', $metadata[ 'exclude' ] ) ) {
           // prp_log( __( 'exclude stab tag', plugin_readme_parser_domain ) );
             $add_to_output = false;
