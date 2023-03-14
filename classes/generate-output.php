@@ -1284,6 +1284,21 @@ if ( !class_exists( 'Generate_Output' ) ) {
     }
     add_shortcode( 'readme_info', 'readme_info' );
   }
+  if ( !function_exists( 'readme_banner' )) {
+    /**
+     * @deprecated 2.0.0 This shortcode is obsolete and should no
+     * longer be used. There is no replacement because the plugin
+     * does not have the required access to the WordPress server.
+     */
+    function readme_banner( string|array|null $paras = null, string $content = null ): string {
+      try {
+        throw new PRP_Exception( 'The <samp><kbd>readme_banner</kbd></samp> shortcode is obsolete. Please use either the <samp><kbd>readme</kbd></samp> or <samp><kbd>readme_info</kbd></samp> shortcodes', PRP_Exception::PRP_ERROR_BAD_INPUT );
+      } catch ( PRP_Exception $e ) {
+        return $e->get_prp_nice_error();
+      }
+    }
+    add_shortcode( 'readme_banner', 'readme_banner' );
+  }
 
 }
 ?>
