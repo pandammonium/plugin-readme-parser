@@ -7,6 +7,10 @@
  * @package Pandammonium-Readme-Parser
  */
 
+// If this file is called directly, abort:
+defined( 'ABSPATH' ) or die();
+defined( 'WPINC' ) or die();
+
 /**
  * Add meta to plugin details
  *

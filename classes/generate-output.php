@@ -8,6 +8,10 @@
  * @since  1.0
  */
 
+// If this file is called directly, abort:
+defined( 'ABSPATH' ) or die();
+defined( 'WPINC' ) or die();
+
 if ( !class_exists( 'Generate_Output' ) ) {
   /**
    * The plugin-readme parser and converter-to-HTML.

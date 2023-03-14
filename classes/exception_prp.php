@@ -5,6 +5,11 @@
  * @package Pandammonium-Readme-Parser
  * @since 2.0.0
  */
+
+// If this file is called directly, abort:
+defined( 'ABSPATH' ) or die();
+defined( 'WPINC' ) or die();
+
 if ( !class_exists( 'PRP_Exception' ) ) {
 
   class PRP_Exception extends Exception {

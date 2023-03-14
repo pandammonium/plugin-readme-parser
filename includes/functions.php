@@ -8,6 +8,10 @@
  * @since  1.2
  */
 
+// If this file is called directly, abort:
+defined( 'ABSPATH' ) or die();
+defined( 'WPINC' ) or die();
+
 if ( !function_exists( 'prp_log' ) ) {
 /**
  * Prints a message to the debug log file.
