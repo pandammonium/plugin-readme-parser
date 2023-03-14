@@ -70,7 +70,7 @@ if ( !function_exists( 'prp_log' ) ) {
         // Make sure the error label is upper case
         $count = 0;
         $output = str_ireplace( $error_label, strtoupper($error_label), $output, $count);
-        error_log( 'Changed case of error label ' . $count . ' time' . (1 === $count ? '' : 's') );
+        // error_log( 'Changed case of error label ' . $count . ' time' . (1 === $count ? '' : 's') );
       }
     }
 
