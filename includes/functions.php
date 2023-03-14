@@ -120,7 +120,7 @@ if ( !function_exists( 'prp_get_wp_error_string' ) ) {
 }
 
 if ( !function_exists( 'prp_log_truncated_line' ) ) {
-  function prp_log_truncated_line( $line, $line_number = -1 ) {
+  function prp_log_truncated_line( string $line, int $line_number = -1 ): void {
 
     // prp_log( 'function', __FUNCTION__ );
 
@@ -147,13 +147,14 @@ if ( !function_exists( 'prp_is_it_excluded' ) ) {
    *
    * @param  $tofind   string  Section name
    * @param  $exclude    string  List of excluded sections
-   * @return       string  true or false, depending on whether the section was valid
+   * @return       bool  true or false, depending on whether the section was valid
    */
-  function prp_is_it_excluded( $tofind, $exclude ) {
+  function prp_is_it_excluded( string $tofind, string $exclude ): bool {
 
     // prp_log( 'function', __FUNCTION__ );
 
     $tofind = strtolower( $tofind );
+    $exclude = strtolower( $exclude );
     $return = true;
 
     // prp_log( __( '  Is \'' . $tofind . '\' excluded?', plugin_readme_parser_domain ) );
@@ -205,10 +206,10 @@ if ( !function_exists( 'prp_get_section_name' ) ) {
    * @since  1.0
    *
    * @param  $readme_line  string  Line from readme
-   * @param  $start_pos    string  Position of line to look from
+   * @param  $start_pos    int  Position of line to look from
    * @return       string  Section name
    */
-  function prp_get_section_name( $readme_line, $start_pos ) {
+  function prp_get_section_name( string $readme_line, int $start_pos ): string {
 
     // prp_log( 'function', __FUNCTION__ );
 
@@ -240,11 +241,11 @@ if ( !function_exists( 'prp_display_links' ) ) {
  * @param  $target     string  Link target
  * @param  $nofollow   string  Link nofollow
  * @param  $version    string  Version number
- * @param  $mirror     string  Array of mirrors
+ * @param  $mirror     string[]  Array of mirror links
  * @param  $plugin_name  string  Plugin name
  * @return       string  Output
  */
-  function prp_display_links( $download, $target, $nofollow, $version, $mirror, $plugin_name ) {
+  function prp_display_links( string $download, string $target, string $nofollow, string $version, array $mirror, string $plugin_name ): string {
 
     // prp_log( 'function', __FUNCTION__ );
 
@@ -308,7 +309,7 @@ if ( !function_exists( 'prp_check_img_exists' ) ) {
    * @param  $ext    string  File extension
    * @return       string  Valid extension or blank
    */
-  function prp_check_img_exists( $filename, $ext ) {
+  function prp_check_img_exists( string $filename, string $ext ): string {
 
     // prp_log( 'function', __FUNCTION__ );
 
@@ -363,13 +364,13 @@ if ( !function_exists( 'prp_strip_list' ) ) {
    *
    * @since  1.0
    *
-   * @param  $list     string  Provided list
-   * @param  $type   string  Type of list
+   * @param  $list     string  List of e.g. tags, categories
+   * @param  $type   string  Type of list, e.g. tags ('t'), categories ('c')
    * @param  $target   string  Link target
    * @param  $nofollow   string  Link nofollow
    * @return       string  HTML output
    */
-  function prp_strip_list( $list, $type, $target, $nofollow ) {
+  function prp_strip_list( string $list, string $type, string $target, string $nofollow ): string {
 
     // prp_log( 'function', __FUNCTION__ );
 
@@ -425,10 +426,10 @@ if ( !function_exists( 'prp_get_file' ) ) {
    * @since  [version number]
    *
    * @param  string  $file_url   The url of the file to fetch
-   * @param  string  $header   Only get headers?
-   * @return string    Array containing file contents and response
+   * @param  bool  $header   True to only get headers; otherwise false
+   * @return string[]    Array containing file contents and response
    */
-  function prp_get_file( $file_url, $header = false ) {
+  function prp_get_file( string $file_url, bool $header = false ): array {
 
     // prp_log( 'function', __FUNCTION__ );
 
@@ -512,9 +513,9 @@ if ( !function_exists( 'prp_get_list' ) ) {
    * @param  $separator  string  The separator character used to split
    * the input string. If not specified, it defaults to a comma (,).
    * @param  $type       string  Indicates the type of list; only used for debug purposes.
-   * @return     string  Array of parameters.
+   * @return     string[]  Array of parameters.
    */
-  function prp_get_list( $input, $separator = '', $type = '' ) {   // Version 1.2
+  function prp_get_list( string $input, string $separator = '', string $type = '' ): array {   // Version 1.2
 
     // prp_log( 'function', __FUNCTION__ );
 
@@ -546,9 +547,6 @@ if ( !function_exists( 'prp_get_list' ) ) {
   }
 }
 
-if ( !function_exists( 'prp_normalise_parameters' ) ) {
-}
-
 if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
 /**
  * Toggle the shortcodes so that any shortcodes in the readme file
@@ -562,11 +560,11 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
  * @since  2.0.0
  * @link   https://wordpress.stackexchange.com/a/115176
  *
- * @param  $content     array  The readme file content
- * @param  $exceptions  array  The shortcodes to keep active
- * @return array  The readme file content
+ * @param  $content     string  The readme file content
+ * @param  $exceptions  string  The shortcodes to keep active
+ * @return string[]  The readme file content
  */
-  function prp_toggle_global_shortcodes( $content ) {
+  function prp_toggle_global_shortcodes( string $content ): string {
 
     // prp_log( 'function', __FUNCTION__ );
 
@@ -664,10 +662,10 @@ if ( !function_exists( 'prp_line_is_head_meta_data' ) ) {
    *
    * @param $line_in_file  string  The current line of the readme file being
    * parsed.
-   * @return boolean  Returns true of the current line in the readme file is
+   * @return bool  Returns true of the current line in the readme file is
    * part of the head meta data, otherwise false.
    */
-  function prp_line_is_head_meta_data( $line_in_file ) {
+  function prp_line_is_head_meta_data( string $line_in_file ): bool {
 
     // prp_log( 'function', __FUNCTION__ );
 
@@ -704,17 +702,19 @@ if ( !function_exists( 'prp_add_head_meta_data_to_output' ) ) {
    * or if
    *   $show_head === true and $show_meta === false.
    *
-   * @param $show_head  boolean  If true, the head should be output. If false,
-   * the head should not be output.
-   * @param $show_meta  boolean  If true, the meta data should be
+   * @param $show_head  bool  If true, the head should be output.
+   * If false, the head should not be output.
+   * @param $show_meta  bool  If true, the meta data should be
    * output. If false, the meta data should not be output.
-   * @param &$line_in_file  string  The line in the readme file currently
-   * being parsed. It is passed by reference so that any amendments may be
-   * made as necessary.
-   * @return boolean  True if this line should be added to the output,
+   * @param &$line_in_file  string  The line in the readme file
+   * currently being parsed. It is passed by reference so that any
+   * amendments may be made as necessary.
+   * @param $metadata  string[]  The metadata from the head of the
+   * file, e.g. tags, version, licence
+   * @return bool  True if this line should be added to the output,
    * otherwise false.
    */
-  function prp_add_head_meta_data_to_output( $show_head, $show_meta, &$line_in_file, $metadata ) {
+  function prp_add_head_meta_data_to_output( bool $show_head, bool $show_meta, string &$line_in_file, array $metadata ): bool {
 
     // prp_log( 'function', __FUNCTION__ );
 

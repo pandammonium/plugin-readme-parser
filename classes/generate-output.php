@@ -243,7 +243,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
      *
      * @uses   prp_get_readme      Fetch the readme file
      *
-     * @param  string    $para     Parameters
+     * @param  string[]    $para     Parameters
      * @param  string    $content  Post content
      * @param  string          Output
      */
@@ -338,7 +338,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function parse_readme_info(): void {
 
-      // Get the file
+      // Get the readme file
 
       try {
         $this->file_data = $this->get_readme( $this->name );
@@ -354,12 +354,13 @@ if ( !class_exists( 'Generate_Output' ) ) {
     }
 
     /**
-     * Normalises the quotation marks to straight ones from curly ones.
-     * Fixes the erroneous array member created by having a space in 'Upgrade
-     * Notice' and names of plugins.
+     * Normalises the quotation marks to straight ones from curly
+     * ones.
+     * Fixes the erroneous array member created by having a space
+     * in 'Upgrade Notice' and names of plugins.
      *
-     * @param  $parameters  array  The text to normalise the quotation marks in.
-     * @return        array  The text containing normalised quotation marks.
+     * @param  $parameters  string|string[]|null  The text to normalise the quotation marks in.
+     * @return        null|WP_Error  The text containing normalised quotation marks.
      */
     private function normalise_parameters( string|array|null $parameters = null ): null|WP_Error {
 
@@ -489,6 +490,13 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // prp_log( __( 'show meta', plugin_readme_parser_domain ), ( $this->show_meta ? 'true' : 'false' ) );
     }
 
+    /**
+     * Validate the shortcode's parameters.
+     *
+     * @param void $  This method takes no arguments.
+     * @throws PRP_Exception If the parameters are invalid.
+     * @return void
+     */
     private function validate_parameters(): void {
 
       // prp_log( 'method', __FUNCTION__ );
@@ -496,11 +504,16 @@ if ( !class_exists( 'Generate_Output' ) ) {
       if ( ( '' !== $this->exclude ) &&
            ( '' !== $this->include ) ) {
         throw new PRP_Exception( 'Parameters \'include\' and \'exclude\' cannot both be specified in the same shortcode', PRP_Exception::PRP_ERROR_BAD_INPUT );
-      // } else {
-      //   return '';
       }
     }
 
+    /**
+     * Read the file that is stored line by line in the provided
+     * array.
+     *
+     * @param void $  This method takes no arguments.
+     * @return void
+     */
     private function read_file_array(): void {
 
       // prp_log( 'method', __FUNCTION__ );
@@ -563,6 +576,13 @@ if ( !class_exists( 'Generate_Output' ) ) {
       $this->file_combined .= '</div>' . self::LINE_END;
     }
 
+    /**
+     * Add the HTML required to display the links section to the
+     * current content.
+     *
+     * @param void $  This method takes no arguments.
+     * @return void
+     */
     private function display_links_section(): void {
 
       // prp_log( 'method', __FUNCTION__ );
@@ -573,6 +593,12 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
     }
 
+    /**
+     * Write out the HTML to a string ready for display.
+     *
+     * @param void $  This method takes no arguments.
+     * @return void
+     */
     private function write_html(): void {
 
       // prp_log( 'method', __FUNCTION__ );
@@ -598,6 +624,12 @@ if ( !class_exists( 'Generate_Output' ) ) {
       $this->my_html = str_replace( '<code>', '<code class="notranslate">', str_replace( '<pre>', '<pre class="notranslate">', $this->my_html ) );
     }
 
+    /**
+     * Set all the member data to their initial values.
+     *
+     * @param void $  This method takes no arguments.
+     * @return void
+     */
     private function initialise(): void {
 
       // prp_log( 'method', __FUNCTION__ );
@@ -650,7 +682,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // prp_log( __('all the things have been initialised', plugin_readme_parser_domain), $this );
     }
 
-    private function standardise_headings_markup( $i ): void {
+    private function standardise_headings_markup( int $i ): void {
 
       // prp_log( 'method', __FUNCTION__ );
 
@@ -672,7 +704,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
     }
 
-    private function standardise_lists( $i ): void {
+    private function standardise_lists( int $i ): void {
 
       // prp_log( 'method', __FUNCTION__ );
 
@@ -795,7 +827,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
     }
 
-    private function read_download_link( $i ): void {
+    private function read_download_link( int $i ): void {
 
       // prp_log( 'method', __FUNCTION__ );
 
@@ -809,7 +841,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
     }
 
-    private function read_head( $i ): void {
+    private function read_head( int $i ): void {
 
       // prp_log( 'method', __FUNCTION__ );
 
@@ -841,7 +873,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
     }
 
-    private function add_current_line_to_output( $i ): void {
+    private function add_current_line_to_output( int $i ): void {
 
       // prp_log( 'method', __FUNCTION__ );
 
@@ -863,19 +895,19 @@ if ( !class_exists( 'Generate_Output' ) ) {
         }
     }
 
-    private function write_html_title( $i ): void {
+    private function write_html_title( int $i ): void {
 
       // prp_log( 'method', __FUNCTION__ );
 
       $this->title = substr( $this->file_array[ $i ], 4, strpos( $this->file_array[ $i ], '</h2>' ) - 4 );
-      if ( prp_is_it_excluded( strtolower( $this->title ), $this->hide ) ) {
+      if ( prp_is_it_excluded( $this->title, $this->hide ) ) {
         $state = 'hide';
       } else {
         $state = 'show';
       }
     }
 
-    private function normalise_html_code_tags( $i ): void {
+    private function normalise_html_code_tags( int $i ): void {
 
       // prp_log( 'method', __FUNCTION__ );
 
@@ -900,7 +932,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
     }
 
-    private function write_content_reveal_plugin( $i, $titles_found ): int {
+    private function write_content_reveal_plugin( int $i, string $titles_found ): int {
 
       // prp_log( 'method', __FUNCTION__ );
 
@@ -927,7 +959,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       return $titles_found;
     }
 
-    private function write_content_reveal_heading( $i, $titles_found ): int {
+    private function write_content_reveal_heading( int $i, string $titles_found ): int {
 
       // prp_log( 'method', __FUNCTION__ );
 
@@ -935,7 +967,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       return ++$titles_found;
     }
 
-    private function write_content_reveal_end( $i, $titles_found ): void {
+    private function write_content_reveal_end( int $i, string $titles_found ): void {
 
       // prp_log( 'method', __FUNCTION__ );
 
@@ -991,10 +1023,10 @@ if ( !class_exists( 'Generate_Output' ) ) {
       if ( ( 0 < strlen( $this->file_data[ 'file' ] ) ) &&
            ( 0 === substr_count( $this->file_data[ 'file' ], "\n" ) ) ) {
 
-        throw new PRP_Exception( 'The readme file for \'' . $this->name . '\' is invalid: there are no newlines', PRP_Exception::PRP_ERROR_BAD_FILE );
+        throw new PRP_Exception( 'The readme file ' . ( empty( $this->name ) ? '' : ' for \'' . $this->name . '\'' ) . ' is invalid: there are no newlines', PRP_Exception::PRP_ERROR_BAD_FILE );
 
       } else {
-        throw new PRP_Exception( 'The readme file for \'' . $this->name . '\' is either missing or invalid', PRP_Exception::PRP_ERROR_BAD_FILE );
+        throw new PRP_Exception( 'The readme file ' . ( empty( $this->name ) ? '' : ' for \'' . $this->name . '\'' ) . ' is either missing or invalid', PRP_Exception::PRP_ERROR_BAD_FILE );
 
       }
     }
@@ -1037,9 +1069,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
      * @since  1.2
      *
      * @param  $plugin_url   string  readme name or URL
-     * @return       string  False or array containing readme and plugin name
+     * @return       string[]|bool  False or array containing readme and plugin name
      */
-    private function get_readme( $plugin_url, $version = '' ): mixed {
+    private function get_readme( string $plugin_url, string $version = '' ): array {
 
       // prp_log( 'method', __FUNCTION__ );
 
@@ -1087,22 +1119,13 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         } else {
 
-          throw new PRP_Exception( 'The readme file for \'' . $this->name . '\' is invalid', PRP_Exception::PRP_ERROR_BAD_FILE );
+          throw new PRP_Exception( 'The readme file ' . ( empty( $this->name ) ? '' : ' for \'' . $this->name . '\'' ) . ' is invalid', PRP_Exception::PRP_ERROR_BAD_FILE );
 
           // prp_log( __( '  readme file is invalid', plugin_readme_parser_domain ) );
-
-          // If not valid, return false
-
-          // return false;
         }
 
       } catch ( PRP_Exception $e ) {
-        $e->get_prp_nice_error();
-        return false;
-      } catch ( Exception $e ) {
-        echo '<p class="error">' . print_r( $e->getMessage(), true ) . '</p>';
-        error_log( print_r( $e->getMessage(), true ) );
-        return false;
+        throw $e;
       }
 
       // prp_log( __( '  file data:   contents of readme file', plugin_readme_parser_domain ) );
@@ -1228,7 +1251,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
   $generator = new Generate_Output();
 
   if ( !function_exists( 'readme_parser' )) {
-    function readme_parser( $paras = '', $content = '' ) {
+    function readme_parser( string|array|null $paras = null, string $content = '' ) {
 
       // prp_log( 'method', __FUNCTION__ );
 
@@ -1245,7 +1268,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     add_shortcode( 'readme', 'readme_parser' );
   }
   if ( !function_exists( 'readme_info' )) {
-    function readme_info( $paras = '', $content = '' ) {
+    function readme_info(array $paras = array(), string $content = '' ) {
 
       // prp_log( 'method', __FUNCTION__ );
 
