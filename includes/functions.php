@@ -259,7 +259,7 @@ if ( !function_exists( 'prp_display_links' ) ) {
     $output = '<div markdown="1" class="np-links">' . $crlf . '## Links ##' . $crlf . $crlf;
 
     if ( $version !== '' ) {
-      $output .= '<a class="np-download-link" href="' . $download . '" target="' . $target . '"' . $nofollow . '>Download the latest version</a> (' . $version . ')<br /><br />' . $crlf;
+      $output .= '<a class="np-download-link" href="' . $download . '" target="' . $target . '"' . $nofollow . '>Download the latest version</a> (v' . $version . ')<br /><br />' . $crlf;
 
       // prp_log( __( '  version found; outputting download link', plugin_readme_parser_domain ) );
 
