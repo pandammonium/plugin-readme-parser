@@ -202,7 +202,7 @@ if ( !class_exists( 'PRP_Exception' ) ) {
           " on line " . print_r( $this->get_prp_line(), true ), true ) );
       }
 
-      $display = '<p class="error">' . plugin_readme_parser_name . ' ' . print_r( 'ERROR ' . $this->get_prp_code(), true ) . ': ' . print_r( $this->get_prp_message(), true ) . '.</p>';
+      $display = '<p><span class="error">' . plugin_readme_parser_name . '</span>: ' . print_r( 'ERROR ' . $this->get_prp_code(), true ) . ' ' . print_r( $this->get_prp_message(), true ) . '.</p>';
 
       return print_r( $display, true );
     }
