@@ -133,10 +133,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // Get cached output
 
       $this->cache = $cache;
-      $result = false;
-      if ( is_numeric( $this->cache ) ) {
-        $result = $this->get_cache( 'prp_' . md5( $exclude . $hide . $include . $target . $nofollow . $ignore . $this->cache . $version . $mirror .$this->content ) );
-      }
+      $result = $this->get_cache( 'prp_' . md5( $exclude . $hide . $include . $target . $nofollow . $ignore . $this->cache . $version . $mirror .$this->content ) );
       if ( false === $result ) {
 
         $this->content = $content;
@@ -276,11 +273,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // Get the cache
 
       $this->cache = $cache;
-      $result = false;
-      if ( is_numeric( $this->cache ) ) {
-        $result = $this->get_cache( 'prp_info_' . md5( $name . $this->cache ) );
-      }
-      // prp_log( 'cache found', $result );
+      $result = $this->get_cache( 'prp_info_' . md5( $name . $this->cache ) );
 
       if ( false === $result ) {
         $this->content = $content;
@@ -1053,11 +1046,12 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       // prp_log( 'method', __FUNCTION__ );
 
+      $result = false;
       if ( is_numeric( $this->cache ) ) {
         $this->cache_key = $cache_key;
         $result = get_transient( $this->cache_key );
-        return $result;
       }
+      // prp_log( 'get cache', (false === $result ? false : true ) );
       return false;
     }
 
