@@ -123,41 +123,48 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // prp_log( __( '---------------- ' . self::COLOURS_DEBUG[ self::$c++ ], plugin_readme_parser_domain ) );
 
       $this->initialise();
-
-      $this->content = $content;
       try {
-        $result = prp_toggle_global_shortcodes( $this->content );
-        if ( is_wp_error( $result ) ) {
-          // prp_log( 'result', $result );
-          // throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
-        }
         $this->normalise_parameters( $paras );
-
-        extract( shortcode_atts( array( 'exclude' => '', 'hide' => '', 'include' => '', 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '5', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $this->parameters ) );
-
-        // Ensure EXCLUDE and INCLUDE parameters aren't both included
-        $this->exclude = strtolower( $exclude );
-        $this->include = strtolower( $include );
-
-        $this->validate_parameters();
-
       } catch ( PRP_Exception $e ) {
         throw $e;
       }
-
-      // prp_log( 'cache', $cache );
+      extract( shortcode_atts( array( 'exclude' => '', 'hide' => '', 'include' => '', 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '5', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $this->parameters ) );
 
       // Get cached output
 
       $this->cache = $cache;
-      $result = $this->get_cache( 'prp_' . md5( $exclude . $hide . $include . $target . $nofollow . $ignore . $this->cache . $version . $mirror .$this->content ) );
-
-      // prp_log( __( 'shortcode content', plugin_readme_parser_domain ),$this->content );
-      // prp_log( __( 'shortcode parameters', plugin_readme_parser_domain ), $this->parameters );
-
-      // prp_log( __( 'result', plugin_readme_parser_domain ), $result );
-
+      $result = false;
+      if ( is_numeric( $this->cache ) ) {
+        $result = $this->get_cache( 'prp_' . md5( $exclude . $hide . $include . $target . $nofollow . $ignore . $this->cache . $version . $mirror .$this->content ) );
+      }
       if ( !$result ) {
+
+        $this->content = $content;
+        try {
+          $result = prp_toggle_global_shortcodes( $this->content );
+          if ( is_wp_error( $result ) ) {
+            // prp_log( 'result', $result );
+            // throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
+          }
+
+          // Ensure EXCLUDE and INCLUDE parameters aren't both included
+          $this->exclude = strtolower( $exclude );
+          $this->include = strtolower( $include );
+
+          $this->validate_parameters();
+
+        } catch ( PRP_Exception $e ) {
+          throw $e;
+        }
+
+        // prp_log( 'cache', $cache );
+
+
+        // prp_log( __( 'shortcode content', plugin_readme_parser_domain ),$this->content );
+        // prp_log( __( 'shortcode parameters', plugin_readme_parser_domain ), $this->parameters );
+
+        // prp_log( __( 'result', plugin_readme_parser_domain ), $result );
+
 
         // prp_log( __( 'transient not cached', plugin_readme_parser_domain ) );
 
@@ -258,37 +265,45 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // prp_log( 'readme_info arg2: content', $content );
 
       $this->initialise();
-
-      $this->content = $content;
       try {
-        $result = prp_toggle_global_shortcodes( $this->content );
-        if ( is_wp_error( $result ) ) {
-          // prp_log( 'result', $result );
-          // throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
-        }
         $this->normalise_parameters( $paras );
-        extract( shortcode_atts( array( 'name' => '', 'target' => '_blank', 'nofollow' => '', 'data' => '', 'cache' => '5' ), $this->parameters ) );
       } catch ( PRP_Exception $e ) {
         throw $e;
       }
-
-
-      // prp_log( 'user attributes', $attributes );
-
-      $output = '';
-      $this->data = strtolower( $data );
+      extract( shortcode_atts( array( 'name' => '', 'target' => '_blank', 'nofollow' => '', 'data' => '', 'cache' => '5' ), $this->parameters ) );
 
       // Get the cache
 
       $this->cache = $cache;
-      $result = $this->get_cache( 'prp_info_' . md5( $name . $this->cache ) );
+      $result = false;
+      if ( is_numeric( $this->cache ) ) {
+        $result = $this->get_cache( 'prp_info_' . md5( $name . $this->cache ) );
+      }
+
+      if ( !$result ) {
+        $this->content = $content;
+        try {
+          $result = prp_toggle_global_shortcodes( $this->content );
+          if ( is_wp_error( $result ) ) {
+            // prp_log( 'result', $result );
+            // throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
+          }
+        } catch ( PRP_Exception $e ) {
+          throw $e;
+        }
+
+
+        // prp_log( 'user attributes', $attributes );
+
+        $output = '';
+        $this->data = strtolower( $data );
+
 
       // prp_log( 'cache is', $this->cache );
       // prp_log( 'result is of type', gettype( $result ) );
       // prp_log( 'result is', $result );
 
 
-      if ( !$result ) {
 
         $this->name = $name;
         $this->target = $target;
@@ -389,23 +404,22 @@ if ( !class_exists( 'Generate_Output' ) ) {
               } else if ( isset( $normalised_parameters[ 'name' ] ) ) {
                 $normalised_parameters['name'] .= ' ' . $normalised_parameters[0];
               } else {
-                // prp_log( __( 'Erroneous parameter found', plugin_readme_parser_domain ) );
+                throw new PRP_Exception( 'Parameter is invalid. Expected <samp><kbd>exclude</kbd></samp>, <samp><kbd>include</kbd></samp> or <samp><kbd>name</kbd></samp>; got <samp><kbd>' . print_r( $normalised_parameters[0], true ) . '</kbd></samp>', PRP_Exception::PRP_ERROR_BAD_INPUT);
               }
               unset( $normalised_parameters[0] );
             }
             $this->parameters = $normalised_parameters;
-            // prp_log( __( 'Parameter array (normalised)', plugin_readme_parser_domain), $this->parameters );
           break;
           case 'string':
             $normalised_parameters = str_replace(array_keys(self::QUOTES), array_values(self::QUOTES), $parameters);
             $this->parameters = $parameters;
-            // prp_log( __( 'Parameter string (normalised)', plugin_readme_parser_domain), '\'' . $this->parameters . '\'' );
           break;
           default:
             $this->parameters = null;
-            throw new PRP_Exception( 'Parameter type is incorrect. Expected <samp><kbd>string|array|null</kbd></samp>; got <samp><kbd>' . gettype( $parameters ) . '</kbd></samp>', PRP_Exception::PRP_ERROR_BAD_INPUT);
+            throw new PRP_Exception( 'Parameter type is incorrect. Expected <samp><kbd>string|array|null</kbd></samp>; got <samp><kbd>' . gettype( $parameters ) . '</kbd></samp>: ' . print_r( $parameters, true ), PRP_Exception::PRP_ERROR_BAD_INPUT ) ;
         }
       }
+      // prp_log( __( 'Parameter ' . gettype( $parameters ) . ' (normalised)', plugin_readme_parser_domain), print_r( $this->parameters, true ) );
       return null;
     }
 
