@@ -133,7 +133,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // Get cached output
 
       $this->cache = $cache;
-      $result = $this->get_cache( 'prp_' . md5( $exclude . $hide . $include . $target . $nofollow . $ignore . $this->cache . $version . $mirror .$this->content ) );
+      $result = $this->get_cache( 'prp_' . md5( $exclude . $hide . $include . $target . $nofollow . $ignore . $this->cache . $version . $mirror . $this->content ) );
+
       if ( false === $result ) {
 
         $this->content = $content;
