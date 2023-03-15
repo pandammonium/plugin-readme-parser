@@ -264,6 +264,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // prp_log( 'readme_info arg1: parameters', $paras );
       // prp_log( 'readme_info arg2: content', $content );
 
+      $output = '';
       $this->initialise();
       try {
         $this->normalise_parameters( $paras );
@@ -295,7 +296,6 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         // prp_log( 'user attributes', $attributes );
 
-        $output = '';
         $this->data = strtolower( $data );
 
 
