@@ -299,9 +299,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
         $this->data = strtolower( $data );
 
 
-      // prp_log( 'cache is', $this->cache );
-      // prp_log( 'result is of type', gettype( $result ) );
-      // prp_log( 'result is', $result );
+        // prp_log( 'cache is', $this->cache );
+        // prp_log( 'result is of type', gettype( $result ) );
+        // prp_log( 'result is', $result );
 
 
 
@@ -397,6 +397,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
               // prp_log( $key . ': ' . $normalised_parameters[$key] );
             }
             if ( isset( $normalised_parameters[0] ) ) {
+              // If there's a value in [0], it means there's a space in the value, e.g. 'Upgrade Notice'. Need to join it up with the apprpriate key and remove the erroneous 0 key.
               if ( isset( $normalised_parameters[ 'exclude' ] ) ) {
                 $normalised_parameters['exclude'] .= ' ' . $normalised_parameters[0];
               } else if ( isset( $normalised_parameters[ 'include' ] ) ) {
@@ -442,7 +443,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
           $this->show_links = true;
         }
       }
-      // prp_log( 'show links (before)', $this->show_links );
+      // prp_log( 'show links (after)', $this->show_links );
     }
 
     /**
