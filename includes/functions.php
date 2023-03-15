@@ -25,7 +25,7 @@ if ( !function_exists( 'prp_log' ) ) {
  * @param bool  $echo  (optional) Forces the message name and message to be displayed on the web page; overrides WP_DEBUG_DISPLAY. Default is false, the message name and message will not be displayed on the web page.
  *
  */
-  function prp_log( string $message_name, mixed $message = null, bool $error = false, bool $echo = false ): string {
+  function prp_log( string $message_name, mixed $message = '', bool $error = false, bool $echo = false ): string {
 
     $debugging = defined( 'WP_DEBUG' ) && WP_DEBUG;
     $debug_logfile = defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG;
