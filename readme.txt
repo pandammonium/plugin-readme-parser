@@ -208,14 +208,16 @@ Semantic versioning is used, with the first release being 1.0.
 
 = 2.0.0 =
 
+The original plugin has been forked and is now maintained by [Caity Ross](https://pandammonium.org/).
+
 * Bug: updates markdown library; the old version broke the plugin when running on more recent versions of PHP.
 * Bug: corrects variable name; a typo led to a broken plugin in certain circumstances.
 * Bug: removes display of screenshots and banners because they aren't accessible from the plugin.
+* Bug: fixes non-display of 'Upgrade Notice' when explicitly included.
 * Enhancement: adds support for block themes.
 * Enhancement: changes behaviour of parameter include="meta,…". If this parameter is specified, it is changed to include="head,…"; without this change, no meta data at all would be output. An error message is written to the WordPress error log to tell the user about the change.
 * Enhancement: refactors the code to reduce function size; moved most code into a class.
 * Enhancement: uses exceptions and the WP_Error class to handle errors.
-* Maintenance: forked and now maintained by [Caity Ross](https://pandammonium.org/).
 
 [Previous version history](https://plugins.trac.wordpress.org/browser/plugin-readme-parser/trunk/changelog.txt)
 
