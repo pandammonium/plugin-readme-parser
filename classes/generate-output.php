@@ -144,7 +144,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
           $result = prp_toggle_global_shortcodes( $this->content );
           if ( is_wp_error( $result ) ) {
             // prp_log( 'result', $result );
-            // throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
+            throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
           }
 
           // Ensure EXCLUDE and INCLUDE parameters aren't both included
@@ -229,10 +229,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
       try {
         $result = prp_toggle_global_shortcodes( $this->content );
         if ( is_wp_error( $result ) ) {
-          // prp_log( 'error code', $result->get_error_code() );
-          // prp_log( 'error message', $result->get_error_message() );
           // prp_log( 'result', $result );
-          // throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
+          throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
         }
       } catch ( PRP_Exception $e ) {
         throw $e;
@@ -292,7 +290,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
           $result = prp_toggle_global_shortcodes( $this->content );
           if ( is_wp_error( $result ) ) {
             // prp_log( 'result', $result );
-            // throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
+            throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
           }
         } catch ( PRP_Exception $e ) {
           throw $e;
@@ -343,7 +341,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
         $result = prp_toggle_global_shortcodes( $this->content );
         if ( is_wp_error( $result ) ) {
           // prp_log( 'result', $result );
-          // throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
+          throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
         }
       } catch ( PRP_Exception $e ) {
         throw $e;
@@ -1265,7 +1263,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       } catch ( PRP_Exception $e ) {
         return $e->get_prp_nice_error();
       } catch ( Exception $e ) {
-        echo print_r( plugin_readme_parser_name . ': something went wrong with the <samp><kbd>readme</kbd></samp> shortcode', true );
+        return plugin_readme_parser_name . ': something went wrong with the <samp><kbd>readme</kbd></samp> shortcode: ERROR ' . print_r( $e->getCode(), true ) . ' '  . print_r( $e->getCode(), true );
       }
     }
     add_shortcode( 'readme', 'readme_parser' );
@@ -1282,7 +1280,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       } catch ( PRP_Exception $e ) {
         return $e->get_prp_nice_error();
       } catch ( Exception $e ) {
-        return print_r( '<p class="error">' . plugin_readme_parser_name . ': something went wrong with the <samp><kbd>readme_info</kbd></samp> shortcode: ' . $e->getMessage() . '.</p>', true );
+        return plugin_readme_parser_name . ': something went wrong with the <samp><kbd>readme_info</kbd></samp> shortcode: ERROR ' . print_r( $e->getCode(), true ) . ' '  . print_r( $e->getCode(), true );
       }
     }
     add_shortcode( 'readme_info', 'readme_info' );
@@ -1298,6 +1296,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
         throw new PRP_Exception( 'The <samp><kbd>readme_banner</kbd></samp> shortcode is obsolete. Please use either the <samp><kbd>readme</kbd></samp> or <samp><kbd>readme_info</kbd></samp> shortcodes', PRP_Exception::PRP_ERROR_BAD_INPUT );
       } catch ( PRP_Exception $e ) {
         return $e->get_prp_nice_error();
+      } catch ( Exception $e ) {
+        return plugin_readme_parser_name . ': something went wrong with the obsolete <samp><kbd>readme_banner</kbd></samp> shortcode: ERROR ' . print_r( $e->getCode(), true ) . ' '  . print_r( $e->getCode(), true );
       }
     }
     add_shortcode( 'readme_banner', 'readme_banner' );
