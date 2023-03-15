@@ -1199,11 +1199,11 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         } else if ( !$plugin_name_found &&
                     $version_found ) {
-          $msg = 'The name could not be found in the readme file. It\'s needed to determine the link for the download file';
+          $msg = 'The plugin name could not be found in the readme file. It\'s needed to determine the link for the download file';
           $code = PRP_Exception::PRP_ERROR_BAD_FILE;
 
         } else {
-          $msg = 'The name and version number could not be found in the readme file. They\'re needed to determine the link for the download file';
+          $msg = 'The plugin name and version number could not be found in the readme file. They\'re needed to determine the link for the download file';
           $code = PRP_Exception::PRP_ERROR_BAD_FILE;
         }
 
@@ -1212,7 +1212,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
         if ( '' !== $this->version ) {
           $output = $this->version;
         } else {
-          $msg = 'The version number could not be found in the readme file';
+          $msg = 'The plugin version number could not be found in the readme file';
           $code = PRP_Exception::PRP_ERROR_BAD_FILE;
         }
 
@@ -1220,7 +1220,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
         if ( '' !== $this->plugin_name ) {
           $output = '<a href="https://wordpress.org/support/plugin/' . $this->plugin_name . '" target="' . $this->target . '"' . $this->nofollow . '>' . $this->content . '</a>';
         } else {
-          $msg = 'The name of the plugin was not given in the shortcode parameters. It\'s needed to obtain the link for the support forum';
+          $msg = 'The plugin name was not given in the shortcode parameters. It\'s needed to obtain the link for the support forum';
           $code = PRP_Exception::PRP_ERROR_BAD_INPUT;
         }
 
@@ -1228,16 +1228,17 @@ if ( !class_exists( 'Generate_Output' ) ) {
         if ( '' !== $this->plugin_name ) {
           $output = '<a href="https://wordpress.org/extend/plugins/' . $this->plugin_name . '/" target="' . $this->target . '"' . $this->nofollow . '>' .$this->content . '</a>';
         } else {
-          $msg = 'The name of the plugin was not given in the shortcode parameters. It\'s needed to determine the link to the plugin in the WordPress plugin directory';
+          $msg = 'The plugin name was not given in the shortcode parameters. It\'s needed to determine the link to the plugin in the WordPress plugin directory';
           $code = PRP_Exception::PRP_ERROR_BAD_INPUT;
         }
 
       } else {
-        throw new PRP_Exception( 'The data parameter in the shortcode is invalid' . ( '' === $this->data ? '' : ': <samp><kbd>data="' . $this->data . '"</kbd></samp>' ), PRP_Exception::PRP_ERROR_BAD_INPUT );
+        $msg = 'The <samp><kbd>data</kbd></samp> parameter in the shortcode is invalid' . ( '' === $this->data ? '' : ': <samp><kbd>data="' . $this->data . '"</kbd></samp>' );
+        $code = PRP_Exception::PRP_ERROR_BAD_INPUT;
 
       }
       if ( '' === $output ) {
-        $msg = 'The data parameter in the shortcode is invalid or missing' . ( '' === $this->data ? '' : ': <samp><kbd><kbd>data="' . $this->data . '"</kbd></samp>' );
+        $msg = 'The <kbd><samp>data</kbd></samp> parameter in the shortcode is invalid or missing' . ( '' === $this->data ? '' : ': <samp><kbd><kbd>data="' . $this->data . '"</kbd></samp>' );
         $code = PRP_Exception::PRP_ERROR_BAD_INPUT;
       }
 
