@@ -67,9 +67,9 @@ if ( !function_exists( 'prp_log' ) ) {
     }
 
     if ( $error ) {
-      $error_label = 'error';
+      $error_label = 'ERROR';
       if ( false === stripos( $output, 'error' ) ) {
-        $output = 'error' . $output;
+        $output = $error_label . ' ' . $output;
       } else {
         // Make sure the error label is upper case
         $count = 0;
@@ -92,7 +92,7 @@ if ( !function_exists( 'prp_log' ) ) {
 
       $delim = ':';
       $pos = strpos( $output, $delim );
-      if ( $pos !== false ) {
+      if ( false !== $pos ) {
         $output = '<b>' . str_replace( $delim, $delim . '</b>', $output );
       }
       switch ( $message_type ) {
