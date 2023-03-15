@@ -403,7 +403,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
           break;
           default:
             $this->parameters = null;
-            throw new PRP_Exception( 'Parameter type is oncorrect. Expected <samp><kbd>string|array|null</kbd></samp>; got <samp><kbd>' . gettype( $parameters ) . '</kbd></samp>', PRP_Exception::PRP_ERROR_BAD_INPUT);
+            throw new PRP_Exception( 'Parameter type is incorrect. Expected <samp><kbd>string|array|null</kbd></samp>; got <samp><kbd>' . gettype( $parameters ) . '</kbd></samp>', PRP_Exception::PRP_ERROR_BAD_INPUT);
         }
       }
       return null;
