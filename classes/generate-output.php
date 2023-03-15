@@ -140,10 +140,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
         $this->include = strtolower( $include );
 
         $this->validate_parameters();
-        // $valid = $this->validate_parameters();
-        // if ( '' !== $valid ) {
-        //   return $valid;
-        // }
+
       } catch ( PRP_Exception $e ) {
         throw $e;
       }
@@ -372,10 +369,6 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       // prp_log( __( 'Parameters (raw)', plugin_readme_parser_domain), $parameters );
 
-      // $parameters = array(
-      //   'data' => 'download,version,wordpress,forum',
-      // );
-
       if ( null === $parameters ) {
         $this->parameters = $parameters;
         // prp_log( 'Parameters are null', $parameters );
@@ -410,17 +403,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
           break;
           default:
             $this->parameters = null;
-            // Can't throw an exception here for reasons I don't fully understand. Use WP_Error instead
-            // $error = new WP_Error();
-            // $error->add( PRP_Exception::PRP_ERROR_BAD_INPUT, 'Wrong plugin. Expected <samp><kbd>' . plugin_readme_parser_domain . '</kbd></samp>; got <samp><kbd>' . $file . '</kbd></samp>' );
-
-            // Can't seem to throw an exception here; don't know why.
-            // throw new PRP_Exception( 'Shortcode parameters: wanted <samp><kbd>string|array|null</kbd></samp>; got <samp><kbd>' . gettype( $parameters ) . '</kbd></samp>: <pre>' . print_r( $parameters, true ) . '</pre>', PRP_Exception::PRP_ERROR_BAD_INPUT );
-          // if ( $error->has_errors() ) {
-          //   return $error;
-          // }
-          return null;
-          // break;
+            throw new PRP_Exception( 'Parameter type is oncorrect. Expected <samp><kbd>string|array|null</kbd></samp>; got <samp><kbd>' . gettype( $parameters ) . '</kbd></samp>', PRP_Exception::PRP_ERROR_BAD_INPUT);
         }
       }
       return null;
