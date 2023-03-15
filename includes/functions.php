@@ -284,7 +284,9 @@ if ( !function_exists( 'prp_display_links' ) ) {
 
       // prp_log( __( '  no version, therefore no download link', plugin_readme_parser_domain ) );
 
-      $output .= '<span class="np-download-link error">No download link is available as the version number could not be found</span><br /><br />' . $crlf;
+
+
+      $output .= '<span class="np-download-link"><span class="error">' . plugin_readme_parser_name . '</span>: No download link is available as the version number could not be found</span><br /><br />' . $crlf;
 
       // $output .= prp_report_error( __( '', '' ), '', false );
 

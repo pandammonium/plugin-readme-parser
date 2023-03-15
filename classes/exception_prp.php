@@ -45,11 +45,11 @@ if ( !class_exists( 'PRP_Exception' ) ) {
         break;
         case self::PRP_ERROR_NONE:
           $this->error_code = $code;
-          throw new InvalidArgumentException( $code . ' is not a ' . __CLASS__ . ' error' );
+          throw new InvalidArgumentException( $code . ' indicates there is no ' . __CLASS__ . ' error' );
           break;
         default:
           $this->error_code = self::PRP_ERROR_UNKNOWN;
-          throw new InvalidArgumentException( 'Invalid error code used in ' . __CLASS__ );
+          throw new InvalidArgumentException( $code . ' is not an error code used in ' . __CLASS__ );
         break;
       }
     }
@@ -196,7 +196,7 @@ if ( !class_exists( 'PRP_Exception' ) ) {
            ( defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) ) {
         error_log( self::PRP_PREFIX .
           "ERROR " . print_r( $this->get_error_code(), true ) .
-          ": " . print_r( $this->get_prp_message_stripped_of_tags(), true ) );
+          " " . print_r( $this->get_prp_message_stripped_of_tags(), true ) );
         error_log( self::PRP_PREFIX .
           "in " . print_r( $this->get_prp_file() .
           " on line " . print_r( $this->get_prp_line(), true ), true ) );
