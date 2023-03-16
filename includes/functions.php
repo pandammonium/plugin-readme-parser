@@ -72,9 +72,7 @@ if ( !function_exists( 'prp_log' ) ) {
         $output = $error_label . ' ' . $output;
       } else {
         // Make sure the error label is upper case
-        $count = 0;
-        $output = str_ireplace( $error_label, strtoupper($error_label), $output, $count);
-        // error_log( 'Changed case of error label ' . $count . ' time' . (1 === $count ? '' : 's') );
+        $output = str_ireplace( $error_label, strtoupper($error_label), $output );
       }
     }
 
@@ -83,6 +81,8 @@ if ( !function_exists( 'prp_log' ) ) {
 
     if ( ( $debugging && $debug_logfile ) ||
          ( $error && !$echo ) ) {
+      $output = str_ireplace( '&lt;', '<', $output );
+      $output = str_ireplace( '&gt;', '>', $output );
       error_log( $prefix . wp_strip_all_tags( trim( $output ) ) );
     }
 

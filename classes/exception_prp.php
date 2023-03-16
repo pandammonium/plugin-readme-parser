@@ -155,7 +155,11 @@ if ( !class_exists( 'PRP_Exception' ) ) {
      * @since 2.0.0
      */
     private function get_prp_message_stripped_of_tags(): string {
-      return wp_strip_all_tags( parent::getMessage() );
+      $output = wp_strip_all_tags( parent::getMessage() );
+      $output = str_ireplace( '&lt;', '<', $output );
+      $output = str_ireplace( '&gt;', '>', $output );
+
+      return $output;
     }
 
     /**
