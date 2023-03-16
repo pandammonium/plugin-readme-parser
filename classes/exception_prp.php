@@ -47,11 +47,11 @@ if ( !class_exists( 'PRP_Exception' ) ) {
         break;
         case self::PRP_ERROR_NONE:
           $this->error_code = $code;
-          throw new InvalidArgumentException( $code . ' indicates there is no ' . __CLASS__ . ' error' );
+          throw new InvalidArgumentException( 'Code ' . $code . ' indicates there is no ' . __CLASS__ . ' error' );
           break;
         default:
           $this->error_code = self::PRP_ERROR_UNKNOWN;
-          throw new InvalidArgumentException( $code . ' is not an error code used in ' . __CLASS__ );
+          throw new InvalidArgumentException( 'Code ' . $code . ' is not an error code used in ' . __CLASS__ );
         break;
       }
     }
