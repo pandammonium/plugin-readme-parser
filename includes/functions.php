@@ -443,6 +443,12 @@ if ( !function_exists( 'prp_get_file' ) ) {
     // prp_log( __( '  file in:     \'' . $file_url. '\'', plugin_readme_parser_domain ) );
     // prp_log( __( '  header:      ' . ( $header ? 'true' : 'false' ), plugin_readme_parser_domain ) );
 
+    $repo = 'https://plugins.svn.wordpress.org/';
+    $pos = strpos( strtolower( $file_url ), $repo . '/' );
+    if ( 0 === $pos ) {
+      throw new PRP_Exception( 'The URL is missing the plugin name: <samp>' . substr( $file_url, $pos, strlen( $repo ) ) . '&lt;plugin-name&gt;/</samp>', PRP_Exception::PRP_ERROR_BAD_URL );
+    }
+
     $file_return = array();
     $rc = 0;
     $error = '';
@@ -451,12 +457,14 @@ if ( !function_exists( 'prp_get_file' ) ) {
       if ( is_wp_error( $result ) ) {
         $error = 'Header: ' . $result -> get_error_message();
         $rc = -1;
+        throw new PRP_Exception( $error . '(' . $result->get_error_code . ')' );
       }
     } else {
       $result = wp_remote_get( $file_url );
       if ( is_wp_error( $result ) ) {
         $error = 'Body: ' . $result -> get_error_message();
         $rc = -1;
+        throw new PRP_Exception( $error . '(' . $result->get_error_code . ')' );
       } else {
         if ( isset( $result[ 'body' ] ) ) {
           $file_return[ 'file' ] = $result[ 'body' ];
