@@ -23,6 +23,7 @@ if ( !class_exists( 'PRP_Exception' ) ) {
     public const PRP_ERROR_BAD_FILE = 202;
     public const PRP_ERROR_BAD_URL = 203;
     public const PRP_ERROR_BAD_DATA = 204;
+    public const PRP_ERROR_BAD_CACHE = 205;
     private $error_code;
 
     /**
@@ -41,6 +42,7 @@ if ( !class_exists( 'PRP_Exception' ) ) {
         case self::PRP_ERROR_BAD_FILE:
         case self::PRP_ERROR_BAD_URL:
         case self::PRP_ERROR_BAD_DATA:
+        case self::PRP_ERROR_BAD_CACHE:
           $this->error_code = $code;
         break;
         case self::PRP_ERROR_NONE:
@@ -70,6 +72,8 @@ if ( !class_exists( 'PRP_Exception' ) ) {
         return 'Bad URL';
         case self::PRP_ERROR_BAD_DATA:
         return 'Bad data';
+        case self::PRP_ERROR_BAD_CACHE:
+        return 'Bad cache';
         case self::PRP_ERROR_NONE:
         return 'None';
         default:
@@ -81,17 +85,26 @@ if ( !class_exists( 'PRP_Exception' ) ) {
     public static function set_error_code_as_string( string $code ): void {
       switch( $code ) {
         case 'Unknown error':
-        $this->set_error_code( self::PRP_ERROR_UNKNOWN );
+          $this->set_error_code( self::PRP_ERROR_UNKNOWN );
+        break;
         case 'Bad input':
-        $this->set_error_code( self::PRP_ERROR_BAD_INPUT );
+          $this->set_error_code( self::PRP_ERROR_BAD_INPUT );
+        break;
         case 'Bad file':
-        $this->set_error_code( self::PRP_ERROR_BAD_FILE );
+          $this->set_error_code( self::PRP_ERROR_BAD_FILE );
+        break;
         case 'Bad URL':
-        $this->set_error_code( self::PRP_ERROR_BAD_URL );
+          $this->set_error_code( self::PRP_ERROR_BAD_URL );
+        break;
         case 'Bad data':
-        $this->set_error_code( self::PRP_ERROR_BAD_DATA );
+          $this->set_error_code( self::PRP_ERROR_BAD_DATA );
+        break;
+        case 'Bad cache':
+          $this->set_error_code( self::PRP_ERROR_BAD_CACHE );
+        break;
         case 'None':
-        $this->set_error_code( self::PRP_ERROR_NONE );
+          $this->set_error_code( self::PRP_ERROR_NONE );
+        break;
         default:
           throw new InvalidArgumentException( 'Invalid error code used in ' . __CLASS__ );
         break;
