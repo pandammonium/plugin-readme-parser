@@ -30,7 +30,7 @@ if ( !class_exists( 'PRP_Exception' ) ) {
      * This method is called when a new exception object is created. It is
      * used to set the error message and any other properties of the exception.
      */
-    public function __construct( $message, $code = 0, Throwable $previous = null ) {
+    public function __construct( $message, $code = PRP_ERROR_UNKNOWN, Throwable $previous = null ) {
       parent::__construct($message, $code, $previous);
       $this->set_error_code( $code );
     }
