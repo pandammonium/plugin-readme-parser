@@ -65,6 +65,10 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private $name;
     private $data;
 
+    private const WP_REPO_URL = '';
+    private const WP_PLUGIN_DIR_URL = 'https://plugins.svn.wordpress.org/';
+    private const WP_DOWNLOAD_DIR_URL = 'https://downloads.wordpress.org/plugin/';
+
     private const LINE_END = "\r\n";
 
     private const STR_LEN = 30;
@@ -132,8 +136,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
       $attributes = shortcode_atts( array( 'exclude' => '', 'hide' => '', 'include' => '', 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '5', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $this->parameters );
       extract( $attributes );
-      prp_log( 'all ' . __FUNCTION__ . ' shortcode attributes', $attributes );
-      // prp_log( 'content (arg2)', ( strlen( $content ) > self::STR_LEN ? substr( $content, 0, self::STR_LEN ) . '…' : $content ) );
+
+      prp_log( 'all ' . __FUNCTION__ . ' shortcode attributes (arg1 + defaults)', $attributes );
+      prp_log( 'content (arg2)', $content );
 
       if ( true === $this->toggle_global_shortcodes() ) {
 
@@ -142,19 +147,19 @@ if ( !class_exists( 'Generate_Output' ) ) {
           $this->validate_sections( $exclude, $include );
           $this->determine_show_head();
           $this->determine_show_links( $links );
-          prp_log( 'exclude', $this->exclude );
-          prp_log( 'cache', $cache );
-          prp_log( 'content', $content );
-          prp_log( 'hide', $hide );
-          prp_log( 'ignore', $ignore );
-          prp_log( 'links', $this->links );
-          prp_log( 'mirror', $mirror );
-          prp_log( 'nofollow', $nofollow );
-          prp_log( 'target', $target );
-          prp_log( 'version', $version );
-          prp_log( 'include', $this->include );
+          // prp_log( 'exclude', $this->exclude );
+          // prp_log( 'cache', $cache );
+          // prp_log( 'content', $content );
+          // prp_log( 'hide', $hide );
+          // prp_log( 'ignore', $ignore );
+          // prp_log( 'links', $this->links );
+          // prp_log( 'mirror', $mirror );
+          // prp_log( 'nofollow', $nofollow );
+          // prp_log( 'target', $target );
+          // prp_log( 'version', $version );
+          // prp_log( 'include', $this->include );
           $cache_key = 'prp_' . md5( $this->exclude . $cache . $content . $hide . $ignore . $this->links . $mirror . $nofollow . $target . $version . $this->include );
-          prp_log( 'cache_key', $cache_key );
+          // prp_log( 'cache_key', $cache_key );
           $result = $this->get_cache( $cache_key, $cache );
 
           if ( false === $result ) {
@@ -167,9 +172,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
             $this->nofollow = 'yes' === strtolower( $nofollow ) ? ' rel="nofollow"' : '';
 
             try {
-              $this->file_data = $this->get_readme( $this->plugin_url, $this->version );
+              $this->get_readme( $this->plugin_url, $this->version );
             } catch( PRP_Exception $e ) {
-              $this->file_data = false;
               $e->get_prp_nice_error();
             }
 
@@ -231,10 +235,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       // prp_log( 'method', __FUNCTION__ );
 
-      // prp_log( '----------------- ' . __FUNCTION__ . ' -----------------' );
-
-      // prp_log( 'readme_info arg1: parameters', $paras );
-      // prp_log( 'readme_info arg2: content', $content );
+      prp_log( '----------------- ' . __FUNCTION__ . ' -----------------' );
+      prp_log( '----------------- ' . self::COLOURS_DEBUG[ self::$c++ ] );
 
       $output = '';
       $this->initialise();
@@ -243,80 +245,66 @@ if ( !class_exists( 'Generate_Output' ) ) {
       } catch ( PRP_Exception $e ) {
         throw $e;
       }
-      extract( shortcode_atts( array( 'name' => '', 'target' => '_blank', 'nofollow' => '', 'data' => '', 'cache' => '5' ), $this->parameters ) );
-        $this->data = strtolower( $data );
-        // prp_log( 'data', $this->data );
+      $attributes = shortcode_atts( array( 'name' => '', 'target' => '_blank', 'nofollow' => '', 'data' => '', 'cache' => '5' ), $this->parameters );
+      extract( $attributes );
 
-      // Get the cache
+      prp_log( 'all ' . __FUNCTION__ . ' shortcode attributes (arg1 + defaults)', $attributes );
+      prp_log( 'content (arg2)', $content );
 
-      $result = $this->get_cache( 'prp_info_' . md5( $name . $cache ), $cache );
-
-      if ( false === $result ) {
-        $this->content = $content;
-
+      if ( true === $this->toggle_global_shortcodes() ) {
 
         try {
-          $result = prp_toggle_global_shortcodes( $this->content );
-          if ( is_wp_error( $result ) ) {
-            // prp_log( 'result', $result );
-            throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
+
+          $this->data = strtolower( $data );
+          $this->content = $content;
+
+          $result = $this->get_cache( 'prp_info_' . md5( $name . $cache ), $cache );
+
+          if ( false === $result ) {
+
+            $this->name = $name;
+            $this->target = $target;
+            $this->nofollow = 'yes' === strtolower( $nofollow ) ? ' rel="nofollow"' : '';
+
+            $this->parse_readme_info();
+            prp_log( 'file data', reset( $this->file_data ) );
+            $this->set_cache();
+
+          } else {
+
+            // Cache retrieved, so get information from resulting array
+
+            prp_log( 'cached plugin name', $result[ 'name' ] );
+            prp_log( 'cached version', $result[ 'version' ] );
+
+            $this->plugin_name = $result[ 'name' ];
+            $this->version = $result[ 'version' ];
+
+            // prp_log( 'this version', $this->version );
+            // prp_log( 'this plugin name', $this->plugin_name );
           }
+
+          if ( '' === $output ) {
+
+            // prp_log( 'data', $data );
+
+            // Need to have this try–catch block so that any remaining shortcodes are evaluated. Without it, the shortcodes are displayed as-is.
+            try {
+              $output = $this->parse_the_data_parameter();
+            } catch ( PRP_Exception $e ) {
+              $output = $e->get_prp_nice_error();
+            }
+
+          }
+
         } catch ( PRP_Exception $e ) {
-          throw $e;
+          // throw $e;
+          return $e->get_prp_nice_error();
+        } finally {
+          $this->toggle_global_shortcodes();
         }
-
-
-        // prp_log( 'cache is', $this->cache );
-        // prp_log( 'result is of type', gettype( $result ) );
-        // prp_log( 'result is', $result );
-
-
-
-        $this->name = $name;
-        $this->target = $target;
-        $this->nofollow = 'yes' === strtolower( $nofollow ) ? ' rel="nofollow"' : '';
-
-        try {
-          $this->parse_readme_info();
-          $this->set_cache();
-        } catch ( PRP_Exception $e ) {
-          $output = $e->get_prp_nice_error();
-        }
-
-      } else {
-
-        // Cache retrieved, so get information from resulting array
-
-        $this->version = $result[ 'version' ];
-        $this->plugin_name = $result[ 'name' ];
-
-        // prp_log( 'version', $this->version );
-        // prp_log( 'plugin name', $this->plugin_name );
       }
-
-      if ( '' === $output ) {
-
-        // prp_log( 'data', $data );
-
-        // Need to have this try–catch block so that any remaining shortcodes are evaluated. Without it, the shortcodes are displayed as-is.
-        try {
-          $output = $this->parse_the_data_parameter();
-        } catch ( PRP_Exception $e ) {
-          $output = $e->get_prp_nice_error();
-        }
-
-      }
-
-      try {
-        $result = prp_toggle_global_shortcodes( $this->content );
-        if ( is_wp_error( $result ) ) {
-          // prp_log( 'result', $result );
-          throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
-        }
-      } catch ( PRP_Exception $e ) {
-        throw $e;
-      }
-
+      prp_log( __FUNCTION__ . ' output', $output );
       return do_shortcode( $output );
     }
 
@@ -325,12 +313,15 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // Get the readme file
 
       try {
-        $this->file_data = $this->get_readme( $this->name );
+        $this->get_readme( $this->name );
         $this->plugin_name = $this->file_data[ 'name' ];
-        $this->get_plugin_name_and_version();
+        if ( false === $this->file_data ) {
+          $this->process_invalid_file();
+        } else {
+          $this->get_plugin_name_and_version();
+        }
 
       } catch ( PRP_Exception $e ) {
-        $this->file_data = false;
         throw $e;
       }
 
@@ -1014,8 +1005,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       prp_log( 'method', __FUNCTION__ );
 
-      prp_log( 'attempting to set cache ' . $this->cache_key . ' to', $save_this_content ? ' the readme file' : $cached_info );
-
+      prp_log( 'attempting to set cache ' . $this->cache_key . ' to the ' . ( $save_this_content ? 'readme file' : 'plugin name and version' ) );
 
       $result = false;
 
@@ -1024,8 +1014,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
         if ( is_numeric( $this->cache ) ) {
           if ( false === $save_this_content ) {
             $cached_info = array(
-              'version' => $this->version,
               'name'    => $this->plugin_name,
+              'version' => $this->version,
             );
           } else {
             $cached_info = $this->content;
@@ -1070,7 +1060,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
       if ( is_numeric( $this->cache ) ) {
         // prp_log( 'expiry time for cache ' . $this->cache_key . ' (minutes)', $this->cache );
         $result = get_transient( $this->cache_key );
-        prp_log( 'found cache ' . $this->cache_key, $result ? 'yes' : 'no' );
+        prp_log( 'found cache ' . $this->cache_key, ( $result ? 'yes' : 'no' ) );
+        prp_log( 'cache ' . $this->cache_key . ' contains', $result );
         return $result;
 
       } else {
@@ -1087,9 +1078,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
      * @since  1.2
      *
      * @param  $plugin_url   string  readme name or URL
-     * @return       string[]|bool  False or array containing readme and plugin name
+     * @return       void
      */
-    private function get_readme( string $plugin_url, string $version = '' ): array {
+    private function get_readme( string $plugin_url, string $version = '' ): void {
 
       // prp_log( 'method', __FUNCTION__ );
 
@@ -1100,8 +1091,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // $plugin_url = 'example-plugin'; // for testing purposes
 
       if ( strpos( $plugin_url, '://' ) === false ) {
-        $array[ 'name' ] = str_replace( ' ', '-', strtolower( $plugin_url ) );
-        $this->plugin_url = 'https://plugins.svn.wordpress.org/' . $array[ 'name' ] . '/';
+        $this->file_data[ 'name' ] = str_replace( ' ', '-', strtolower( $plugin_url ) );
+        $this->plugin_url = self::WP_PLUGIN_DIR_URL . $this->file_data[ 'name' ] . '/';
         // prp_log( __( '  url:        \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
 
         if ( is_numeric( $version ) ) {
@@ -1118,23 +1109,24 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
 
       try {
-        $this->file_data = prp_get_file( $this->plugin_url );
+        $result = prp_get_file( $this->plugin_url );
 
         // Ensure the file is valid
 
-        if ( ( $this->file_data[ 'rc' ] === 0 ) &&
-             ( $this->file_data[ 'file' ] !== '' ) &&
-             ( substr( $this->file_data[ 'file' ], 0, 9 ) !== '<!DOCTYPE' ) &&
-             ( substr_count( $this->file_data[ 'file' ], "\n" ) !== 0 ) ) {
+        if ( ( $result[ 'rc' ] === 0 ) &&
+             ( $result[ 'file' ] !== '' ) &&
+             ( substr( $result[ 'file' ], 0, 9 ) !== '<!DOCTYPE' ) &&
+             ( substr_count( $result[ 'file' ], "\n" ) !== 0 ) ) {
 
           // Return values
 
-          $array[ 'file' ] = $this->file_data[ 'file' ];
+          $this->file_data[ 'file' ] = $result[ 'file' ];
 
-          return $array;
+          // return $array;
 
         } else {
 
+          $this->file_data = false;
           throw new PRP_Exception( 'The readme file ' . ( empty( $this->name ) ? '' : ' for \'' . $this->name . '\'' ) . ' is invalid', PRP_Exception::PRP_ERROR_BAD_FILE );
 
           // prp_log( __( '  readme file is invalid', plugin_readme_parser_domain ) );
@@ -1189,7 +1181,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       $output = '';
 
-      // prp_log( 'data', $this->data );
+      prp_log( 'data', $this->data );
 
       $msg = '';
       $code = PRP_Exception::PRP_ERROR_NONE;
@@ -1199,23 +1191,21 @@ if ( !class_exists( 'Generate_Output' ) ) {
         $version_found = '' !== $this->version;
         if ( $plugin_name_found &&
              $version_found ) {
-          $output = '<a href="https://downloads.wordpress.org/plugin/' . $this->plugin_name . '.' . $this->version . '.zip" target="' . $this->target . '"' . $this->nofollow . '>' . $this->content. '</a>';
-
+          $output = '<a href="' . self::WP_DOWNLOAD_DIR_URL . $this->plugin_name . '.' . $this->version . '.zip" target="' . $this->target . '"' . $this->nofollow . '>' . $this->content . '</a>';
         } else if ( $plugin_name_found &&
                     !$version_found ) {
-          $msg = 'The plugin version could not be found in the readme file. It\'s needed to determine the link for the download file';
+          $msg = 'The plugin version could not be found in the readme file. Without it, the link for the download file cannot be determined';
           $code = PRP_Exception::PRP_ERROR_BAD_FILE;
 
         } else if ( !$plugin_name_found &&
                     $version_found ) {
-          $msg = 'The plugin name could not be found in the readme file. It\'s needed to determine the link for the download file';
+          $msg = 'The plugin name could not be found in the readme file. Without it, the link for the download file cannot be determined';
           $code = PRP_Exception::PRP_ERROR_BAD_FILE;
 
         } else {
-          $msg = 'The plugin name and version number could not be found in the readme file. They\'re needed to determine the link for the download file';
+          $msg = 'The plugin name and version number could not be found in the readme file. Without them, the link for the download file cannot be determined';
           $code = PRP_Exception::PRP_ERROR_BAD_FILE;
         }
-
 
       } else if ( 'version' === $this->data ) {
         if ( '' !== $this->version ) {
