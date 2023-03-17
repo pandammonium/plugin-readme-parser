@@ -1272,6 +1272,13 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
     }
 
+    function readme_banner(): void {
+
+      // prp_log( 'method', __FUNCTION__ );
+
+      throw new PRP_Exception( 'The <samp><kbd>readme_banner</kbd></samp> shortcode is obsolete. Please use either the <samp><kbd>readme</kbd></samp> or <samp><kbd>readme_info</kbd></samp> shortcodes', PRP_Exception::PRP_ERROR_BAD_INPUT );
+    }
+
   }
 
   $generator = new Generate_Output();
@@ -1321,6 +1328,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
       prp_log( 'shortcode function', __FUNCTION__ );
 
       try {
+        global $generator;
+        $generator->readme_banner();
       } catch ( PRP_Exception $e ) {
         return $e->get_prp_nice_error();
       } catch ( Exception $e ) {
