@@ -50,9 +50,12 @@ if ( !function_exists( 'prp_log' ) ) {
     $message_type = gettype( $message );
     $output = '';
     switch ( $message_type ) {
-      case 'string':
       case 'integer':
-        $output = print_r( $header . $divider . trim( $message ), true );
+        $output = print_r( $header . $divider . var_export( strval( $message ),true ), true );
+        break;
+      case 'string':
+        $output = $message ? '\'' . trim( $message ) . '\'' : '';
+        $output = print_r( $header . $divider . $output, true );
       break;
       case 'object':
         if ( is_wp_error( $message ) ) {
@@ -110,14 +113,14 @@ if ( !function_exists( 'prp_log' ) ) {
 }
 
 if ( !function_exists( 'prp_get_wp_error_string' ) ) {
-  function prp_get_wp_error_string( WP_Error $error, bool $echo = false ):string {
+  function prp_get_wp_error_string( WP_Error $error, bool $echo = false ): string {
 
     $output = plugin_readme_parser_name .
-        ' error ' .
-        trim( print_r( $error->get_error_code(), true ) ).
-        ': ' .
-        trim( print_r( $error->get_error_message(), true ) ) .
-        ( empty( $error->get_error_data() ) ? '' : '. \'' . trim( print_r( $error->get_error_data(), true ) ) . '\'' );
+      ' error ' .
+      trim( print_r( $error->get_error_code(), true ) ).
+      ': ' .
+      trim( print_r( $error->get_error_message(), true ) ) .
+      ( empty( $error->get_error_data() ) ? '' : '. \'' . trim( print_r( $error->get_error_data(), true ) ) . '\'' );
 
     return $echo ? '<p>' . $output . '.</p>' : $output;
   }
@@ -439,9 +442,8 @@ if ( !function_exists( 'prp_get_file' ) ) {
 
     // prp_log( 'function', __FUNCTION__ );
 
-    // prp_log( __( '  Get file:', plugin_readme_parser_domain ) );
-    // prp_log( __( '  file in:     \'' . $file_url. '\'', plugin_readme_parser_domain ) );
-    // prp_log( __( '  header:      ' . ( $header ? 'true' : 'false' ), plugin_readme_parser_domain ) );
+    // prp_log( 'file url', $file_url );
+    // prp_log( 'header', $header );
 
     $repo = 'https://plugins.svn.wordpress.org/';
     $pos = strpos( strtolower( $file_url ), $repo . '/' );
@@ -457,29 +459,26 @@ if ( !function_exists( 'prp_get_file' ) ) {
       if ( is_wp_error( $result ) ) {
         $error = 'Header: ' . $result -> get_error_message();
         $rc = -1;
-        throw new PRP_Exception( $error . '(' . $result->get_error_code . ')' );
+        // throw new PRP_Exception( $error . '(' . $result->get_error_code . ')' );
       }
     } else {
       $result = wp_remote_get( $file_url );
       if ( is_wp_error( $result ) ) {
         $error = 'Body: ' . $result -> get_error_message();
         $rc = -1;
-        throw new PRP_Exception( $error . '(' . $result->get_error_code . ')' );
+        // throw new PRP_Exception( $error . '(' . $result->get_error_code . ')' );
       } else {
         if ( isset( $result[ 'body' ] ) ) {
           $file_return[ 'file' ] = $result[ 'body' ];
-          // prp_log( 'file', $file_return[ 'file' ] );
         }
       }
     }
-    // prp_log( '  error', $error );
-    // prp_log( '  rc', $rc );
 
     $file_return[ 'error' ] = $error;
     $file_return[ 'rc' ] = $rc;
     if ( is_wp_error( $result ) ) {
       // prp_log( '  WP Error', $result );
-      throw new PRP_Exception( $result->get_error_message(),intval( $result->get_error_code() ) );
+      throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
     } else {
       // prp_log( 'type of response', gettype( $result[ 'response' ] ) );
       // prp_log( 'response', $result[ 'response' ] );
@@ -494,13 +493,14 @@ if ( !function_exists( 'prp_get_file' ) ) {
         //   prp_log( 'file', $file_return[ 'file' ] );
         // }
       }
-      $response = $result[ 'http_response' ]->get_response_object();
-      // prp_log( 'type of response object', gettype( $response ) );
-      try {
-        $response->throw_for_status( false );
-      } catch ( Exception $e) {
-        throw new PRP_Exception( 'The URL <samp>' . $file_url . '</samp> of the readme file returned a <samp>' . $e->getMessage() . '</samp> error', PRP_Exception::PRP_ERROR_BAD_URL );
-      // } finally {
+      if ( isset( $result[ 'http_response' ] ) ) {
+        $response = $result[ 'http_response' ]->get_response_object();
+        // prp_log( 'type of response object', gettype( $response ) );
+        try {
+          $response->throw_for_status( false );
+        } catch ( Exception $e) {
+          throw new PRP_Exception( 'The URL <samp>' . $file_url . '</samp> of the readme file returned a <samp>' . $e->getMessage() . '</samp> error', PRP_Exception::PRP_ERROR_BAD_URL );
+        }
       }
 
     }
@@ -510,6 +510,9 @@ if ( !function_exists( 'prp_get_file' ) ) {
     // prp_log( __( '  file return: contents of readme file', plugin_readme_parser_domain ) );
     // prp_log( '  file return', $file_return );
 
+    // prp_log( 'file return (error)', $file_return[ 'error' ] );
+    // prp_log( 'file return (rc)', $file_return[ 'rc' ] );
+    // prp_log( 'file return (response)', $file_return[ 'response' ] );
     return $file_return;
   }
 }
@@ -653,14 +656,18 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
 
       }
     } else {
-      // Can't throw an exception here because it won't be caught by the plugin, presumably because it's used as a filter on `the_content`. Use WP_Error instead.
-
+      // Can't throw an exception here because it won't be caught by the plugin, presumably because it's used as a filter on `the_content`. Use WP_Error instead:
       $error = new WP_Error();
       $error->add( PRP_Exception::PRP_ERROR_BAD_INPUT, 'Wrong plugin. Expected <samp><kbd>' . plugin_readme_parser_domain . '</kbd></samp>; got <samp><kbd>' . $file . '</kbd></samp>' );
       // prp_log( 'has errors', $error->has_errors() );
       // prp_log( 'error', $error );
       // prp_log( 'error code', $error->get_error_code() );
       // prp_log( 'error message', $error->get_error_message() );
+
+      // Turn all the shortcodes on:
+      $GLOBALS['shortcode_tags'] = $original_shortcodes;
+      $original_shortcodes = array();
+
       return prp_log( 'error', $error, true, true );
     }
     return $content;

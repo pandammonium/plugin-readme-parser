@@ -22,7 +22,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private $content;
 
     private array $file_array;
-    private $file_data;
+    private array $file_data;
 
     private $plugin_url;
     private $plugin_name;
@@ -67,6 +67,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private const LINE_END = "\r\n";
 
+    private const STR_LEN = 30;
+
     private const QUOTES = array(
      '“' => '',
      '”' => '',
@@ -76,14 +78,14 @@ if ( !class_exists( 'Generate_Output' ) ) {
      '&#8221;' => ''
     );
 
-    // private static $c = 0;
-    // private const COLOURS_DEBUG = array (
-    //   0 => 'red',
-    //   1 => 'orange',
-    //   2 => 'yellow',
-    //   3 => 'green',
-    //   4 => 'blue',
-    // );
+    private static $c = 0;
+    private const COLOURS_DEBUG = array (
+      0 => 'red',
+      1 => 'orange',
+      2 => 'yellow',
+      3 => 'green',
+      4 => 'blue',
+    );
 
     /**
      * Construct an instance of Generate_Output.
@@ -109,7 +111,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
      * @uses   prp_get_list      Extract a list
      * @uses   prp_is_it_excluded    Check if the current section is excluded
      * @uses   prp_strip_list      Strip a user or tag list and add links
-     * @uses   prp_log             Output debug info to the WP error log
+     * @uses   // prp_log             Output debug info to the WP error log
      *
      * @param  string    $content  readme filename
      * @param  string    $paras  Parameters
@@ -119,8 +121,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       // prp_log( 'method', __FUNCTION__ );
 
-      // prp_log( __( '---------------- ' . __FUNCTION__ . ' ----------------', plugin_readme_parser_domain ) );
-      // prp_log( __( '---------------- ' . self::COLOURS_DEBUG[ self::$c++ ], plugin_readme_parser_domain ) );
+      prp_log( '---------------- ' . __FUNCTION__ . ' ----------------' );
+      prp_log( '---------------- ' . self::COLOURS_DEBUG[ self::$c++ ] );
 
       $this->initialise();
       try {
@@ -128,115 +130,89 @@ if ( !class_exists( 'Generate_Output' ) ) {
       } catch ( PRP_Exception $e ) {
         throw $e;
       }
-      extract( shortcode_atts( array( 'exclude' => '', 'hide' => '', 'include' => '', 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '5', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $this->parameters ) );
+      $attributes = shortcode_atts( array( 'exclude' => '', 'hide' => '', 'include' => '', 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '5', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $this->parameters );
+      extract( $attributes );
+      prp_log( 'all ' . __FUNCTION__ . ' shortcode attributes', $attributes );
+      // prp_log( 'content (arg2)', ( strlen( $content ) > self::STR_LEN ? substr( $content, 0, self::STR_LEN ) . '…' : $content ) );
 
-      // Get cached output
+      if ( true === $this->toggle_global_shortcodes() ) {
 
-      $this->cache = $cache;
-      $result = $this->get_cache( 'prp_' . md5( $exclude . $hide . $include . $target . $nofollow . $ignore . $this->cache . $version . $mirror . $this->content ) );
-
-      if ( false === $result ) {
-
-        $this->content = $content;
         try {
-          $result = prp_toggle_global_shortcodes( $this->content );
-          if ( is_wp_error( $result ) ) {
-            // prp_log( 'result', $result );
-            throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
+
+          $this->validate_sections( $exclude, $include );
+          $this->determine_show_head();
+          $this->determine_show_links( $links );
+          prp_log( 'exclude', $this->exclude );
+          prp_log( 'cache', $cache );
+          prp_log( 'content', $content );
+          prp_log( 'hide', $hide );
+          prp_log( 'ignore', $ignore );
+          prp_log( 'links', $this->links );
+          prp_log( 'mirror', $mirror );
+          prp_log( 'nofollow', $nofollow );
+          prp_log( 'target', $target );
+          prp_log( 'version', $version );
+          prp_log( 'include', $this->include );
+          $cache_key = 'prp_' . md5( $this->exclude . $cache . $content . $hide . $ignore . $this->links . $mirror . $nofollow . $target . $version . $this->include );
+          prp_log( 'cache_key', $cache_key );
+          $result = $this->get_cache( $cache_key, $cache );
+
+          if ( false === $result ) {
+            $this->plugin_url = $content;
+            $this->hide = strtolower( $hide );
+            $this->ignore = prp_get_list( $ignore, ',,', 'ignore' );
+            $this->mirror = prp_get_list( $mirror, ',,', 'mirror' );
+            $this->version = $version;
+            $this->target = $target;
+            $this->nofollow = 'yes' === strtolower( $nofollow ) ? ' rel="nofollow"' : '';
+
+            try {
+              $this->file_data = $this->get_readme( $this->plugin_url, $this->version );
+            } catch( PRP_Exception $e ) {
+              $this->file_data = false;
+              $e->get_prp_nice_error();
+            }
+
+            if ( false === $this->file_data ) {
+              $this->process_invalid_file();
+            } else {
+              $this->process_valid_file();
+            }
+
+            // Send the resultant code back, plus encapsulating DIV and version comments. Use double quotes to permit linebreaks ("\n")
+
+            $this->content = "\n<!-- " . plugin_readme_parser_name . " v" . plugin_readme_parser_version . " -->\n<div class=\"np-notepad\">" . $this->my_html . "</div>\n<!-- End of " . plugin_readme_parser_name . " code -->\n";
+
+            // Cache the results
+
+
+            $this->set_cache( true );
+
+            // prp_log( 'set cache', ( strlen( $result ) > self::STR_LEN ? substr( $result, 0, self::STR_LEN ) . '…' : $result ) );
+            // prp_log( 'cache just set ' . $this->cache_key, $this->get_cache( $this->cache_key ) );
+
+          } else {
+
+            // prp_log( __( 'transient already cached', plugin_readme_parser_domain ) );
+
+            prp_log( 'cached content', gettype( $result ) );
+              $this->content = $result;
+
+            // prp_log( 'cached content ' . $this->cache_key, $this->content );
           }
 
-          // Ensure EXCLUDE and INCLUDE parameters aren't both included
-          $this->exclude = strtolower( $exclude );
-          $this->include = strtolower( $include );
-
-          $this->validate_parameters();
-
         } catch ( PRP_Exception $e ) {
-          throw $e;
+          // throw $e;
+          return $e->get_prp_nice_error();
+        } finally {
+          $this->toggle_global_shortcodes();
         }
-
-        // prp_log( 'cache', $cache );
-
-
-        // prp_log( __( 'shortcode content', plugin_readme_parser_domain ),$this->content );
-        // prp_log( __( 'shortcode parameters', plugin_readme_parser_domain ), $this->parameters );
-
-        // prp_log( __( 'result', plugin_readme_parser_domain ), $result );
-
-
-        // prp_log( __( 'transient not cached', plugin_readme_parser_domain ) );
-
-        // Set parameter values
-
-        $this->plugin_url =$this->content;
-
-        $this->hide = strtolower( $hide );
-        $this->links = strtolower( $links );
-        $this->ignore = prp_get_list( $ignore, ',,', 'ignore' );
-        $this->mirror = prp_get_list( $mirror, ',,', 'mirror' );
-        $this->version = $version;
-        $this->target = $target;
-
-        // prp_log( __( 'Sections to be included', plugin_readme_parser_domain), $include );
-        // prp_log( __( 'Sections to be excluded', plugin_readme_parser_domain), $exclude );
-
-        if ( 'yes' === strtolower( $nofollow ) ) {
-          $this->nofollow = ' rel="nofollow"';
-        }
-
-        // Work out in advance whether links should be shown
-
-        $this->should_links_be_shown();
-
-        // Work out in advance whether the head should be shown
-
-        $this->should_head_be_shown();
-
-        // Work out filename and fetch the contents
-
-        try{
-          $this->file_data = $this->get_readme( $this->plugin_url, $this->version );
-        } catch ( PRP_Exception $e ) {
-          $e->get_prp_nice_error();
-          $this->file_data = false;
-        }
-        // Ensure the file is valid
-
-        if ( false !== $this->file_data ) {
-          $this->process_valid_file();
-
-        } else {
-          $this->process_invalid_file();
-        }
-
-        // Send the resultant code back, plus encapsulating DIV and version comments. Use double quotes to permit linebreaks (\n)
-
-        $this->content = "\n<!-- " . plugin_readme_parser_name . " v" . plugin_readme_parser_version . " -->\n<div class=\"np-notepad\">" . $this->my_html . "</div>\n<!-- End of " . plugin_readme_parser_name . " code -->\n";
-
-        // Cache the results
-
-        $this->set_cache( true );
-
-      } else {
-
-        // prp_log( __( 'transient already cached', plugin_readme_parser_domain ) );
-
-        $this->content = $result;
       }
-
-      try {
-        $result = prp_toggle_global_shortcodes( $this->content );
-        if ( is_wp_error( $result ) ) {
-          // prp_log( 'result', $result );
-          throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
-        }
-      } catch ( PRP_Exception $e ) {
-        throw $e;
-      }
-
 
       // prp_log( __( '---------------- README PARSER -- end ---------', plugin_readme_parser_domain ) );
 
+      // prp_log( 'content ' . ( strlen( $content ) > self::STR_LEN ? substr( $this->content, 0, self::STR_LEN ) . '…' : $this->content ) );
+      // return '<p>Hello World</p>';
       return $this->content;
     }
 
@@ -273,8 +249,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       // Get the cache
 
-      $this->cache = $cache;
-      $result = $this->get_cache( 'prp_info_' . md5( $name . $this->cache ) );
+      $result = $this->get_cache( 'prp_info_' . md5( $name . $cache ), $cache );
 
       if ( false === $result ) {
         $this->content = $content;
@@ -303,6 +278,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
         try {
           $this->parse_readme_info();
+          $this->set_cache();
         } catch ( PRP_Exception $e ) {
           $output = $e->get_prp_nice_error();
         }
@@ -352,7 +328,6 @@ if ( !class_exists( 'Generate_Output' ) ) {
         $this->file_data = $this->get_readme( $this->name );
         $this->plugin_name = $this->file_data[ 'name' ];
         $this->get_plugin_name_and_version();
-        $this->set_cache();
 
       } catch ( PRP_Exception $e ) {
         $this->file_data = false;
@@ -419,7 +394,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     /**
      * Determines whether the links should be shown or not.
      */
-    private function should_links_be_shown(): void {
+    private function determine_show_links( string $links ): void {
 
       // prp_log( 'method', __FUNCTION__ );
 
@@ -435,12 +410,13 @@ if ( !class_exists( 'Generate_Output' ) ) {
           $this->show_links = true;
         }
       }
+      $this->links = $this->show_links ? strtolower( $links ) : '';;
       // prp_log( 'show links (after)', $this->show_links );
     }
 
     /**
      */
-    private function should_head_be_shown(): void {
+    private function determine_show_head(): void {
 
       // $this->show_head = false;
       // $this->show_meta = false;
@@ -459,10 +435,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
         if ( !$this->meta_explicitly_excluded ) {
           if ( $this->meta_explicitly_included ) {
             $new_include = str_replace( 'meta', 'head', $this->include );
-            prp_log( __( 'Cannot include the meta data part of the head without the summary part:', plugin_readme_parser_domain ), '', false, false );
-            prp_log( __( '  Parameters supplied', plugin_readme_parser_domain ), 'include="' . $this->include . '"', false, false );
-            prp_log( __( '  Parameters changed to', plugin_readme_parser_domain ), 'include="' . $new_include . '"', false, false );
-            // prp_log( __( 'Cannot include the meta data part of the head without the summary part.\n  Parameters supplied:   include="' . $this->include . '"\n  Parameters changed to: include="' . $new_include . '"', plugin_readme_parser_domain ), '', true, true );
+            prp_log( __( "Cannot include the meta data part of the head without the summary part:\n  Parameters supplied:   include=\"" . $this->include . "\"\n  Parameters changed to: include=\"" . $new_include . "\"", plugin_readme_parser_domain ), "", false, true );
             // Add the head to the include parameter value:
             $this->include = $new_include;
             // Set show_head to be true instead of false:
@@ -485,19 +458,29 @@ if ( !class_exists( 'Generate_Output' ) ) {
     }
 
     /**
-     * Validate the shortcode's parameters.
+     * Make sure the exclude and include parameters are not both
+     * specified.
      *
-     * @param void $  This method takes no arguments.
-     * @throws PRP_Exception If the parameters are invalid.
-     * @return void
+     * @param string  $exclude  The sections to be excluded from
+     * the display.
+     * @param string  $include  The sections to be included in the
+     * display.
+     * @throws PRP_Exception If the exclude and include parameters
+     * are both specified.
+     * @return bool  True if the exclude and include parameters
+     * are not both specified.
      */
-    private function validate_parameters(): void {
+    private function validate_sections( string $exclude, string $include ): bool {
 
       // prp_log( 'method', __FUNCTION__ );
 
-      if ( ( '' !== $this->exclude ) &&
-           ( '' !== $this->include ) ) {
+      if ( ( '' !== $exclude ) &&
+           ( '' !== $include ) ) {
         throw new PRP_Exception( 'Parameters \'include\' and \'exclude\' cannot both be specified in the same shortcode', PRP_Exception::PRP_ERROR_BAD_INPUT );
+      } else {
+        $this->exclude = strtolower( $exclude );
+        $this->include = strtolower( $include );
+        return true;
       }
     }
 
@@ -505,7 +488,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
      * Read the file that is stored line by line in the provided
      * array.
      *
-     * @param void $  This method takes no arguments.
+     * @param void  $  This method takes no arguments.
      * @return void
      */
     private function read_file_array(): void {
@@ -544,13 +527,13 @@ if ( !class_exists( 'Generate_Output' ) ) {
         $this->read_download_link( $i );
 
         // if ( 'head' === $this->section ) {
-        //   prp_log( 'Just before \'head\', $this->add_to_output===' . ( $this->add_to_output ? 'true' : 'false' ) );
+        //   // prp_log( 'Just before \'head\', $this->add_to_output===' . ( $this->add_to_output ? 'true' : 'false' ) );
         // }
 
         $this->read_head( $i );
 
         // if ( 'Description' === $this->section ) {
-        //   prp_log( 'ADD TO OUTPUT', $this->add_to_output );
+        //   // prp_log( 'ADD TO OUTPUT', $this->add_to_output );
         // }
 
         $this->read_screenshots();
@@ -632,7 +615,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       $this->content = '';
 
       $this->file_array = array();
-      $this->file_data = '';
+      $this->file_data = array();
 
       $this->plugin_url = '';
       $this->plugin_name = '';
@@ -981,7 +964,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       } else {
         $this->plugin_name = '';
       }
-      // prp_log( __( 'plugin name', plugin_readme_parser_domain ), $this->plugin_name );
+      // prp_log( 'plugin name', $this->plugin_name );
 
       // Split file into array based on CRLF
 
@@ -1014,9 +997,11 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       // prp_log( 'method', __FUNCTION__ );
 
-      if ( ( 0 < strlen( $this->file_data[ 'file' ] ) ) &&
-           ( 0 === substr_count( $this->file_data[ 'file' ], "\n" ) ) ) {
+      if ( false === $this->file_data ) {
+        throw new PRP_Exception( 'The readme file ' . ( empty( $this->name ) ? '' : ' for \'' . $this->name . '\'' ) . ' is invalid', PRP_Exception::PRP_ERROR_BAD_FILE );
 
+      } else if ( ( 0 < strlen( $this->file_data[ 'file' ] ) ) &&
+                  ( 0 === substr_count( $this->file_data[ 'file' ], "\n" ) ) ) {
         throw new PRP_Exception( 'The readme file ' . ( empty( $this->name ) ? '' : ' for \'' . $this->name . '\'' ) . ' is invalid: there are no newlines', PRP_Exception::PRP_ERROR_BAD_FILE );
 
       } else {
@@ -1027,33 +1012,71 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function set_cache( bool $save_this_content = false ): void {
 
-      // prp_log( 'method', __FUNCTION__ );
+      prp_log( 'method', __FUNCTION__ );
+
+      prp_log( 'attempting to set cache ' . $this->cache_key . ' to', $save_this_content ? ' the readme file' : $cached_info );
+
+
+      $result = false;
 
       $cached_info = array();
-      if ( is_numeric( $this->cache ) ) {
-        if ( false === $save_this_content ) {
-          $cached_info = array(
-            'version' => $this->version,
-            'name'    => $this->plugin_name,
-          );
+      try {
+        if ( is_numeric( $this->cache ) ) {
+          if ( false === $save_this_content ) {
+            $cached_info = array(
+              'version' => $this->version,
+              'name'    => $this->plugin_name,
+            );
+          } else {
+            $cached_info = $this->content;
+          }
+          $transient = get_transient( $this->cache_key );
+          if ( false === $transient ) {
+            prp_log( 'attempting to create new cache ' . $this->cache_key );
+            $result = set_transient( $this->cache_key, $cached_info, 60 * $this->cache );
+            prp_log( 'new cache ' . $this->cache_key . ' created', $result ? true : false );
+          } else {
+            // Don't fail if the cache already exists
+            prp_log( 'cache ' . $this->cache_key . ' already exists' );
+            $result = true;
+          }
         } else {
-          $cached_info = $this->content;
+          if ( 'no' !== strtolower( $this->cache ) ) {
+            throw new PRP_Exception( 'Cache expiration is invalid. Expected integer; got ' . gettype( $this->cache ) . ' ' . $this->cache, PRP_Exception::PRP_ERROR_BAD_CACHE );
+          } else {
+            prp_log( 'cache not in use' );
+          }
         }
-        set_transient( $this->cache_key, $cached_info, 60 * $this->cache );
+      } catch( PRP_Exception $e ) {
+        $e->get_prp_nice_error();
+      }
+      prp_log( 'cache ' . $this->cache_key . ' set', $result );
+      if ( false === $result ) {
+        $deleted = delete_transient( $this->cache_key );
+        $deleted_msg = $deleted ? 'Cache has been deleted' : 'Cache was not deleted' . ( get_transient( $this->cache_key ) ? ', so it is still lurking' : ' because it doesn\'t exist' );
+        throw new PRP_Exception( 'Failed to set cache ' . $this->cache_key . '. ' . $deleted_msg, PRP_Exception::PRP_ERROR_BAD_CACHE );
       }
     }
 
-    private function get_cache( string $cache_key ): bool|array|string {
+    private function get_cache( string $cache_key, string $cache ): bool|array|string {
 
-      // prp_log( 'method', __FUNCTION__ );
+      prp_log( 'method', __FUNCTION__ );
 
-      $result = false;
+      // $result = false;
+      $this->cache = $cache;
+      $this->cache_key = $cache_key;
+      prp_log( 'looking for cache', $this->cache_key );
+
       if ( is_numeric( $this->cache ) ) {
-        $this->cache_key = $cache_key;
+        // prp_log( 'expiry time for cache ' . $this->cache_key . ' (minutes)', $this->cache );
         $result = get_transient( $this->cache_key );
+        prp_log( 'found cache ' . $this->cache_key, $result ? 'yes' : 'no' );
+        return $result;
+
+      } else {
+        prp_log( 'expiry time for cache ' . $this->cache_key . ' is invalid', $this->cache );
+        throw new PRP_Exception( 'Cache expiry time is invalid: ' . $this->cache, PRP_Exception::PRP_ERROR_BAD_CACHE );
       }
-      // prp_log( 'get cache', (false === $result ? false : true ) );
-      return false;
     }
 
     /**
@@ -1070,13 +1093,11 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       // prp_log( 'method', __FUNCTION__ );
 
-      // prp_log( __( '  Get readme:', plugin_readme_parser_domain ) );
-      // prp_log( __( '  title:      \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
+      // prp_log( 'plugin url', $plugin_url );
 
-      // Work out filename and fetch the contents
+      // Work out URL and fetch the contents
 
-      // $plugin_url = 'example-plugin';
-      // prp_log( 'url contains \'://\': ' . strpos( $plugin_url, '://' ) );
+      // $plugin_url = 'example-plugin'; // for testing purposes
 
       if ( strpos( $plugin_url, '://' ) === false ) {
         $array[ 'name' ] = str_replace( ' ', '-', strtolower( $plugin_url ) );
@@ -1122,11 +1143,6 @@ if ( !class_exists( 'Generate_Output' ) ) {
       } catch ( PRP_Exception $e ) {
         throw $e;
       }
-
-      // prp_log( __( '  file data:   contents of readme file', plugin_readme_parser_domain ) );
-      // prp_log( $this->file_data, '  file data:' );
-
-
     }
 
     private function get_plugin_name_and_version(): void {
@@ -1242,14 +1258,38 @@ if ( !class_exists( 'Generate_Output' ) ) {
       return $output;
     }
 
+    /**
+     * Toggles the global shortcodes on and off.
+     *
+     * @param  void  $  This method has no parameters.
+     * @throws  PRP_Exception on failure.
+     * @return bool  True on success; false on failure
+     */
+    function toggle_global_shortcodes(): bool {
+
+      // prp_log( 'method', __FUNCTION__ );
+
+      try {
+        $result = prp_toggle_global_shortcodes( $this->content );
+        if ( is_wp_error( $result ) ) {
+          // prp_log( 'result', $result );
+          throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
+        }
+        return $result === $this->content;
+      } catch ( PRP_Exception $e ) {
+        // throw $e;
+        return $e->get_prp_nice_error();
+      }
+    }
+
   }
 
   $generator = new Generate_Output();
 
   if ( !function_exists( 'readme_parser' )) {
-    function readme_parser( string|array|null $paras = null, string $content = '' ) {
+    function readme_parser( string|array|null $paras = null, string $content = '' ): string {
 
-      // prp_log( 'method', __FUNCTION__ );
+      prp_log( 'shortcode function', __FUNCTION__ );
 
       try {
         global $generator;
@@ -1258,15 +1298,15 @@ if ( !class_exists( 'Generate_Output' ) ) {
       } catch ( PRP_Exception $e ) {
         return $e->get_prp_nice_error();
       } catch ( Exception $e ) {
-        return plugin_readme_parser_name . ': something went wrong with the <samp><kbd>readme</kbd></samp> shortcode: ERROR ' . print_r( $e->getCode(), true ) . ' '  . print_r( $e->getCode(), true );
+        return plugin_readme_parser_name . ': something went wrong with the <samp><kbd>readme</kbd></samp> shortcode: ERROR ' . print_r( $e->getCode(), true ) . ' '  . print_r( $e->getMessage(), true );
       }
     }
     add_shortcode( 'readme', 'readme_parser' );
   }
   if ( !function_exists( 'readme_info' )) {
-    function readme_info(array $paras = array(), string $content = '' ) {
+    function readme_info(array $paras = array(), string $content = '' ): string {
 
-      // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'shortcode function', __FUNCTION__ );
 
       try {
         global $generator;
@@ -1275,7 +1315,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       } catch ( PRP_Exception $e ) {
         return $e->get_prp_nice_error();
       } catch ( Exception $e ) {
-        return plugin_readme_parser_name . ': something went wrong with the <samp><kbd>readme_info</kbd></samp> shortcode: ERROR ' . print_r( $e->getCode(), true ) . ' '  . print_r( $e->getCode(), true );
+        return plugin_readme_parser_name . ': something went wrong with the <samp><kbd>readme_info</kbd></samp> shortcode: ERROR ' . print_r( $e->getCode(), true ) . ' '  . print_r( $e->getMessage(), true );
       }
     }
     add_shortcode( 'readme_info', 'readme_info' );
@@ -1287,12 +1327,14 @@ if ( !class_exists( 'Generate_Output' ) ) {
      * does not have the required access to the WordPress server.
      */
     function readme_banner( string|array|null $paras = null, string $content = null ): string {
+
+      prp_log( 'shortcode function', __FUNCTION__ );
+
       try {
-        throw new PRP_Exception( 'The <samp><kbd>readme_banner</kbd></samp> shortcode is obsolete. Please use either the <samp><kbd>readme</kbd></samp> or <samp><kbd>readme_info</kbd></samp> shortcodes', PRP_Exception::PRP_ERROR_BAD_INPUT );
       } catch ( PRP_Exception $e ) {
         return $e->get_prp_nice_error();
       } catch ( Exception $e ) {
-        return plugin_readme_parser_name . ': something went wrong with the obsolete <samp><kbd>readme_banner</kbd></samp> shortcode: ERROR ' . print_r( $e->getCode(), true ) . ' '  . print_r( $e->getCode(), true );
+        return plugin_readme_parser_name . ': something went wrong with the obsolete <samp><kbd>readme_banner</kbd></samp> shortcode: ERROR ' . print_r( $e->getCode(), true ) . ' '  . print_r( $e->getMessage(), true );
       }
     }
     add_shortcode( 'readme_banner', 'readme_banner' );
