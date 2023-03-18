@@ -220,6 +220,10 @@ if ( !class_exists( 'PRP_Exception' ) ) {
       }
 
       $display = '<p><span class="error">' . plugin_readme_parser_name . '</span>: ' . print_r( 'ERROR ' . $this->get_prp_code(), true ) . ' ' . print_r( $this->get_prp_message(), true ) . '.</p>';
+      $previous = $this->get_prp_previous();
+      if ( $previous ) {
+        $display .= '<p><span class="error">' . plugin_readme_parser_name . '</span>: ' . print_r( 'ERROR ' . $previous->get_prp_code(), true ) . ' ' . print_r( $previous->get_prp_message(), true ) . '.</p>';
+          }
 
       return print_r( $display, true );
     }
