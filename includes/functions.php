@@ -103,6 +103,13 @@ if ( !function_exists( 'prp_log' ) ) {
         case 'integer':
           $output = '<p>' . $output . '</p>';
         break;
+        case 'object':
+          if ( is_wp_error( $message ) ) {
+            // Do nothing: output was formatted in 'prp_get_wp_error_string'.
+            break;
+          } else {
+            // Fall through
+          }
         default:
           $output = '<pre>' . $output . '</pre>';
         break;
