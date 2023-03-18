@@ -1,8 +1,6 @@
 <?php
 /**
- * Generate output
- *
- * Functions to generate required output
+ * Generates HTML output from a WordPress plugin readme file.
  *
  * @package Pandammonium-Readme-Parser
  * @author dartiss, pandammonium
@@ -21,7 +19,22 @@ defined( 'WPINC' ) or die();
 
 if ( !class_exists( 'Generate_Output' ) ) {
   /**
-   * The plugin-readme parser and converter-to-HTML.
+   * Provides a shortcode to convert a WordPress plugin readme to
+   * HTML.
+   *
+   * Using the parameters and content of a shortcode, the class
+   * fetches the readme file of a specified plugin from the
+   * WordPress servers, parses its contents and converts it, using
+   * a third-party library (Michelf, included), to HTML.
+   *
+   * WordPress plugin readme files have specific sections, which
+   * this class looks out for, and selectively displays or
+   * witholds, depending on the options the user provides via the
+   * shortcode parameters.
+   *
+   * @author dartiss, pandammonium
+   * @since 1.0
+   * @since 2.0.0 Converted the collection of functions to a class.
    */
   class Generate_Output {
 
@@ -468,7 +481,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
      * display.
      * @throws PRP_Exception If the exclude and include parameters
      * are both specified.
-     * @return bool True if the exclude and include parameters
+     * @return true if the exclude and include parameters
      * are not both specified.
      */
     private function validate_sections( string $exclude, string $include ): bool {
@@ -1288,9 +1301,10 @@ if ( !class_exists( 'Generate_Output' ) ) {
      *
      * @param void $ This method has no parameters.
      * @throws PRP_Exception on failure.
-     * @return bool True on success.
+     * @return true|string True on success; an error message on
+     * fail.
      */
-    function toggle_global_shortcodes(): bool {
+    function toggle_global_shortcodes(): bool|string {
 
       // prp_log( 'method', __FUNCTION__ );
       // prp_log( 'arguments', func_get_args() );
@@ -1312,6 +1326,13 @@ if ( !class_exists( 'Generate_Output' ) ) {
      * removed in a future version. There is no replacement because
      * the plugin does not have the required access to the
      * WordPress server.
+     *
+     * @author dartiss
+     * @since 2.0.0 Deprecated.
+     *
+     * @param $ This method has no srguments.
+     * @throws PRP_Exception on being invoked.
+     * @return void
      */
     function readme_banner(): void {
 
