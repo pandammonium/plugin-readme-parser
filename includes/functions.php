@@ -334,49 +334,7 @@ if ( !function_exists( 'prp_check_img_exists' ) ) {
    * @return       string  Valid extension or blank
    */
   function prp_check_img_exists( string $filename, string $ext ): string {
-
-    // prp_log( 'function', __FUNCTION__ );
-
-    // $file_url = $filename . $ext;
-    // $file_exists = false;
-
-    // prp_log( __( '  Check image exists:', plugin_readme_parser_domain ) );
-
-    // prp_log( __( '  file path', plugin_readme_parser_domain ), $file_url );
-
-    // prp_log( __( '  file exists', plugin_readme_parser_domain ), file_exists( $file_url ) );
-
-    // prp_log( __( '  mime type', plugin_readme_parser_domain ), mime_content_type( $file_url ) );
-
-    // $file_contents = (bool)@file_get_contents($file_url, false, stream_context_create([
-    //     'http' => [
-    //         'method' => 'HEAD',
-    //         'ignore_errors' => true,
-    //     ],
-    // ]));
-
-    // prp_log( __( '  can get file contents', plugin_readme_parser_domain ), $file_contents );
-
-    // $file_exists = @mime_content_type( $file_url ) === 'image/' . $ext;
-    // $file_exists = @file_exists( $file_url );
-
-    // $file_exists = (bool)@file_get_contents($file_url, false, stream_context_create([
-    //     'http' => [
-    //         'method' => 'HEAD',
-    //         'ignore_errors' => true,
-    //     ],
-    // ]));
-
-
-    return false;
-
-    // if ( $file_exists ) {
-    //   prp_log( __( '\'' . $filename . $ext . '\' exists: true', plugin_readme_parser_domain ) );
-    //   return $ext;
-    // } else {
-    //   prp_log( __( '\'' . $filename . $ext . '\' exists: false', plugin_readme_parser_domain ) );
-    //   return false;
-    // }
+    return '';
   }
 }
 
