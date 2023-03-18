@@ -5,7 +5,14 @@
  * Functions to generate required output
  *
  * @package Pandammonium-Readme-Parser
- * @since  1.0
+ * @author dartiss, pandammonium
+ * @since 1.0
+ * @since 2.0.0 Converts the file to a class.
+ *
+ * @todo Absorb as many functions as is meaningful from includes/
+ * functions.php.
+ * @todo Sort out the calls to prp_log().
+ * @todo Improve the documentation wrt PHPDoc.
  */
 
 // If this file is called directly, abort:
@@ -115,12 +122,12 @@ if ( !class_exists( 'Generate_Output' ) ) {
      * @uses   prp_get_section_name  Get the name of the current section
      * @uses   prp_get_list      Extract a list
      * @uses   prp_is_it_excluded    Check if the current section is excluded
-     * @uses   prp_strip_list      Strip a user or tag list and add links
+     * @uses   prp_format_list      Strip a user or tag list and add links
      * @uses   // prp_log             Output debug info to the WP error log
      *
-     * @param  string    $content  readme filename
-     * @param  string    $paras  Parameters
-     * @return   string          Output
+     * @param string $content readme filename
+     * @param string $paras Parameters
+     * @return string Output.
      */
     public function readme_parser( string|array|null $paras = null, string $content = '' ): string {
 
@@ -228,9 +235,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
      *
      * @uses   prp_get_readme      Fetch the readme file
      *
-     * @param  string[]    $para     Parameters
-     * @param  string    $content  Post content
-     * @param  string          Output
+     * @param string[] $para Parameters
+     * @param string $content Post content
+     * @return  string          Output
      */
     public function readme_info( array $paras = array(), string $content = '' ): string {
 
@@ -455,13 +462,13 @@ if ( !class_exists( 'Generate_Output' ) ) {
      * Make sure the exclude and include parameters are not both
      * specified.
      *
-     * @param string  $exclude  The sections to be excluded from
+     * @param string $exclude The sections to be excluded from
      * the display.
-     * @param string  $include  The sections to be included in the
+     * @param string $include The sections to be included in the
      * display.
      * @throws PRP_Exception If the exclude and include parameters
      * are both specified.
-     * @return bool  True if the exclude and include parameters
+     * @return bool True if the exclude and include parameters
      * are not both specified.
      */
     private function validate_sections( string $exclude, string $include ): bool {
@@ -483,7 +490,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
      * Read the file that is stored line by line in the provided
      * array.
      *
-     * @param void  $  This method takes no arguments.
+     * @param void $ This method takes no arguments.
      * @return void
      */
     private function read_file_array(): void {
@@ -553,7 +560,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
      * Add the HTML required to display the links section to the
      * current content.
      *
-     * @param void $  This method takes no arguments.
+     * @param void $ This method takes no arguments.
      * @return void
      */
     private function display_links_section(): void {
@@ -570,7 +577,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     /**
      * Write out the HTML to a string ready for display.
      *
-     * @param void $  This method takes no arguments.
+     * @param void $ This method takes no arguments.
      * @return void
      */
     private function write_html(): void {
@@ -602,7 +609,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     /**
      * Set all the member data to their initial values.
      *
-     * @param void $  This method takes no arguments.
+     * @param void $ This method takes no arguments.
      * @return void
      */
     private function initialise(): void {
@@ -1101,9 +1108,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
      *
      * Function to work out the filename of the readme and get it
      *
-     * @since  1.2
+     * @since 1.2
      *
-     * @param  $plugin_url   string  readme name or URL
+     * @param string $plugin_url readme name or URL
      * @return       void
      */
     private function get_readme( string $plugin_url, string $version = '' ): void {
@@ -1139,7 +1146,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
         $result = prp_get_file( $this->plugin_url );
 
         // Ensure the file is valid
-
+        /** @todo When 'prp_get_file' is updated, update this error-checking to match. */
         if ( ( $result[ 'rc' ] === 0 ) &&
              ( $result[ 'file' ] !== '' ) &&
              ( substr( $result[ 'file' ], 0, 9 ) !== '<!DOCTYPE' ) &&
@@ -1279,9 +1286,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
     /**
      * Toggles the global shortcodes on and off.
      *
-     * @param  void  $  This method has no parameters.
-     * @throws  PRP_Exception on failure.
-     * @return bool  True on success; false on failure
+     * @param void $ This method has no parameters.
+     * @throws PRP_Exception on failure.
+     * @return bool True on success.
      */
     function toggle_global_shortcodes(): bool {
 
@@ -1300,6 +1307,12 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
     }
 
+    /**
+     * @deprecated 2.0.0 This method is obsolete and will be
+     * removed in a future version. There is no replacement because
+     * the plugin does not have the required access to the
+     * WordPress server.
+     */
     function readme_banner(): void {
 
       // prp_log( 'method', __FUNCTION__ );
@@ -1313,6 +1326,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
   $generator = new Generate_Output();
 
   if ( !function_exists( 'readme_parser' )) {
+    /**
+     * @api readme shortcode
+     */
     function readme_parser( string|array|null $paras = null, string $content = '' ): string {
 
       prp_log( 'shortcode function', __FUNCTION__ );
@@ -1330,6 +1346,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
     add_shortcode( 'readme', 'readme_parser' );
   }
   if ( !function_exists( 'readme_info' )) {
+    /**
+     * @api readme_info shortcode
+     */
     function readme_info(array $paras = array(), string $content = '' ): string {
 
       // prp_log( 'shortcode function', __FUNCTION__ );
@@ -1348,9 +1367,11 @@ if ( !class_exists( 'Generate_Output' ) ) {
   }
   if ( !function_exists( 'readme_banner' )) {
     /**
+     * @api readme_banner shortcode
      * @deprecated 2.0.0 This shortcode is obsolete and should no
      * longer be used. There is no replacement because the plugin
      * does not have the required access to the WordPress server.
+     * It will be removed from a future version of this plugin.
      */
     function readme_banner( string|array|null $paras = null, string $content = null ): string {
 

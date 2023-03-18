@@ -1,9 +1,15 @@
 <?php
 /**
- * Handles errors
+ * Handles errors.
  *
  * @package Pandammonium-Readme-Parser
+ * @author pandammonium <internet@pandammonium.org>
  * @since 2.0.0
+ *
+ * @todo See if any of these can be replaced by built-in PHP
+ * Exception classes.
+ * @todo Check any chained exceptions use the third argument of the
+ * constructor.
  */
 
 // If this file is called directly, abort:
