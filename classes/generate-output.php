@@ -82,14 +82,14 @@ if ( !class_exists( 'Generate_Output' ) ) {
      '&#8221;' => ''
     );
 
-    private static $c = 0;
-    private const COLOURS_DEBUG = array (
-      0 => 'red',
-      1 => 'orange',
-      2 => 'yellow',
-      3 => 'green',
-      4 => 'blue',
-    );
+    // private static $c = 0;
+    // private const COLOURS_DEBUG = array (
+    //   0 => 'red',
+    //   1 => 'orange',
+    //   2 => 'yellow',
+    //   3 => 'green',
+    //   4 => 'blue',
+    // );
 
     /**
      * Construct an instance of Generate_Output.
@@ -125,9 +125,10 @@ if ( !class_exists( 'Generate_Output' ) ) {
     public function readme_parser( string|array|null $paras = null, string $content = '' ): string {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
-      prp_log( '---------------- ' . __FUNCTION__ . ' ----------------' );
-      prp_log( '---------------- ' . self::COLOURS_DEBUG[ self::$c++ ] );
+      // prp_log( '---------------- ' . __FUNCTION__ . ' ----------------' );
+      // prp_log( '---------------- ' . self::COLOURS_DEBUG[ self::$c++ ] );
 
       $this->initialise();
       try {
@@ -138,8 +139,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
       $attributes = shortcode_atts( array( 'exclude' => '', 'hide' => '', 'include' => '', 'target' => '_blank', 'nofollow' => '', 'ignore' => '', 'cache' => '5', 'version' => '', 'mirror' => '', 'links' => 'bottom', 'name' => '' ), $this->parameters );
       extract( $attributes );
 
-      prp_log( 'all ' . __FUNCTION__ . ' shortcode attributes (arg1 + defaults)', $attributes );
-      prp_log( 'content (arg2)', $content );
+      // prp_log( 'all ' . __FUNCTION__ . ' shortcode attributes (arg1 + defaults)', $attributes );
+      // prp_log( 'content (arg2)', $content );
 
       if ( true === $this->toggle_global_shortcodes() ) {
 
@@ -197,13 +198,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
             // prp_log( 'cache just set ' . $this->cache_key, $this->get_cache( $this->cache_key ) );
 
           } else {
-
-            // prp_log( __( 'transient already cached', plugin_readme_parser_domain ) );
-
-            prp_log( 'cached content', gettype( $result ) );
+            // prp_log( 'cached content type', gettype( $result ) );
               $this->content = $result;
-
-            // prp_log( 'cached content ' . $this->cache_key, $this->content );
           }
 
         } catch ( PRP_Exception $e ) {
@@ -235,9 +231,10 @@ if ( !class_exists( 'Generate_Output' ) ) {
     public function readme_info( array $paras = array(), string $content = '' ): string {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
-      prp_log( '----------------- ' . __FUNCTION__ . ' -----------------' );
-      prp_log( '----------------- ' . self::COLOURS_DEBUG[ self::$c++ ] );
+      // prp_log( '----------------- ' . __FUNCTION__ . ' -----------------' );
+      // prp_log( '----------------- ' . self::COLOURS_DEBUG[ self::$c++ ] );
 
       $output = '';
       $this->initialise();
@@ -249,8 +246,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
       $attributes = shortcode_atts( array( 'name' => '', 'target' => '_blank', 'nofollow' => '', 'data' => '', 'cache' => '5' ), $this->parameters );
       extract( $attributes );
 
-      prp_log( 'all ' . __FUNCTION__ . ' shortcode attributes (arg1 + defaults)', $attributes );
-      prp_log( 'content (arg2)', $content );
+      // prp_log( 'all ' . __FUNCTION__ . ' shortcode attributes (arg1 + defaults)', $attributes );
+      // prp_log( 'content (arg2)', $content );
 
       if ( true === $this->toggle_global_shortcodes() ) {
 
@@ -268,15 +265,15 @@ if ( !class_exists( 'Generate_Output' ) ) {
             $this->nofollow = 'yes' === strtolower( $nofollow ) ? ' rel="nofollow"' : '';
 
             $this->parse_readme_info();
-            prp_log( 'file data', reset( $this->file_data ) );
+            // prp_log( 'file data', reset( $this->file_data ) );
             $this->set_cache();
 
           } else {
 
             // Cache retrieved, so get information from resulting array
 
-            prp_log( 'cached plugin name', $result[ 'name' ] );
-            prp_log( 'cached version', $result[ 'version' ] );
+            // prp_log( 'cached plugin name', $result[ 'name' ] );
+            // prp_log( 'cached version', $result[ 'version' ] );
 
             $this->plugin_name = $result[ 'name' ];
             $this->version = $result[ 'version' ];
@@ -305,7 +302,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
           $this->toggle_global_shortcodes();
         }
       }
-      prp_log( __FUNCTION__ . ' output', $output );
+      // prp_log( __FUNCTION__ . ' output', $output );
       return do_shortcode( $output );
     }
 
@@ -323,7 +320,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
         }
 
       } catch ( PRP_Exception $e ) {
-        throw $e;
+        throw new PRP_Exception( 'Failed to parse readme file', PRP_Exception::PRP_ERROR_BAD_FILE, $e);
       }
 
     }
@@ -563,7 +560,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       if ( ( $this->show_links ) &&
            ( 'bottom' === $this->links ) ) {
-        $this->file_combined .= prp_display_links( $this->download, $this->target, $this->nofollow, $this->version, $this->mirror, $this->plugin_name );
+        $this->file_combined .= prp_display_links( $this->download, $this->target, $this->nofollow, $this->version, $this->mirror, $this->plugin_name, $this->plugin_title );
       }
     }
 
@@ -1029,9 +1026,10 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function set_cache( bool $save_this_content = false ): void {
 
-      prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
-      prp_log( 'attempting to set cache ' . $this->cache_key . ' to the ' . ( $save_this_content ? 'readme file' : 'plugin name and version' ) );
+      // prp_log( 'attempting to set cache ' . $this->cache_key . ' to the ' . ( $save_this_content ? 'readme file' : 'plugin name and version' ) );
 
       $result = false;
 
@@ -1048,25 +1046,25 @@ if ( !class_exists( 'Generate_Output' ) ) {
           }
           $transient = get_transient( $this->cache_key );
           if ( false === $transient ) {
-            prp_log( 'attempting to create new cache ' . $this->cache_key );
+            // prp_log( 'attempting to create new cache ' . $this->cache_key );
             $result = set_transient( $this->cache_key, $cached_info, 60 * $this->cache );
-            prp_log( 'new cache ' . $this->cache_key . ' created', $result ? true : false );
+            // prp_log( 'new cache ' . $this->cache_key . ' created', $result ? true : false );
           } else {
             // Don't fail if the cache already exists
-            prp_log( 'cache ' . $this->cache_key . ' already exists' );
+            // prp_log( 'cache ' . $this->cache_key . ' already exists' );
             $result = true;
           }
         } else {
           if ( 'no' !== strtolower( $this->cache ) ) {
             throw new PRP_Exception( 'Cache expiration is invalid. Expected integer; got ' . gettype( $this->cache ) . ' ' . $this->cache, PRP_Exception::PRP_ERROR_BAD_CACHE );
-          } else {
-            prp_log( 'cache not in use' );
+          // } else {
+          //   prp_log( 'cache not in use' );
           }
         }
       } catch( PRP_Exception $e ) {
         $e->get_prp_nice_error();
       }
-      prp_log( 'cache ' . $this->cache_key . ' set', $result );
+      // prp_log( 'cache ' . $this->cache_key . ' set', $result );
       if ( false === $result ) {
         $deleted = delete_transient( $this->cache_key );
         $deleted_msg = $deleted ? 'Cache has been deleted' : 'Cache was not deleted' . ( get_transient( $this->cache_key ) ? ', so it is still lurking' : ' because it doesn\'t exist' );
@@ -1076,22 +1074,23 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function get_cache( string $cache_key, string $cache ): bool|array|string {
 
-      prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       // $result = false;
       $this->cache = $cache;
       $this->cache_key = $cache_key;
-      prp_log( 'looking for cache', $this->cache_key );
+      // prp_log( 'looking for cache', $this->cache_key );
 
       if ( is_numeric( $this->cache ) ) {
         // prp_log( 'expiry time for cache ' . $this->cache_key . ' (minutes)', $this->cache );
         $result = get_transient( $this->cache_key );
-        prp_log( 'found cache ' . $this->cache_key, ( $result ? 'yes' : 'no' ) );
-        prp_log( 'cache ' . $this->cache_key . ' contains', $result );
+        // prp_log( 'found cache ' . $this->cache_key, ( $result ? 'yes' : 'no' ) );
+        // prp_log( 'cache ' . $this->cache_key . ' contains', $result );
         return $result;
 
       } else {
-        prp_log( 'expiry time for cache ' . $this->cache_key . ' is invalid', $this->cache );
+        // prp_log( 'expiry time for cache ' . $this->cache_key . ' is invalid', $this->cache );
         throw new PRP_Exception( 'Cache expiry time is invalid: ' . $this->cache, PRP_Exception::PRP_ERROR_BAD_CACHE );
       }
     }
@@ -1206,10 +1205,11 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function parse_the_data_parameter(): string {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       $output = '';
 
-      prp_log( 'data', $this->data );
+      // prp_log( 'data', $this->data );
 
       $msg = '';
       $code = PRP_Exception::PRP_ERROR_NONE;
@@ -1265,7 +1265,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       }
       if ( '' === $output ) {
-        $msg = 'The <kbd><samp>data</kbd></samp> parameter in the shortcode is invalid or missing' . ( '' === $this->data ? '' : ': <samp><kbd><kbd>data="' . $this->data . '"</kbd></samp>' );
+        $msg = 'The <kbd><samp>data</kbd></samp> parameter in the shortcode is ' . ( '' === $this->data ? 'missing' : 'invalid: <samp><kbd><kbd>data="' . $this->data . '"</kbd></samp>' );
         $code = PRP_Exception::PRP_ERROR_BAD_INPUT;
       }
 
