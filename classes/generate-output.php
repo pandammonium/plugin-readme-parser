@@ -1438,7 +1438,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
         $this->file_combined .= '<span class="np-download-link"><span class="error">' . plugin_readme_parser_name . '</span>: No download link is available as the version number could not be found</span><br /><br />' . self::LINE_END;
       }
 
-      $this->file_combined .= '<a href="' . self::WP_PLUGIN_PAGE_URL . $this->plugin_name . '/" target="' . $this->target . '"' . $this->nofollow . '>Visit the official WordPress plugin page for ' . $plugin_title . '</a><br />' . self::LINE_END;
+      $this->file_combined .= '<a href="' . self::WP_PLUGIN_PAGE_URL . $this->plugin_name . '/" target="' . $this->target . '"' . $this->nofollow . '>Visit the official WordPress plugin page for ' . $this->plugin_title . '</a><br />' . self::LINE_END;
       $this->file_combined .= '<a href="' . self::WP_PLUGIN_SUPPORT_URL . $this->plugin_name . '" target="' . $this->target . '"' . $this->nofollow . '>Need help? Visit the WordPress support forum for ' . $this->plugin_title . '</a><br />' . self::LINE_END . '</div>' . self::LINE_END;
 
     }
