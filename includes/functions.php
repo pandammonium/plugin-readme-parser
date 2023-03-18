@@ -585,12 +585,10 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
 
     // prp_log( 'function', __FUNCTION__ );
 
+    static $original_shortcodes = array();
     $file = plugin_dir_path( __DIR__ );
     // prp_log( __( 'Plugin directory: ', plugin_readme_parser_domain ) . $file );
     if ( str_contains( $file, plugin_readme_parser_filename ) ) {
-
-      static $original_shortcodes = array();
-
       // prp_log( __( 'no. original shortcodes', plugin_readme_parser_domain ), count ( $original_shortcodes ) );
       // prp_log( __( 'no. global shortcodes', plugin_readme_parser_domain ), count ( $GLOBALS['shortcode_tags'] ) );
       // prp_log( __( 'shortcode content', plugin_readme_parser_domain ), $content );
@@ -658,7 +656,7 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
     } else {
       // Can't throw an exception here because it won't be caught by the plugin, presumably because it's used as a filter on `the_content`. Use WP_Error instead:
       $error = new WP_Error();
-      $error->add( PRP_Exception::PRP_ERROR_BAD_INPUT, 'Wrong plugin. Expected <samp><kbd>' . plugin_readme_parser_domain . '</kbd></samp>; got <samp><kbd>' . $file . '</kbd></samp>' );
+      $error->add( PRP_Exception::PRP_ERROR_BAD_INPUT, 'Wrong plugin. Expected <samp><kbd>' . plugin_readme_parser_domain . '</kbd></samp>; got <samp><kbd>' . basename( $file ) . '</kbd></samp>' );
       // prp_log( 'has errors', $error->has_errors() );
       // prp_log( 'error', $error );
       // prp_log( 'error code', $error->get_error_code() );

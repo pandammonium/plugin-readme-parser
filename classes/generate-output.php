@@ -1261,13 +1261,12 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       try {
         $result = prp_toggle_global_shortcodes( $this->content );
-        if ( is_wp_error( $result ) ) {
+        if ( $this->content !== $result ) {
           // prp_log( 'result', $result );
           throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
         }
-        return $result === $this->content;
+        return true;
       } catch ( PRP_Exception $e ) {
-        // throw $e;
         return $e->get_prp_nice_error();
       }
     }
