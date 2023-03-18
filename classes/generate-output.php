@@ -88,6 +88,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private const WP_REPO_URL = '';
     private const WP_PLUGIN_DIR_URL = 'https://plugins.svn.wordpress.org/';
     private const WP_DOWNLOAD_DIR_URL = 'https://downloads.wordpress.org/plugin/';
+    private const WP_PLUGIN_PAGE_URL = 'https://wordpress.org/extend/plugins/';
+    private const WP_PLUGIN_SUPPORT_URL = 'https://wordpress.org/support/plugin/';
 
     private const LINE_END = "\r\n";
 
@@ -129,13 +131,13 @@ if ( !class_exists( 'Generate_Output' ) ) {
      *
      * Function to output the results of the readme
      *
-     * @uses   prp_display_links     Show the links section
-     * @uses   prp_get_file      Fetch file
+     * @uses   display_links     Show the links section
+     * @uses   $this->get_file      Fetch file
      * @uses   prp_get_readme      Fetch the readme
      * @uses   prp_get_section_name  Get the name of the current section
-     * @uses   prp_get_list      Extract a list
-     * @uses   prp_is_it_excluded    Check if the current section is excluded
-     * @uses   prp_format_list      Strip a user or tag list and add links
+     * @uses   this->get_list      Extract a list
+     * @uses   $this->is_it_excluded    Check if the current section is excluded
+     * @uses   format_list      Strip a user or tag list and add links
      * @uses   // prp_log             Output debug info to the WP error log
      *
      * @param string $content readme filename
@@ -187,8 +189,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
           if ( false === $result ) {
             $this->plugin_url = $content;
             $this->hide = strtolower( $hide );
-            $this->ignore = prp_get_list( $ignore, ',,', 'ignore' );
-            $this->mirror = prp_get_list( $mirror, ',,', 'mirror' );
+            $this->ignore = $this->get_list( $ignore, ',,', 'ignore' );
+            $this->mirror = $this->get_list( $mirror, ',,', 'mirror' );
             $this->version = $version;
             $this->target = $target;
             $this->nofollow = 'yes' === strtolower( $nofollow ) ? ' rel="nofollow"' : '';
@@ -413,11 +415,11 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // prp_log( 'include', $this->include );
       // prp_log( 'exclude', $this->exclude );
       if ( '' !== $this->include ) {
-        if ( prp_is_it_excluded( 'links', $this->include ) ) {
+        if ( $this->is_it_excluded( 'links', $this->include ) ) {
           $this->show_links = true;
         }
       } else {
-        if ( !prp_is_it_excluded( 'links', $this->exclude ) ) {
+        if ( !$this->is_it_excluded( 'links', $this->exclude ) ) {
           $this->show_links = true;
         }
       }
@@ -432,10 +434,10 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // $this->show_head = false;
       // $this->show_meta = false;
 
-      $this->head_explicitly_excluded = prp_is_it_excluded( 'head', $this->exclude );
-      $this->head_explicitly_included = prp_is_it_excluded( 'head', $this->include );
-      $this->meta_explicitly_excluded = prp_is_it_excluded( 'meta', $this->exclude );
-      $this->meta_explicitly_included = prp_is_it_excluded( 'meta', $this->include );
+      $this->head_explicitly_excluded = $this->is_it_excluded( 'head', $this->exclude );
+      $this->head_explicitly_included = $this->is_it_excluded( 'head', $this->include );
+      $this->meta_explicitly_excluded = $this->is_it_excluded( 'meta', $this->exclude );
+      $this->meta_explicitly_included = $this->is_it_excluded( 'meta', $this->include );
 
       // prp_log( __( 'head exp exc', plugin_readme_parser_domain ), ( $this->head_explicitly_excluded ? 'true' : 'false' ) );
       // prp_log( __( 'head exp inc', plugin_readme_parser_domain ), ( $this->head_explicitly_included ? 'true' : 'false' ) );
@@ -580,7 +582,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       if ( ( $this->show_links ) &&
            ( 'bottom' === $this->links ) ) {
-        $this->file_combined .= prp_display_links( $this->download, $this->target, $this->nofollow, $this->version, $this->mirror, $this->plugin_name, $this->plugin_title );
+        $this->display_links();
       }
     }
 
@@ -682,12 +684,12 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       if ( '=== ' === substr( $this->file_array [$i ], 0, 4 ) ) {
         $this->file_array[ $i ] = str_replace( '===', '#', $this->file_array[ $i ] );
-        $this->section = prp_get_section_name( $this->file_array[ $i ], 1 );
+        $this->section = $this->get_section_name( $this->file_array[ $i ], 1 );
         // // prp_log( __( 'section', plugin_readme_parser_domain ), $this->section );
       } else {
         if ( '== ' === substr( $this->file_array[ $i ], 0, 3 ) ) {
           $this->file_array[ $i ] = str_replace( '==', '##' , $this->file_array[ $i ] );
-          $this->section = prp_get_section_name( $this->file_array[ $i ], 2 );
+          $this->section = $this->get_section_name( $this->file_array[ $i ], 2 );
           // // prp_log( __( 'section', plugin_readme_parser_domain ), $this->section );
         } else {
           if ( '= ' === substr( $this->file_array[ $i ], 0, 2 ) ) {
@@ -760,7 +762,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       // Is this an included section?
 
-      if ( prp_is_it_excluded( $this->section, $this->include ) ) {
+      if ( $this->is_it_excluded( $this->section, $this->include ) ) {
         // prp_log( __( 'included', plugin_readme_parser_domain ), $this->section );
 
         if ( $this->section !== $this->prev_section ) {
@@ -782,7 +784,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       // Is this an excluded section?
 
-      if ( prp_is_it_excluded( $this->section, $this->exclude ) ) {
+      if ( $this->is_it_excluded( $this->section, $this->exclude ) ) {
         $this->add_to_output = false;
         // prp_log( __( 'excluded', plugin_readme_parser_domain ), $this->section );
       } else {
@@ -822,7 +824,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       if ( ( $this->links === strtolower( $this->section ) ) &&
            ( $this->section !== $this->prev_section ) ) {
         if ( $this->show_links ) {
-          $this->file_array[ $i ] = prp_display_links( $this->download, $this->target, $this->nofollow, $this->version, $this->mirror, $this->plugin_name ) . $this->file_array[ $i ];
+          $this->file_array[ $i ] = $this->display_links( $this->download, $this->target, $this->nofollow, $this->version, $this->mirror, $this->plugin_name ) . $this->file_array[ $i ];
         }
       }
     }
@@ -859,7 +861,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
             'download' => isset( $this->download ) ? $this->download : '',
             'target' => $this->target,
           );
-          $this->add_to_output = prp_add_head_meta_data_to_output( $this->show_head, $this->show_meta, $this->file_array[ $i ], $this->metadata );
+          $this->add_to_output = $this->add_head_meta_data_to_output( $i );
         }
       }
     }
@@ -905,7 +907,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // prp_log( 'arguments', func_get_args() );
 
       $this->title = substr( $this->file_array[ $i ], 4, strpos( $this->file_array[ $i ], '</h2>' ) - 4 );
-      if ( prp_is_it_excluded( $this->title, $this->hide ) ) {
+      if ( $this->is_it_excluded( $this->title, $this->hide ) ) {
         $state = 'hide';
       } else {
         $state = 'show';
@@ -1155,10 +1157,10 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
 
       try {
-        $result = prp_get_file( $this->plugin_url );
+        $result = $this->get_file();
 
         // Ensure the file is valid
-        /** @todo When 'prp_get_file' is updated, update this error-checking to match. */
+        /** @todo When '$this->get_file' is updated, update this error-checking to match. */
         if ( ( $result[ 'rc' ] === 0 ) &&
              ( $result[ 'file' ] !== '' ) &&
              ( substr( $result[ 'file' ], 0, 9 ) !== '<!DOCTYPE' ) &&
@@ -1306,19 +1308,20 @@ if ( !class_exists( 'Generate_Output' ) ) {
      */
     function toggle_global_shortcodes(): bool|string {
 
-      // prp_log( 'method', __FUNCTION__ );
-      // prp_log( 'arguments', func_get_args() );
+      prp_log( 'method', __FUNCTION__ );
+      prp_log( 'arguments', func_get_args() );
 
-      try {
+      // try {
         $result = prp_toggle_global_shortcodes( $this->content );
+        // if ( is_wp_error( $result ) ) {
         if ( $this->content !== $result ) {
           // prp_log( 'result', $result );
-          throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
+          throw new PRP_Exception( $result );
         }
         return true;
-      } catch ( PRP_Exception $e ) {
-        return $e->get_prp_nice_error();
-      }
+      // } catch ( PRP_Exception $e ) {
+      //   return $e->get_prp_nice_error();
+      // }
     }
 
     /**
@@ -1342,7 +1345,542 @@ if ( !class_exists( 'Generate_Output' ) ) {
       throw new PRP_Exception( 'The <samp><kbd>readme_banner</kbd></samp> shortcode is obsolete. Please use either the <samp><kbd>readme</kbd></samp> or <samp><kbd>readme_info</kbd></samp> shortcodes', PRP_Exception::PRP_ERROR_BAD_INPUT );
     }
 
+    /**
+     * Gets the section name from the current line in the readme file.
+     *
+     * @author dartiss
+     * @since 1.0
+     *
+     * @param string $readme_line The current line in the readme file.
+     * @param int $start_pos The position in the line to start
+     * looking from.
+     * @return string The section name given in the current line in
+     * the readme file.
+     */
+    function get_section_name( string $readme_line, int $start_pos ): string {
+
+      // prp_log( 'function', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
+
+      $hash_pos = strpos( $readme_line, '#', $start_pos + 1 );
+
+      if ( $hash_pos ) {
+        $section = substr( $readme_line, $start_pos + 1, $hash_pos - $start_pos - 2 );
+      } else {
+        $section = substr( $readme_line, $start_pos + 1 );
+      }
+
+      // prp_log( __( '  Get section name:', plugin_readme_parser_domain ) );
+      // prp_log( __( '  section name: \'' . $section . '\'', plugin_readme_parser_domain ) );
+
+      return $section;
+    }
+
+    /**
+     * Displays predefined links relevant to the plugin.
+     *
+     * The links displayed are:
+     * * the ZIP archive of the latest version of the plugin for
+     * download
+     * * the official WordPress page for the plugin
+     * * the WordPress support forum for the plugin
+     *
+     * Display of the links is controlled by the 'exclude'/'include'
+     * parameters of the 'readme' shortcode.
+     *
+     * @author dartiss, pandammonium
+     * @since 1.2
+     * @since 2.0.0 Uses constants for the URLs. Updates the link
+     * text, adding $plugin_nice_name to avoid using the vague 'this
+     * plugin' in display text.
+     *
+     * @param void $ This method has no arguments.
+     * @return void
+     *
+     * @todo Consider replacing the long list of arguments with an
+     * array. Alternatively, move to Generate_Output.
+     * @todo Consider making the link text customisable. How?
+     * @todo Consider throwing an exception if the version cannot be
+     * found.
+     */
+    function display_links(): void {
+
+      // prp_log( 'function', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
+
+      // prp_log( __( '  Display links:', plugin_readme_parser_domain ) );
+      // prp_log( __( '  download link: \'' . $download . '\'', plugin_readme_parser_domain ) );
+      // prp_log( __( '  target:        \'' . $target . '\'', plugin_readme_parser_domain ) );
+      // prp_log( __( '  nofollow:      \'' . $nofollow . '\'', plugin_readme_parser_domain ) );
+      // prp_log( __( '  version:       \'' . $version . '\'', plugin_readme_parser_domain ) );
+
+      // Don't overwrite the combined file:
+      $this->file_combined .= '<div markdown="1" class="np-links">' . self::LINE_END . '## Links ##' . self::LINE_END . self::LINE_END;
+
+      if ( $this->version !== '' ) {
+        $this->file_combined .= '<a class="np-download-link" href="' . $this->download . '" target="' . $this->target . '"' . $this->nofollow . '>Download the latest version of ' . $this->plugin_title . '</a> (v' . $this->version . ')<br /><br />' . self::LINE_END;
+
+        // prp_log( __( '  version found; outputting download link', plugin_readme_parser_domain ) );
+
+        // If any mirrors exist, add them to the output:
+        if ( $this->mirror[ 0 ] > 0 ) {
+          for ( $m = 1; $m <= $this->mirror[ 0 ]; $m++ ) {
+            $this->file_combined .= '<a class="np-download-link" href="' . $this->mirror[ $m ] . '" target="' . $this->target . '"' . $this->nofollow . '>Download ' . $this->plugin_title . ' from mirror ' . $m . '</a><br />' . self::LINE_END;
+            // prp_log( __( '  mirror[' . $m . ']: ', plugin_readme_parser_domain ) . $this->mirror[ $m ] );
+          }
+          $this->file_combined .= '<br />';
+        } else {
+          // prp_log( __( '  mirror:        \'none\'', plugin_readme_parser_domain ) );
+        }
+
+      } else {
+        // prp_log( __( '  no version, therefore no download link', plugin_readme_parser_domain ) );
+        $this->file_combined .= '<span class="np-download-link"><span class="error">' . plugin_readme_parser_name . '</span>: No download link is available as the version number could not be found</span><br /><br />' . self::LINE_END;
+      }
+
+      $this->file_combined .= '<a href="' . self::WP_PLUGIN_PAGE_URL . $this->plugin_name . '/" target="' . $this->target . '"' . $this->nofollow . '>Visit the official WordPress plugin page for ' . $plugin_title . '</a><br />' . self::LINE_END;
+      $this->file_combined .= '<a href="' . self::WP_PLUGIN_SUPPORT_URL . $this->plugin_name . '" target="' . $this->target . '"' . $this->nofollow . '>Need help? Visit the WordPress support forum for ' . $this->plugin_title . '</a><br />' . self::LINE_END . '</div>' . self::LINE_END;
+
+    }
+
+    /**
+     * Determine which parts of the head meta data, if any, should
+     * be added to the output.
+     *
+     * The head comprises the plugin title/name, the meta data and
+     * a summary/description of the plugin. There may be one or
+     * more blank lines. This function deals with the meta data
+     * only.
+     *
+     * The meta data is the labelled data, such as tags, licence
+     * and contributors. It is added to the output if one of the
+     * following is true:
+     * * $show_head === $show_meta === true
+     * * $show_head === false and $show_meta === true.
+     *
+     * The summary is added to the output if one of the following
+     * is true:
+     * * $show_head === $show_meta === true
+     * * $show_head === true and $show_meta === false.
+     *
+     * @author pandammonium
+     * @since 2.0.0 Abstracted from Generate_Output.
+     *
+     * @param int $i The number of the
+     * @return bool True if this line should be added to the
+     * output, otherwise false.
+     */
+    function add_head_meta_data_to_output( $i ): bool {
+
+      // prp_log( 'function', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
+
+      $add_to_output = true;
+
+      if ( $this->show_head || $this->show_meta ) {
+
+        // prp_log_truncated_line( 'checking ' . ( '' === $this->file_array[ $i ] ? '\'\'' : $this->file_array[ $i ] ) );
+
+        if ( $this->line_is_head_meta_data( $i ) ) {
+
+          // Process meta data from top
+
+          if ( !$this->show_meta ) {
+            // prp_log( __( 'exclude all meta', plugin_readme_parser_domain ) );
+            $add_to_output = false;
+
+          } else if ( ( 'Requires at least:' === substr( $this->file_array[ $i ], 0, 18 ) ) &&
+               ( $this->is_it_excluded( 'requires', $this->metadata[ 'exclude' ] ) ) ) {
+            // prp_log( __( 'exclude WP req', plugin_readme_parser_domain ) );
+            $add_to_output = false;
+
+          } else if ( ( 'Requires PHP:' === substr( $this->file_array[ $i ], 0, 18 ) ) &&
+               ( $this->is_it_excluded( 'requires php', $this->metadata[ 'exclude' ] ) ) ) {
+            // prp_log( __( 'exclude PHP req', plugin_readme_parser_domain ) );
+            $add_to_output = false;
+
+          } else if ( ( 'Tested up to:' === substr( $this->file_array[ $i ], 0, 13 ) ) &&
+               ( $this->is_it_excluded( 'tested', $this->metadata[ 'exclude' ] ) ) ) {
+            // prp_log( __( 'exclude test', plugin_readme_parser_domain ) );
+            $add_to_output = false;
+
+          } else if ( ( 'License:' === substr( $this->file_array[ $i ], 0, 8 ) ) &&
+               ( $this->is_it_excluded( 'license', $this->metadata[ 'exclude' ] ) ) ) {
+            // prp_log( __( 'exclude licence', plugin_readme_parser_domain ) );
+            $add_to_output = false;
+
+          } else if ( 'Contributors:' === substr( $this->file_array[ $i ], 0, 13 ) ) {
+            if ( $this->is_it_excluded( 'contributors', $this->metadata[ 'exclude' ] ) ) {
+            // prp_log( __( 'exclude contrib', plugin_readme_parser_domain ) );
+              $add_to_output = false;
+            } else {
+              // Show contributors and tags using links to WordPress pages
+              $this->file_array[ $i ] = substr( $this->file_array[ $i ], 0, 14 ) . $this->format_list( substr( $this->file_array[ $i ], 14 ), 'c' );
+            }
+
+          } else if ( 'Tags:' === substr( $this->file_array[ $i ], 0, 5 ) ) {
+            if ( $this->is_it_excluded( 'tags', $this->metadata[ 'exclude' ] ) ) {
+            // prp_log( __( 'exclude tags', plugin_readme_parser_domain ) );
+              $add_to_output = false;
+            } else {
+              $this->file_array[ $i ] = substr( $this->file_array[ $i ], 0, 6 ) . $this->format_list( substr( $this->file_array[ $i ], 6 ), 't' );
+            }
+
+          } else if ( 'Donate link:' === substr( $this->file_array[ $i ], 0, 12 ) ) {
+            if ( $this->is_it_excluded( 'donate', $this->metadata[ 'exclude' ] ) ) {
+            // prp_log( __( 'exclude donate', plugin_readme_parser_domain ) );
+              $add_to_output = false;
+            } else {
+              // Convert the donation link to a hyperlink
+              $text = substr( $this->file_array[ $i ], 13 );
+              $this->file_array[ $i ] = substr( $this->file_array[ $i ], 0, 13 ) . '<a href="' . $text . '">' . $text . '</a>';
+            }
+
+          } else if ( 'License URI:' === substr( $this->file_array[ $i ], 0, 12 ) ) {
+            if ( $this->is_it_excluded( 'license uri', $this->metadata[ 'exclude' ] ) ) {
+            // prp_log( __( 'exclude lic uri', plugin_readme_parser_domain ) );
+              $add_to_output = false;
+            } else {
+              // Convert the licence URL to a hyperlink
+              $text = substr( $this->file_array[ $i ], 13 );
+              $this->file_array[ $i ] = substr( $this->file_array[ $i ], 0, 13 ) . '<a href="' . $text . '">' . $text . '</a>';
+            }
+
+          } else if ( 'Stable tag:' === substr( $this->file_array[ $i ], 0, 11 ) ) {
+            if ( $this->is_it_excluded( 'stable', $this->metadata[ 'exclude' ] ) ) {
+            // prp_log( __( 'exclude stab tag', plugin_readme_parser_domain ) );
+              $add_to_output = false;
+            } else {
+              // Link to the download given by the version
+              $this->file_array[ $i ] = substr( $this->file_array[ $i ], 0, 12 ) . '<a href="' . $this->metadata[ 'download' ].'" style="max-width: 100%;">' . $this->metadata[ 'version' ] . '</a>';
+            }
+          }
+
+          // If one of the header tags, add a BR tag to the end of the line.
+          // As the output is meant to be XHTML, the BR tag needs to be closed. The proper way to do this is to have no space before the slash.
+
+          $this->file_array[ $i ] .= '<br/>';
+        } else {
+          // prp_log( __( 'line is not meta data but is in head; add to output', plugin_readme_parser_domain ), ( $add_to_output ? 'true' : 'false' ) );
+          return $this->show_head;
+        }
+      } else {
+        $add_to_out = false;
+      }
+
+      // prp_log( __( 'add head meta data to output', plugin_readme_parser_domain ), ( $add_to_output ? 'true' : 'false' ) );
+      return $add_to_output;
+    }
+
+    /**
+     * Tests whether the current section is explicitly excluded from
+     * the display.
+     *
+     * The section heading is compared to the value of the 'exclude'
+     * parameter of the shortcode to see if it has been explicitly
+     * excluded. Screenshots are always excluded because the plugin
+     * is forbidden from accessing the image files on the WordPress
+     * SVN server where they are stored.
+     *
+     * @author dartiss
+     * @since 1.0
+     *
+     * @param string $tofind The section name.
+     * @param string $exclude List of excluded sections.
+     * @return bool True or false, depending on whether the section
+     * was valid or invalid.
+     */
+    function is_it_excluded( string $tofind, string $exclude ): bool {
+
+      // prp_log( 'function', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
+
+      $tofind = strtolower( $tofind );
+      $exclude = strtolower( $exclude );
+      $return = true;
+
+      // prp_log( __( '  Is \'' . $tofind . '\' excluded?', plugin_readme_parser_domain ) );
+      // prp_log( __( '  exclusion list: \'' . $exclude . '\'', plugin_readme_parser_domain ) );
+
+      if ( 'screenshots' === $tofind ||
+           'screenshot' === $tofind ) {
+        $return = true;
+
+      } else {
+        if ( $tofind !== $exclude ) {
+          // The presence of commas mean that they can be used as delimiters for searching in the parameter string, but they also mean that the search isn't as straightforward as it first appears.
+          // Search in the middle:
+          $pos = strpos( $exclude, ',' . $tofind . ',' );
+          if ( $pos === false ) {
+            // Search on the left:
+            $pos = strpos( substr( $exclude, 0, strlen( $tofind ) + 1 ), $tofind . ',' );
+            if ( $pos === false ) {
+              // Search on the right:
+              $pos = strpos( substr( $exclude, ( strlen( $tofind ) + 1 ) * -1, strlen( $tofind ) + 1 ), ',' . $tofind );
+              if ( $pos === false ) {
+                $return = false;
+              }
+            }
+          }
+        }
+      }
+      // if ( 'description' === $tofind ) {
+      //   prp_log( __( '  \'' . $tofind . '\' is ' . ( $return ? 'explicitly excluded' : 'not explicitly excluded' ), plugin_readme_parser_domain ) );
+      // }
+      return $return;
+    }
+
+
+    /**
+     * Formats lists for display.
+     *
+     * Each item in the list is cleaned up, and formatted as an
+     * HTML link, ready for display.
+     *
+     * @author dartiss, pandammonium
+     * @since 1.0
+     * @since 2.0.0 Renamed from 'prp_strip_list' to
+     * 'format_list'. Uses constants for the URLs. Renames return
+     * variable for semantic clarity. Adds error handling.
+     *
+     * @param string $list A list of items, currently one of:
+     * * plugin contributors
+     * * plugin tags
+     * @param string $type The type of list, currently one of:
+     * * 't': tags
+     * * 'c': contributors
+     * @param string $target Link target.
+     * @param string $nofollow Link nofollow.
+     * @throws PRP_Exception if an unsupported list type is given.
+     * @return string The list formatted as HTML.
+     */
+    function format_list( string $list, string $type ): string {
+
+      // prp_log( 'function', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
+
+      // prp_log( 'list', $list );
+      // prp_log( 'type', $type );
+      // prp_log( 'target', $this->metadata[ 'target' ] );
+      // prp_log( 'nofollow', $this->metadata[ 'nofollow' ] );
+
+      $url = '';
+      switch ( $type ) {
+        case 'c':
+          $url = WP_USER_DIR_URL;
+        break;
+        case 't':
+          $url = WP_PLUGIN_TAGS_URL;
+        break;
+        default:
+          throw new PRP_Exception( 'Invalid list type found: ' . $type, PRP_Exception::PRP_ERROR_BAD_DATA );
+      }
+
+      $startpos = 0;
+      $number = 0;
+      $endpos = strpos( $list, ',', 0 );
+      $html = '';
+
+      while ( $endpos !== false ) {
+        ++$number;
+        $item = trim( substr( $list, $startpos, $endpos - $startpos ) );
+        // prp_log( 'item', $item );
+        if ( $number > 1 ) {
+          $html .= ', ';
+        }
+        $html .= '<a href="' . $url . $item . '" target="' . $this->metadata[ 'target' ] . '"' . $this->metadata[ 'nofollow' ] . '>' . $item . '</a>';
+        $startpos = $endpos + 1;
+        $endpos = strpos( $list, ',', $startpos );
+      }
+
+      $item = trim( substr( $list, $startpos ) );
+      if ( $number > 0 ) {
+        $html .= ', ';
+      }
+      $html .= '<a href="' . $url . $item . '" target="' . $this->metadata[ 'target' ] . '"' . $this->metadata[ 'nofollow' ] . '>' . $item . '</a>';
+
+      return $html;
+    }
+
+    /**
+     * Gets the given file from WordPress.
+     *
+     * Uses WordPress API to fetch a file from the WordPress server
+     * and to and check the response code (rc):
+     * * success: 0
+     * * failure: -1
+     *
+     * @author dartiss, pandammonium
+     * @since 1.6
+     * @since 2.0.0 Enhances error handling.
+     *
+     * @param bool $header True if only the headers should be
+     * fetched; false to fetch everything.
+     * @return string[] The file contents and the server response.
+     *
+     * @todo Make error handling fully reliant on WP_Error and
+     * exceptions rather than error codes with magic numbers.
+     */
+    function get_file( bool $header = false ): array {
+
+      // prp_log( 'function', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
+
+      // prp_log( 'file url', $this->plugin_url );
+      // prp_log( 'header', $header );
+
+      $pos = strpos( strtolower( $this->plugin_url ), WP_PLUGIN_DIR_URL . '/' );
+      if ( 0 === $pos ) {
+        throw new PRP_Exception( 'The URL is missing the plugin name: <samp>' . substr( $this->plugin_url, $pos, strlen( $repo ) ) . '&lt;plugin-name&gt;/</samp>', PRP_Exception::PRP_ERROR_BAD_URL );
+      }
+
+      $file_return = array();
+      $rc = 0;
+      $error = '';
+      if ( $header ) {
+        $result = wp_remote_head( $this->plugin_url );
+        if ( is_wp_error( $result ) ) {
+          $error = 'Header: ' . $result -> get_error_message();
+          $rc = -1;
+          // throw new PRP_Exception( $error . '(' . $result->get_error_code . ')' );
+        }
+      } else {
+        $result = wp_remote_get( $this->plugin_url );
+        if ( is_wp_error( $result ) ) {
+          $error = 'Body: ' . $result -> get_error_message();
+          $rc = -1;
+          // throw new PRP_Exception( $error . '(' . $result->get_error_code . ')' );
+        } else {
+          if ( isset( $result[ 'body' ] ) ) {
+            $file_return[ 'file' ] = $result[ 'body' ];
+          }
+        }
+      }
+
+      $file_return[ 'error' ] = $error;
+      $file_return[ 'rc' ] = $rc;
+      if ( is_wp_error( $result ) ) {
+        // prp_log( '  WP Error', $result );
+        throw new PRP_Exception( $result->get_error_message(), $result->get_error_code() );
+      } else {
+        // prp_log( 'type of response', gettype( $result[ 'response' ] ) );
+        // prp_log( 'response', $result[ 'response' ] );
+        // prp_log( 'type of http response', gettype( $result[ 'http_response' ] ) );
+        // prp_log( 'http response – null?', null === $result[ 'http_response' ] );
+        if ( isset( $result[ 'response' ][ 'code' ] ) ) {
+          $file_return[ 'response' ] = $result[ 'response' ][ 'code' ];
+          // prp_log( 'file return', $file_return );
+          // prp_log( 'response', $file_return[ 'response' ] );
+          // prp_log( 'rc', $file_return[ 'rc' ] );
+          // if ( isset( $file_return[ 'file' ] ) ) {
+          //   prp_log( 'file', $file_return[ 'file' ] );
+          // }
+        }
+        if ( isset( $result[ 'http_response' ] ) ) {
+          $response = $result[ 'http_response' ]->get_response_object();
+          // prp_log( 'type of response object', gettype( $response ) );
+          try {
+            $response->throw_for_status( false );
+          } catch ( Exception $e) {
+            throw new PRP_Exception( 'The URL <samp>' . $this->plugin_url . '</samp> of the readme file returned a <samp>' . $e->getMessage() . '</samp> error', PRP_Exception::PRP_ERROR_BAD_URL );
+          }
+        }
+
+      }
+
+      // prp_log( __( '  file out:    contents of readme file', plugin_readme_parser_domain ) );
+      // prp_log( '  file out', $result );
+      // prp_log( __( '  file return: contents of readme file', plugin_readme_parser_domain ) );
+      // prp_log( '  file return', $file_return );
+
+      // prp_log( 'file return (error)', $file_return[ 'error' ] );
+      // prp_log( 'file return (rc)', $file_return[ 'rc' ] );
+      // prp_log( 'file return (response)', $file_return[ 'response' ] );
+      return $file_return;
+    }
+
+    /**
+     * Extract parameters to an array
+     *
+     * Function to extract parameters from an input string and
+     * add to an array
+     *
+     * @since 1.0
+     *
+     * @param string $input The input string that needs to be split.
+     * @param string $separator The separator character used to split
+     * the input string. If not specified, it defaults to a comma (,).
+     * @param string $type Indicates the type of list; only used for debug purposes.
+     * @return     string[]  Array of parameters.
+     */
+    function get_list( string $input, string $separator = '', string $type = '' ): array {   // Version 1.2
+
+      // prp_log( 'function', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
+
+      // prp_log( __( '  Get \'' . $type . '\' list:', plugin_readme_parser_domain ) );
+      // prp_log( __( '  input:     \'' . $input . '\'', plugin_readme_parser_domain ) );
+      // prp_log( __( '  separator: \'' . $separator . '\'', plugin_readme_parser_domain ) );
+
+      if ( $separator === '' ) {
+        $separator = ',';
+      }
+      $comma = strpos( strtolower( $input ), $separator );
+
+      $item = 0;
+      while ( $comma !== false ) {
+        $item++;
+        $content[ $item ] = substr( $input, 0, $comma );
+        $input = substr( $input, $comma + strlen( $separator ) );
+        $comma = strpos( $input, $separator );
+      }
+
+      if ( $input !== '' ) {
+        $item++;
+        $content[ $item ] = substr( $input, 0 );
+      }
+
+      $content[ 0 ] = $item;
+      // prp_log( $content[0], '  content[0]:' );
+      return $content;
+    }
+
+    /**
+     * Checks that the the readme file line is head meta data.
+     *
+     * Tests to see whether the current line in the readme file is a line in
+     * the head meta data (e.g. tags, licence, contributors) or not.
+     *
+     * @author pandammonium
+     * @since 2.0.0 Abstracted from Generate_Output.
+     *
+     * @param int $i The current line number of the readme file being parsed.
+     * @return bool True if the current line in the readme file is part of the
+     * head meta data, otherwise false.
+     */
+    function line_is_head_meta_data( int $i ): bool {
+
+      // prp_log( 'function', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
+
+      if ( ( 'Contributors:' === substr( $this->file_array[ $i ], 0, 13 ) ) or
+           ( 'Donate link:' === substr( $this->file_array[ $i ], 0, 12 ) ) or
+           ( 'Tags:' === substr( $this->file_array[ $i ], 0, 5 ) ) or
+           ( 'Requires at least:' === substr( $this->file_array[ $i ], 0, 18 ) ) or
+           ( 'Requires PHP:' === substr( $this->file_array[ $i ], 0, 13 ) ) or
+           ( 'Tested up to:' === substr( $this->file_array[ $i ], 0, 13 ) ) or
+           ( 'Stable tag:' === substr( $this->file_array[ $i ], 0, 11 ) ) or
+           ( 'License URI:' === substr( $this->file_array[ $i ], 0, 12 ) ) or
+           ( 'License:' === substr( $this->file_array[ $i ], 0, 8 ) ) ) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+
   }
+
 
   $generator = new Generate_Output();
 
