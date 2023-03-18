@@ -130,6 +130,7 @@ if ( !function_exists( 'prp_log_truncated_line' ) ) {
   function prp_log_truncated_line( string $line, int $line_number = -1 ): void {
 
     // prp_log( 'function', __FUNCTION__ );
+    // prp_log( 'arguments', func_get_args() );
 
     $line_length = 46;
 
@@ -159,6 +160,7 @@ if ( !function_exists( 'prp_is_it_excluded' ) ) {
   function prp_is_it_excluded( string $tofind, string $exclude ): bool {
 
     // prp_log( 'function', __FUNCTION__ );
+    // prp_log( 'arguments', func_get_args() );
 
     $tofind = strtolower( $tofind );
     $exclude = strtolower( $exclude );
@@ -219,6 +221,7 @@ if ( !function_exists( 'prp_get_section_name' ) ) {
   function prp_get_section_name( string $readme_line, int $start_pos ): string {
 
     // prp_log( 'function', __FUNCTION__ );
+    // prp_log( 'arguments', func_get_args() );
 
     $hash_pos = strpos( $readme_line, '#', $start_pos + 1 );
 
@@ -255,6 +258,7 @@ if ( !function_exists( 'prp_display_links' ) ) {
   function prp_display_links( string $download, string $target, string $nofollow, string $version, array $mirror, string $plugin_name ): string {
 
     // prp_log( 'function', __FUNCTION__ );
+    // prp_log( 'arguments', func_get_args() );
 
     // prp_log( __( '  Display links:', plugin_readme_parser_domain ) );
     // prp_log( __( '  download link: \'' . $download . '\'', plugin_readme_parser_domain ) );
@@ -535,6 +539,8 @@ if ( !function_exists( 'prp_get_list' ) ) {
   function prp_get_list( string $input, string $separator = '', string $type = '' ): array {   // Version 1.2
 
     // prp_log( 'function', __FUNCTION__ );
+    // prp_log( 'arguments', func_get_args() );
+
 
     // prp_log( __( '  Get \'' . $type . '\' list:', plugin_readme_parser_domain ) );
     // prp_log( __( '  input:     \'' . $input . '\'', plugin_readme_parser_domain ) );
@@ -584,6 +590,7 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
   function prp_toggle_global_shortcodes( string $content ): string {
 
     // prp_log( 'function', __FUNCTION__ );
+    // prp_log( 'arguments', func_get_args() );
 
     static $original_shortcodes = array();
     $file = plugin_dir_path( __DIR__ );
@@ -687,6 +694,7 @@ if ( !function_exists( 'prp_line_is_head_meta_data' ) ) {
   function prp_line_is_head_meta_data( string $line_in_file ): bool {
 
     // prp_log( 'function', __FUNCTION__ );
+    // prp_log( 'arguments', func_get_args() );
 
     if ( ( 'Contributors:' === substr( $line_in_file, 0, 13 ) ) or
          ( 'Donate link:' === substr( $line_in_file, 0, 12 ) ) or
@@ -736,6 +744,7 @@ if ( !function_exists( 'prp_add_head_meta_data_to_output' ) ) {
   function prp_add_head_meta_data_to_output( bool $show_head, bool $show_meta, string &$line_in_file, array $metadata ): bool {
 
     // prp_log( 'function', __FUNCTION__ );
+    // prp_log( 'arguments', func_get_args() );
 
     // prp_log( 'Args of prp_add_head_meta_data_to_output()', array(
     //   'show head' => $show_head,

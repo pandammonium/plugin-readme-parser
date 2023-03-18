@@ -99,6 +99,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     public function __construct() {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       $this->initialise();
     }
@@ -339,6 +340,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function normalise_parameters( string|array|null $parameters = null ): null|WP_Error {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       // prp_log( __( 'Parameters (raw)', plugin_readme_parser_domain), $parameters );
 
@@ -388,6 +390,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function determine_show_links( string $links ): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       // prp_log( 'show links (before)', $this->show_links );
       // prp_log( 'include', $this->include );
@@ -464,6 +467,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function validate_sections( string $exclude, string $include ): bool {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       if ( ( '' !== $exclude ) &&
            ( '' !== $include ) ) {
@@ -485,6 +489,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function read_file_array(): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       $count = count( $this->file_array );
       // prp_log( __( 'readme file has ' . $count . ' lines', plugin_readme_parser_domain ) );
@@ -554,6 +559,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function display_links_section(): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       if ( ( $this->show_links ) &&
            ( 'bottom' === $this->links ) ) {
@@ -570,6 +576,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function write_html(): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       $titles_found = 0;
       $count = count( $this->file_array );
@@ -601,6 +608,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function initialise(): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       $this->parameters = null;
       $this->content = '';
@@ -653,6 +661,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function standardise_headings_markup( int $i ): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       if ( '=== ' === substr( $this->file_array [$i ], 0, 4 ) ) {
         $this->file_array[ $i ] = str_replace( '===', '#', $this->file_array[ $i ] );
@@ -675,6 +684,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function standardise_lists( int $i ): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       if ( ( '*' === substr( $this->file_array[ $i ], 0, 1 ) ) &&
            ( ' ' !== substr( $this->file_array[ $i ], 0, 2 ) ) &&
@@ -712,6 +722,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function read_section(): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       if ( '' !== $this->include ) {
         $this->read_included_sections();
@@ -728,6 +739,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function read_included_sections(): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       // Is this an included section?
 
@@ -749,6 +761,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function read_excluded_sections(): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       // Is this an excluded section?
 
@@ -769,6 +782,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function read_excluded_line(): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       // Is it an excluded line?
 
@@ -786,6 +800,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function read_links(): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       if ( ( $this->links === strtolower( $this->section ) ) &&
            ( $this->section !== $this->prev_section ) ) {
@@ -798,6 +813,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function read_download_link( int $i ): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       if ( 'Stable tag:' === substr( $this->file_array[ $i ], 0, 11 ) ) {
 
@@ -812,6 +828,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function read_head( int $i ): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       if ( $this->add_to_output ) {
 
@@ -833,6 +850,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function read_screenshots(): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       if ( 'Screenshots' === $this->section ) {
         // Do not display screenshots: any attempt to access the screenshots on WordPress' SVN servers is met with an HTTP 403 (forbidden) error.
@@ -844,6 +862,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function add_current_line_to_output( int $i ): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       if ( ( '' !== $this->file_array[ $i ] or !$this->last_line_blank ) &&
          $this->add_to_output ) {
@@ -866,6 +885,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function write_html_title( int $i ): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       $this->title = substr( $this->file_array[ $i ], 4, strpos( $this->file_array[ $i ], '</h2>' ) - 4 );
       if ( prp_is_it_excluded( $this->title, $this->hide ) ) {
@@ -878,6 +898,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function normalise_html_code_tags( int $i ): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       // If first line of code multi-line, replace CODE with PRE tag
 
@@ -903,6 +924,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function write_content_reveal_plugin( int $i, string $titles_found ): int {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
       if ( is_plugin_active( 'simple-content-reveal/simple-content-reveal.php' ) ) {
@@ -930,6 +952,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function write_content_reveal_heading( int $i, string $titles_found ): int {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       $this->file_array[ $i ] = acr_start( '<h2>%image% ' . $this->title . '</h2>', $this->title, $this->state, $scr_url, $scr_ext );
       return ++$titles_found;
@@ -938,6 +961,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function write_content_reveal_end( int $i, string $titles_found ): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       if ( ( '</div>' === $this->file_array[ $i ] ) && ( 0 < $titles_found ) ) {
         $this->file_array[ $i ] = acr_end() . self::LINE_END . $this->file_array[ $i ];
@@ -947,6 +971,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function process_valid_file(): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       // prp_log( __( 'file_data', plugin_readme_parser_domain ), $this->file_data );
 
@@ -987,6 +1012,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function process_invalid_file(): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       if ( false === $this->file_data ) {
         throw new PRP_Exception( 'The readme file ' . ( empty( $this->name ) ? '' : ' for \'' . $this->name . '\'' ) . ' is invalid', PRP_Exception::PRP_ERROR_BAD_FILE );
@@ -1083,6 +1109,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function get_readme( string $plugin_url, string $version = '' ): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       // prp_log( 'plugin url', $plugin_url );
 
@@ -1140,6 +1167,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     private function get_plugin_name_and_version(): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       // Split file into array based on CRLF
 
@@ -1258,6 +1286,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     function toggle_global_shortcodes(): bool {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       try {
         $result = prp_toggle_global_shortcodes( $this->content );
@@ -1274,6 +1303,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     function readme_banner(): void {
 
       // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       throw new PRP_Exception( 'The <samp><kbd>readme_banner</kbd></samp> shortcode is obsolete. Please use either the <samp><kbd>readme</kbd></samp> or <samp><kbd>readme_info</kbd></samp> shortcodes', PRP_Exception::PRP_ERROR_BAD_INPUT );
     }
