@@ -122,14 +122,18 @@ if ( !function_exists( 'prp_log' ) ) {
 if ( !function_exists( 'prp_get_wp_error_string' ) ) {
   function prp_get_wp_error_string( WP_Error $error, bool $echo = false ): string {
 
-    $output = plugin_readme_parser_name .
-      ' error ' .
-      trim( print_r( $error->get_error_code(), true ) ).
-      ': ' .
-      trim( print_r( $error->get_error_message(), true ) ) .
-      ( empty( $error->get_error_data() ) ? '' : '. \'' . trim( print_r( $error->get_error_data(), true ) ) . '\'' );
+    if ( is_wp_error( $error ) ) {
+      $output = plugin_readme_parser_name .
+        ' error ' .
+        trim( print_r( $error->get_error_code(), true ) ).
+        ': ' .
+        trim( print_r( $error->get_error_message(), true ) ) .
+        ( empty( $error->get_error_data() ) ? '' : '. \'' . trim( print_r( $error->get_error_data(), true ) ) . '\'' );
 
-    return $echo ? '<p>' . $output . '.</p>' : $output;
+      return $html ? '<p>' . $output . '.</p>' : $output;
+    } else {
+      throw new PRP_Exception( 'Expected a WP_Error object; got a ' . gettype( $error ), PRP_Exception::PRP_ERROR_BAD_DATA );
+    }
   }
 }
 
