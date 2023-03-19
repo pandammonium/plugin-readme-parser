@@ -4,7 +4,7 @@
  *
  * Functions called by main output generator.
  *
- * @package Pandammonium-Readme-Parser
+ * @package Pandammonium-ReadmeParser-Functions
  * @author dartiss, pandammonium
  * @since 1.2
  * @since 2.0.0 Wraps each function definition inside a check for its

@@ -11,7 +11,7 @@
  * Text Domain: plugin-readme-parser
  * @link        https://pandammonium.org/wordpress-dev/plugin-readme-parser/
  * @since       1.0
- * @package     Plugin_readme_Parse
+ * @package     Pandammonium-ReadmeParser
  * @author      pandammonium, dartiss
  * @license     GPLv2 or later
  * @wordpress-plugin
@@ -21,13 +21,6 @@
 defined( 'ABSPATH' ) or die();
 defined( 'WPINC' ) or die();
 
-/**
-* Plugin-readme Parser
-*
-* Main code - include various functions
-*
-* @package	Pandammonium-Readme-Parser
-*/
 
 define( 'plugin_readme_parser_version', '2.0.0' );
 define( 'plugin_readme_parser_filename', 'plugin-readme-parser' );

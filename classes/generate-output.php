@@ -2,7 +2,7 @@
 /**
  * Generates HTML output from a WordPress plugin readme file.
  *
- * @package Pandammonium-Readme-Parser
+ * @package Pandammonium-ReadmeParser-GenerateOutput
  * @author dartiss, pandammonium
  * @since 1.0
  * @since 2.0.0 Converts the file to a class.

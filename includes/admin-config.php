@@ -4,7 +4,7 @@
  *
  * Various functions relating to the various administration screens
  *
- * @package Pandammonium-Readme-Parser
+ * @package Pandammonium-ReadmeParser-AdminConfig
  */
 
 // If this file is called directly, abort:

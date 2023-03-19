@@ -2,7 +2,7 @@
 /**
  * Handles errors.
  *
- * @package Pandammonium-Readme-Parser
+ * @package Pandammonium-ReadmeParser-Exceptions
  * @author pandammonium <internet@pandammonium.org>
  * @since 2.0.0
  *
