@@ -71,7 +71,7 @@ if ( !function_exists( 'prp_log' ) ) {
    * @param bool $echo Forces the message name and message to be displayed on
    * the web page; overrides WP_DEBUG_DISPLAY. The default is false, the
    * message name and message will not be displayed on the web page.
-   * @throws none.
+   * @throws none
    * @return string The fully constructed and formatted message.
    */
   function prp_log( string $message_name, mixed $message = '', bool $error = false, bool $echo = false ): string {
@@ -80,7 +80,7 @@ if ( !function_exists( 'prp_log' ) ) {
     $debug_logfile = defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG;
     $debug_display = defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
 
-    // prp_print_debug_status( $debugging, $debug_logfile, $debug_display, $error, $echo );
+    prp_print_debug_status( $debugging, $debug_logfile, $debug_display, $error, $echo );
 
     $header = ( '' === $message_name ) ? '' : $message_name;
     $divider = ( '' === $message ) ? '' : ': ';
@@ -198,9 +198,9 @@ if ( !function_exists( 'prp_log_truncated_line' ) ) {
    * @since 2.0.0
    *
    * @param string $line The line of text to be truncated.
-   * @param The $line_number line number, if there is one (e.g. the $line is
+   * @param $line_number The line number, if there is one (e.g. the $line is
    * taken from a file).
-   * @throws none.
+   * @throws none
    * @return void
    */
   function prp_log_truncated_line( string $line, int $line_number = -1 ): void {
@@ -308,7 +308,7 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
    *
    * @param string $content The readme file content.
    * @param string $exceptions The shortcodes to keep active.
-   * @throws none.
+   * @throws none
    * @return string The readme file content or an error message.
    */
   function prp_toggle_global_shortcodes( string $content ): string {
