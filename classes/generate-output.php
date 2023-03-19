@@ -38,54 +38,350 @@ if ( !class_exists( 'Generate_Output' ) ) {
    */
   class Generate_Output {
 
+    /**
+     * @var string|string[]|null Stores the parameters from the shortcode.
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
     private string|array|null $parameters;
-    private $content;
+    /**
+     * @var string Stores the text that will be displayed. If all or part of
+     * the readme file is to be displayed (`[readme]`), then the content is
+     * the HTML obtained from the conversion of the readme markdown plus a
+     * wrapper around it. If selected information only is to be displayed
+     * (`[readme_info`]), then the content is the text taken from between the
+     * two shortcode tags.
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private string $content;
 
+    /**
+     * @var string[] Stores each line of the readme file in its members. Its contents come from `$this->file_data`.
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
     private array $file_array;
+    /**
+     * @var string The contents of the readme file in one long string. Its
+     * contents are split into `$this->file_array`.
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
     private array $file_data;
 
-    private $plugin_url;
-    private $plugin_name;
-    private $plugin_title;
+    /**
+     * @var string The WordPress URL of the plugin gleaned from the name of
+     * the plugin, which is obtained from the $content passed in with the `[readme]` shortcode.
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private string $plugin_url;
+    /**
+     * @var string The name of the plugin formatted for use in URLs, etc.
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private string $plugin_name;
+    /**
+     * @var string The name of the plugin formatted for use in display text.
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private string $plugin_title;
 
-    private $cache;
-    private $cache_key;
+    /**
+     * @var string The length of time the cache will be valid for in minutes.
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private string $cache_expiry;
+    /**
+     * @var string The key used to identify each cache.
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private string $cache_key;
 
-    private $exclude;
-    private $include;
-    private $hide;
-    private $links;
-    private $ignore;
-    private $mirror;
-    private $nofollow;
-    private $version;
-    private $target;
-    private $download;
-    private $metadata;
+    /**
+     * @var string Stores the value of the `exclude` parameter, which
+     * indicates which readme sections should be excluded from display. May
+     * not co-occur with `$this->include`. If this parameter is used in the
+     * `[readme]` shortcode, only those sections not listed will be displayed.
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private string $exclude;
+    /**
+     * @var string Stores the value of the `include` parameter, which
+     * indicates which readme sections should be included in the display. May
+     * not co-occur with `$this->exclude`. If this parameter is used in the
+     * `[readme]` shortcode, only those sections listed will be displayed.
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private string $include;
+    /**
+     * @var string The readme sections to hide in the display. They will
+     * appear when clicked. Only functional when the Simple Content Reveal
+     * Plugin is installed and activated.
+     * @access private
+     *
+     * @link https://wordpress.org/plugins/simple-content-reveal/ The Simple
+     * Content Reveal plugin
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     * @deprecated 2.0.0 The Simple Content Reveal plugin has been closed
+     * since 23 January 2018.
+     */
+    private string $hide;
+    /**
+     * @var string Stores the value of the `links` parameter, which indicates
+     * where the links section should be placed. By default, the links are
+     * placed at the very end of the readme; setting the `links` to any
+     * section title will cause the links to be displayed immediately before
+     * that section.
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private string $links;
+    /**
+     * @var string[]|string Stores the value of the `ignore` parameter,
+     * which indicates which specific lines should not be displayed.
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private array|string $ignore;
+    /**
+     * @var string[]|string Stores the value of the `mirror` parameter,
+     * which gives the locations of locations, other than the WordPress plugin
+     * directory, where the plugin may be downloaded from.
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private array|string $mirror;
+    /**
+     * @var string If the `nofollow` parameter is given in the shortcode, this
+     * stores the HTML nofollow attribute. If that parameter is not given,
+     * this will be an ampty string.
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private string $nofollow;
+    /**
+     * @var string Stores the value of the `version` parameter, which, when
+     * present, indicates a specific version of the readme to display.
+     * Currently doesn't work.
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private string $version;
+    /**
+     * @var string Stores the value of the `target` parameter, which indicates the value that should be used as the value of the target attribute in the HTML tag `<a>`.
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     * @deprecated 2.0.0 The `target` attribute is not recommended in modern
+     * HTML due to security and privacy concerns, so the `target` parameter is
+     * deprecated and will be removed in a future version; it will be replaced
+     * by a parameter that allows the user to set the `rel` attribute to
+     * `nopener` or `noreferrer`.
+     * @link https://html.spec.whatwg.org/multipage/links.html#link-type-noreferrer
+     * @link https://html.spec.whatwg.org/multipage/links.html#link-type-noopener
+     */
+    private string $target;
+    /**
+     * @var string
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private string $download;
+    /**
+     * @var string[]|string
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private array|string $metadata;
 
-    private $show_links;
-    private $show_head;
-    private $show_meta;
+    /**
+     * @var bool
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private bool $show_links;
+    /**
+     * @var bool
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private bool $show_head;
+    /**
+     * @var bool
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private bool $show_meta;
 
-    private $head_explicitly_excluded;
-    private $head_explicitly_included;
-    private $meta_explicitly_excluded;
-    private $meta_explicitly_included;
+    /**
+     * @var bool
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private bool $head_explicitly_excluded;
+    /**
+     * @var bool
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private bool $head_explicitly_included;
+    /**
+     * @var bool
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private bool $meta_explicitly_excluded;
+    /**
+     * @var string
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private bool $meta_explicitly_included;
 
-    private $section;
-    private $prev_section;
-    private $last_line_blank;
-    private $div_written;
-    private $add_to_output;
-    private $code;
-    private $file_combined;
+    /**
+     * @var string
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private string $section;
+    /**
+     * @var string
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private string $prev_section;
+    /**
+     * @var bool
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private bool $last_line_blank;
+    /**
+     * @var bool
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private bool $div_written;
+    /**
+     * @var bool
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private bool $add_to_output;
+    /**
+     * @var string
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private string $code;
+    /**
+     * @var string
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private string $file_combined;
 
-    private $my_html;
+    /**
+     * @var string
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private string $my_html;
 
-    private $name;
-    private $data;
+    /**
+     * @var string
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private string $name;
+    /**
+     * @var string
+     * @access private
+     *
+     * @author pandammonium
+     * @since 2.0.0
+     */
+    private string $data;
 
-    private const WP_REPO_URL = '';
     private const WP_PLUGIN_DIR_URL = 'https://plugins.svn.wordpress.org/';
     private const WP_DOWNLOAD_DIR_URL = 'https://downloads.wordpress.org/plugin/';
     private const WP_PLUGIN_PAGE_URL = 'https://wordpress.org/extend/plugins/';
@@ -93,7 +389,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private const LINE_END = "\r\n";
 
-    private const STR_LEN = 30;
+    // private const STR_LEN = 30;
 
     private const QUOTES = array(
      '“' => '',
@@ -131,14 +427,14 @@ if ( !class_exists( 'Generate_Output' ) ) {
      *
      * Function to output the results of the readme
      *
-     * @uses   display_links     Show the links section
-     * @uses   $this->get_file      Fetch file
-     * @uses   prp_get_readme      Fetch the readme
-     * @uses   prp_get_section_name  Get the name of the current section
-     * @uses   this->get_list      Extract a list
-     * @uses   $this->is_it_excluded    Check if the current section is excluded
-     * @uses   format_list      Strip a user or tag list and add links
-     * @uses   // prp_log             Output debug info to the WP error log
+     * @uses display_links Show the links section
+     * @uses get_file Fetch file
+     * @uses prp_get_readme Fetch the readme
+     * @uses prp_get_section_name Get the name of the current section
+     * @uses get_list Extract a list
+     * @uses is_it_excluded Check if the current section is excluded
+     * @uses format_list Strip a user or tag list and add links
+     * @uses prp_log Output debug info to the WP error log
      *
      * @param string $content readme filename
      * @param string $paras Parameters
@@ -172,7 +468,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
           $this->determine_show_head();
           $this->determine_show_links( $links );
           // prp_log( 'exclude', $this->exclude );
-          // prp_log( 'cache', $cache );
+          // prp_log( 'cache expiry', $cache_expiry );
           // prp_log( 'content', $content );
           // prp_log( 'hide', $hide );
           // prp_log( 'ignore', $ignore );
@@ -209,7 +505,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
             // Send the resultant code back, plus encapsulating DIV and version comments. Use double quotes to permit linebreaks ("\n")
 
-            $this->content = "\n<!-- " . plugin_readme_parser_name . " v" . plugin_readme_parser_version . " -->\n<div class=\"np-notepad\">" . $this->my_html . "</div>\n<!-- End of " . plugin_readme_parser_name . " code -->\n";
+            $this->content = "\n<!-- " . plugin_readme_parser_name . " v" . plugin_readme_parser_version . " -->\n<div class=\"np-notepad\">" . $this->my_html . "</div>\n<!-- End of " . plugin_readme_parser_name . " -->\n";
 
             // Cache the results
 
@@ -244,7 +540,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
      *
      * Function to output a piece of requested readme information
      *
-     * @uses   prp_get_readme      Fetch the readme file
+     * @uses prp_get_readme Fetch the readme file
      *
      * @param string[] $para Parameters
      * @param string $content Post content
@@ -639,7 +935,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       $this->plugin_name = '';
       $this->plugin_title = '';
 
-      $this->cache = '';
+      $this->cache_expiry = '';
       $this->cache_key = '';
       $this->exclude = '';
       $this->include = '';
@@ -1057,7 +1353,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       $cached_info = array();
       try {
-        if ( is_numeric( $this->cache ) ) {
+        if ( is_numeric( $this->cache_expiry ) ) {
           if ( false === $save_this_content ) {
             $cached_info = array(
               'name'    => $this->plugin_name,
@@ -1069,7 +1365,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
           $transient = get_transient( $this->cache_key );
           if ( false === $transient ) {
             // prp_log( 'attempting to create new cache ' . $this->cache_key );
-            $result = set_transient( $this->cache_key, $cached_info, 60 * $this->cache );
+            $result = set_transient( $this->cache_key, $cached_info, 60 * $this->cache_expiry );
             // prp_log( 'new cache ' . $this->cache_key . ' created', $result ? true : false );
           } else {
             // Don't fail if the cache already exists
@@ -1077,8 +1373,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
             $result = true;
           }
         } else {
-          if ( 'no' !== strtolower( $this->cache ) ) {
-            throw new PRP_Exception( 'Cache expiration is invalid. Expected integer; got ' . gettype( $this->cache ) . ' ' . $this->cache, PRP_Exception::PRP_ERROR_BAD_CACHE );
+          if ( 'no' !== strtolower( $this->cache_expiry ) ) {
+            throw new PRP_Exception( 'Cache expiration is invalid. Expected integer; got ' . gettype( $this->cache_expiry ) . ' ' . $this->cache_expiry, PRP_Exception::PRP_ERROR_BAD_CACHE );
           // } else {
           //   prp_log( 'cache not in use' );
           }
@@ -1094,26 +1390,26 @@ if ( !class_exists( 'Generate_Output' ) ) {
       }
     }
 
-    private function get_cache( string $cache_key, string $cache ): bool|array|string {
+    private function get_cache( string $cache_key, string $cache_expiry ): bool|array|string {
 
       // prp_log( 'method', __CLASS__ . '::' . __FUNCTION__ );
       // prp_log( 'arguments', func_get_args() );
 
       // $result = false;
-      $this->cache = $cache;
+      $this->cache_expiry = $cache_expiry;
       $this->cache_key = $cache_key;
       // prp_log( 'looking for cache', $this->cache_key );
 
-      if ( is_numeric( $this->cache ) ) {
-        // prp_log( 'expiry time for cache ' . $this->cache_key . ' (minutes)', $this->cache );
+      if ( is_numeric( $this->cache_expiry ) ) {
+        // prp_log( 'expiry time for cache ' . $this->cache_key . ' (minutes)', $this->cache_expiry );
         $result = get_transient( $this->cache_key );
         // prp_log( 'found cache ' . $this->cache_key, ( $result ? 'yes' : 'no' ) );
         // prp_log( 'cache ' . $this->cache_key . ' contains', $result );
         return $result;
 
       } else {
-        // prp_log( 'expiry time for cache ' . $this->cache_key . ' is invalid', $this->cache );
-        throw new PRP_Exception( 'Cache expiry time is invalid: ' . $this->cache, PRP_Exception::PRP_ERROR_BAD_CACHE );
+        // prp_log( 'expiry time for cache ' . $this->cache_key . ' is invalid', $this->cache_expiry );
+        throw new PRP_Exception( 'Cache expiry time is invalid: ' . $this->cache_expiry, PRP_Exception::PRP_ERROR_BAD_CACHE );
       }
     }
 
@@ -1135,8 +1431,6 @@ if ( !class_exists( 'Generate_Output' ) ) {
       // prp_log( 'plugin url', $plugin_url );
 
       // Work out URL and fetch the contents
-
-      // $plugin_url = 'example-plugin'; // for testing purposes
 
       if ( strpos( $plugin_url, '://' ) === false ) {
         $this->file_data[ 'name' ] = str_replace( ' ', '-', strtolower( $plugin_url ) );
@@ -1434,18 +1728,18 @@ if ( !class_exists( 'Generate_Output' ) ) {
      * The meta data is the labelled data, such as tags, licence
      * and contributors. It is added to the output if one of the
      * following is true:
-     * * $show_head === $show_meta === true
-     * * $show_head === false and $show_meta === true.
+     * * `$show_head === $show_meta === true`
+     * * `$show_head === false and $show_meta === true`.
      *
      * The summary is added to the output if one of the following
      * is true:
-     * * $show_head === $show_meta === true
-     * * $show_head === true and $show_meta === false.
+     * * `$show_head === $show_meta === true`
+     * * `$show_head === true and $show_meta === false`.
      *
      * @author pandammonium
-     * @since 2.0.0 Abstracted from Generate_Output.
+     * @since 2.0.0
      *
-     * @param int $i The number of the
+     * @param int $i The index into `$this->file_array` that should be parsed.
      * @return bool True if this line should be added to the
      * output, otherwise false.
      */
@@ -1710,7 +2004,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       $pos = strpos( strtolower( $this->plugin_url ), WP_PLUGIN_DIR_URL . '/' );
       if ( 0 === $pos ) {
-        throw new PRP_Exception( 'The URL is missing the plugin name: <samp>' . substr( $this->plugin_url, $pos, strlen( $repo ) ) . '&lt;plugin-name&gt;/</samp>', PRP_Exception::PRP_ERROR_BAD_URL );
+        throw new PRP_Exception( 'The URL is missing the plugin name: <samp>' . substr( $this->plugin_url, $pos, strlen( WP_PLUGIN_DIR_URL ) ) . '&lt;plugin-name&gt;/</samp>', PRP_Exception::PRP_ERROR_BAD_URL );
       }
 
       $file_return = array();
