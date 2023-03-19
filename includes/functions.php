@@ -16,6 +16,7 @@
  *
  * @todo Sort out the calls to prp_log().
  * @todo Improve the documentation wrt PHPDoc.
+ * @todo Consider converting to a class.
  */
 
 // If this file is called directly, abort:
@@ -24,7 +25,7 @@ defined( 'WPINC' ) or die();
 
 if ( !defined( 'WP_PLUGIN_DIR_URL' ) ) {
   /**
-   * The base URL for the WordPress SVN server for plugins.
+   * @const string The base URL for the WordPress SVN server for plugins.
    *
    * @author pandammonium
    * @since 2.0.0
@@ -33,7 +34,7 @@ if ( !defined( 'WP_PLUGIN_DIR_URL' ) ) {
 }
 if ( !defined( 'WP_USER_DIR_URL' ) ) {
   /**
-   * The base URL for WordPress user profiles.
+   * @const string The base URL for WordPress user profiles.
    *
    * @author pandammonium
    * @since 2.0.0
@@ -42,7 +43,7 @@ if ( !defined( 'WP_USER_DIR_URL' ) ) {
 }
 if ( !defined( 'WP_PLUGIN_TAGS_URL' ) ) {
   /**
-   * The base URL for WordPress plugin tags.
+   * @const string The base URL for WordPress plugin tags.
    *
    * @author pandammonium
    * @since 2.0.0
@@ -61,6 +62,9 @@ if ( !function_exists( 'prp_log' ) ) {
    *
    * @author pandammonium
    * @since 2.0.0
+   *
+   * @uses prp_print_debug_status()
+   * @uses prp_get_wp_error_string()
    *
    * @param string message_name  A name to associate with the message. This is
    * useful if logging multiple messages.
@@ -279,9 +283,9 @@ if ( !function_exists( 'prp_check_img_exists' ) ) {
    * an empty string, and will be removed from future versions of this plugin.
    *
    * @param string $filename The filename minus its extension.
-   * @param string $ext The file extension.
+   * @param string $ext The file extension, including the dot.
    * @throws E_USER_DEPRECATED to indicate that this function is deprecated.
-   * @return false.
+   * @return false
    */
   function prp_check_img_exists( string $filename, string $ext ): false {
     trigger_error( 'It is not possible to determine whether image files exist on the WordPress SVN server or not, therefore ' . __FUNCTION__ . '() is deprecated and has no effect on the output', E_USER_DEPRECATED );
@@ -305,6 +309,8 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
    * @since 2.0.0
    * @link https://wordpress.stackexchange.com/a/115176 Stack Exchange was used
    * to inform the implementation of this function.
+   *
+   * @uses PRP_Exception
    *
    * @param string $content The readme file content.
    * @param string $exceptions The shortcodes to keep active.
