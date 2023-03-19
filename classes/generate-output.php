@@ -1890,7 +1890,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
      */
     function readme_parser( string|array|null $paras = null, string $content = '' ): string {
 
-      prp_log( 'shortcode function', __FUNCTION__ );
+      // prp_log( 'shortcode function', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       try {
         global $generator;
@@ -1911,6 +1912,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
     function readme_info(array $paras = array(), string $content = '' ): string {
 
       // prp_log( 'shortcode function', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       try {
         global $generator;
@@ -1934,7 +1936,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
      */
     function readme_banner( string|array|null $paras = null, string $content = null ): string {
 
-      prp_log( 'shortcode function', __FUNCTION__ );
+      // prp_log( 'shortcode function', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       try {
         global $generator;
