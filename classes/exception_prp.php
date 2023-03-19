@@ -10,6 +10,7 @@
  * Exception classes.
  * @todo Check any chained exceptions use the third argument of the
  * constructor.
+ * @todo Thoroughly test every instance of use.
  */
 
 // If this file is called directly, abort:
