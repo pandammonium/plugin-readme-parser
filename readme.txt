@@ -1,14 +1,14 @@
 === Plugin-readme Parser ===
-Contributors: pandammonium, dartiss
+Contributors: dartiss, pandammonium
 Tags: embed, markdown, parser, plugin, readme
 Requires at least: 4.6
-Tested up to: 6.1.1
+Tested up to: 6.1
 Requires PHP: 8.0
 Stable tag: 2.0.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-📑 Embed readme content into posts
+Embeds WordPress plugin readme content into a WP post, page, etc.
 
 == Description ==
 
@@ -29,9 +29,9 @@ Key features include:
 * Google Translation suppressed on code output
 * And much, much more!
 
-Iconography is courtesy of the very talented [Janki Rathod](https://www.fiverr.com/jankirathore) ♥️
+Iconography is courtesy of the very talented [Janki Rathod](https://www.fiverr.com/jankirathore)
 
-👉 Please visit the [Github page](https://github.com/pandammonium/plugin-readme-parser "Github") for the latest code development, planned enhancements and known issues 👈
+Please visit the [Github page](https://github.com/pandammonium/plugin-readme-parser "Github") for the latest code development, planned enhancements and known issues
 
 == Getting Started ==
 
@@ -148,11 +148,7 @@ This may be of particular use to plugin developers because it allows the readme 
 
 == Displaying the plugin banner ==
 
-Some plugins have banners assigned to them. The shortcode `[readme_banner]` can be used to output these banners (responsively). Between the opening and closing shortcode you must specify a plugin name (a URL can't be used) and that's it. For example:
-
-`[readme_banner]YouTube Embed[/readme_banner]`
-
-If no banner image exists then nothing will be output.
+Displaying the plugin banner has been made obsolete because the plugin does not have access to the WordPress server where they are stored. USe of the 'readme_banner' shortcode will result in an error.
 
 == Display specific readme information ==
 
@@ -200,7 +196,7 @@ Each section that has a `<div>` around it with a `class` of `np-` followed by th
 
 The download link has an additional `<div>` around it with a `class` of `np-download-link`.
 
-Each of these `div`'s can therefore be styled using your theme stylesheet.
+Each of these `div`s can therefore be styled using your theme stylesheet.
 
 == Changelog ==
 
@@ -208,15 +204,15 @@ Semantic versioning is used, with the first release being 1.0.
 
 = 2.0.0 =
 
-The original plugin has been forked and is now maintained by [Caity Ross](https://pandammonium.org/).
+[The original plugin](https://github.com/dartiss/plugin-readme-parser) has been forked; this forked version is maintained by [Caity Ross](https://pandammonium.org/).
 
-* Bug: updates markdown library; the old version broke the plugin when running on more recent versions of PHP.
-* Bug: corrects variable name; a typo led to a broken plugin in certain circumstances.
-* Bug: removes display of screenshots and banners because they aren't accessible from the plugin.
-* Bug: fixes non-display of 'Upgrade Notice' when explicitly included.
+* Bug fix: updates markdown library; the old version broke the plugin when running on more recent versions of PHP.
+* Bug fix: corrects variable name; a typo led to a broken plugin in certain circumstances.
+* Bug fix: removes display of screenshots and banners because they aren't accessible from the plugin. The 'readme_banner' shortcode is now obsolete, and displays an error message if used; it will be removed from a later version.
+* Bug fix: fixes non-display of 'Upgrade Notice' when explicitly included.
 * Enhancement: adds support for block themes.
-* Enhancement: changes behaviour of parameter include="meta,…". If this parameter is specified, it is changed to include="head,…"; without this change, no meta data at all would be output. An error message is written to the WordPress error log to tell the user about the change.
-* Enhancement: refactors the code to reduce function size; moved most code into a class.
+* Enhancement: changes behaviour of parameter include="meta,…". If this parameter is specified, it is changed to include="head,…"; without this change, no meta data at all would be output. A message indicating the change is written to the WordPress error log.
+* Enhancement: refactors the code to reduce function size; moves most code into a class.
 * Enhancement: uses exceptions and the WP_Error class to handle errors.
 
 [Previous version history](https://plugins.trac.wordpress.org/browser/plugin-readme-parser/trunk/changelog.txt)

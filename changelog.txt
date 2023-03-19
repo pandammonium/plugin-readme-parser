@@ -1,5 +1,7 @@
 == Changelog ==
 
+The following changes were made in [the original plugin](https://github.com/dartiss/plugin-readme-parser) by [dartiss](https://github.com/dartiss).
+
 = 1.3.7 =
 * Maintenance: Removed donation links
 
