@@ -1308,8 +1308,8 @@ if ( !class_exists( 'Generate_Output' ) ) {
      */
     function toggle_global_shortcodes(): bool|string {
 
-      prp_log( 'method', __FUNCTION__ );
-      prp_log( 'arguments', func_get_args() );
+      // prp_log( 'method', __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       // try {
         $result = prp_toggle_global_shortcodes( $this->content );
