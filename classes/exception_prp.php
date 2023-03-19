@@ -31,7 +31,8 @@ if ( !class_exists( 'PRP_Exception' ) ) {
     public const PRP_ERROR_BAD_URL = 203;
     public const PRP_ERROR_BAD_DATA = 204;
     public const PRP_ERROR_BAD_CACHE = 205;
-    private $error_code;
+    public const PRP_ERROR_DEPRECATED = 205;
+    protected $code;
 
     /**
      * This method is called when a new exception object is created. It is
@@ -39,10 +40,10 @@ if ( !class_exists( 'PRP_Exception' ) ) {
      */
     public function __construct( $message, $code = PRP_ERROR_UNKNOWN, Throwable $previous = null ) {
       parent::__construct($message, $code, $previous);
-      $this->set_error_code( $code );
+      $this->set_code( $code );
     }
 
-    private function set_error_code( $code ): void {
+    private function set_code( $code ): void {
       switch( $code ) {
         case self::PRP_ERROR_UNKNOWN:
         case self::PRP_ERROR_BAD_INPUT:
@@ -50,24 +51,29 @@ if ( !class_exists( 'PRP_Exception' ) ) {
         case self::PRP_ERROR_BAD_URL:
         case self::PRP_ERROR_BAD_DATA:
         case self::PRP_ERROR_BAD_CACHE:
-          $this->error_code = $code;
+          $this->code = $code;
         break;
         case self::PRP_ERROR_NONE:
-          $this->error_code = $code;
+          $this->code = $code;
           throw new InvalidArgumentException( 'Code ' . $code . ' indicates there is no ' . __CLASS__ . ' error' );
-          break;
+        break;
+        case self::PRP_ERROR_DEPRECATED:
+        case E_USER_DEPRECATED:
+          $this->code = self::PRP_ERROR_DEPRECATED;
+          trigger_error( plugin_readme_parser_name . ': ' . wp_strip_all_tags( $this->get_prp_message() ), E_USER_DEPRECATED );
+        break;
         default:
-          $this->error_code = self::PRP_ERROR_UNKNOWN;
+          $this->code = self::PRP_ERROR_UNKNOWN;
           throw new InvalidArgumentException( 'Code ' . $code . ' is not an error code used in ' . __CLASS__ );
         break;
       }
     }
 
-    private function get_error_code(): int {
-      return $this->error_code;
+    private function get_code(): int {
+      return $this->code;
     }
 
-    public static function get_error_code_as_string( int $code ): string {
+    public static function get_code_as_string( int $code ): string {
       switch( $code ) {
         case self::PRP_ERROR_UNKNOWN:
         return 'Unknown error';
@@ -81,37 +87,10 @@ if ( !class_exists( 'PRP_Exception' ) ) {
         return 'Bad data';
         case self::PRP_ERROR_BAD_CACHE:
         return 'Bad cache';
+        case self::PRP_ERROR_DEPRECATED:
+        return 'Deprecated';
         case self::PRP_ERROR_NONE:
         return 'None';
-        default:
-          throw new InvalidArgumentException( 'Invalid error code used in ' . __CLASS__ );
-        break;
-      }
-    }
-
-    public static function set_error_code_as_string( string $code ): void {
-      switch( $code ) {
-        case 'Unknown error':
-          $this->set_error_code( self::PRP_ERROR_UNKNOWN );
-        break;
-        case 'Bad input':
-          $this->set_error_code( self::PRP_ERROR_BAD_INPUT );
-        break;
-        case 'Bad file':
-          $this->set_error_code( self::PRP_ERROR_BAD_FILE );
-        break;
-        case 'Bad URL':
-          $this->set_error_code( self::PRP_ERROR_BAD_URL );
-        break;
-        case 'Bad data':
-          $this->set_error_code( self::PRP_ERROR_BAD_DATA );
-        break;
-        case 'Bad cache':
-          $this->set_error_code( self::PRP_ERROR_BAD_CACHE );
-        break;
-        case 'None':
-          $this->set_error_code( self::PRP_ERROR_NONE );
-        break;
         default:
           throw new InvalidArgumentException( 'Invalid error code used in ' . __CLASS__ );
         break;
@@ -219,7 +198,7 @@ if ( !class_exists( 'PRP_Exception' ) ) {
       if ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) &&
            ( defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) ) {
         error_log( self::PRP_PREFIX .
-          "ERROR " . print_r( $this->get_error_code(), true ) .
+          "ERROR " . print_r( $this->get_code(), true ) .
           " " . print_r( $this->get_prp_message_stripped_of_tags(), true ) );
         error_log( self::PRP_PREFIX .
           "in " . print_r( $this->get_prp_file() .
@@ -231,6 +210,11 @@ if ( !class_exists( 'PRP_Exception' ) ) {
       if ( $previous ) {
         $display .= '<p><span class="error">' . plugin_readme_parser_name . '</span>: ' . print_r( 'ERROR ' . $previous->get_prp_code(), true ) . ' ' . print_r( $previous->get_prp_message(), true ) . '.</p>';
           }
+      $delim = ':';
+      $pos = strpos( $display, $delim );
+      if ( false !== $pos ) {
+        $display = '<b>' . str_replace( $delim, $delim . '</b>', $display );
+      }
 
       return print_r( $display, true );
     }

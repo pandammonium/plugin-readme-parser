@@ -247,17 +247,19 @@ if ( !function_exists( 'prp_check_img_exists' ) ) {
    *
    * @author dartiss, pandammonium
    * @since 1.2
-   * @deprecated 2.0.0 This function is obsolete because resulted
+   * @deprecated 2.0.0 This function is obsolete because it resulted
    * in an HTTP 403 (Forbidden) error from the WordPress SVN
    * server. It currently returns an empty strings, and will be
    * removed from future versions of this plugin.
    *
    * @param string $filename The filename minus its extension.
    * @param string $ext The file extension.
-   * @return string An empty string.
+   * @throws E_USER_DEPRECATED to indcicate that this function is deprecated.
+   * @return false.
    */
-  function prp_check_img_exists( string $filename, string $ext ): string {
-    return '';
+  function prp_check_img_exists( string $filename, string $ext ): false {
+    trigger_error( 'It is not possible to determine whether image files exist on the WordPress SVN server or not, therefore ' . __FUNCTION__ . '() is deprecated and has no effect on the output', E_USER_DEPRECATED );
+    return false;
   }
 }
 
