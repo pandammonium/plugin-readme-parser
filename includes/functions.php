@@ -81,7 +81,7 @@ if ( !function_exists( 'prp_log' ) ) {
     $debug_logfile = defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG;
     $debug_display = defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
 
-    prp_print_debug_status( $debugging, $debug_logfile, $debug_display, $error, true );
+    // prp_print_debug_status( $debugging, $debug_logfile, $debug_display, $error, $echo );
 
     $header = ( '' === $message_name ) ? '' : $message_name;
     $divider = ( '' === $message ) ? '' : ': ';
