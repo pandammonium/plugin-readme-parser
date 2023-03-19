@@ -7,12 +7,12 @@
  * @package Pandammonium-Readme-Parser
  * @author dartiss, pandammonium
  * @since 1.2
- * @since 2.0.0 Wraps each function definition inside a check for
- * its existence. Moves some functions into Generate_Output.
- * Enhances the documentation to meet the PHPDoc specification.
- * Removes code to do with obtaining images from the WordPress SVN
- * server, to which access from the plugin is forbidden. Improves
- * error handling by using exceptions and WP_Error objects.
+ * @since 2.0.0 Wraps each function definition inside a check for its
+ * existence. Moves some functions into Generate_Output. Enhances the
+ * documentation to meet the PHPDoc specification. Removes code to do with
+ * obtaining images from the WordPress SVN server, to which access from the
+ * plugin is forbidden. Improves error handling by using exceptions and
+ * WP_Error objects.
  *
  * @todo Sort out the calls to prp_log().
  * @todo Improve the documentation wrt PHPDoc.
@@ -52,29 +52,28 @@ if ( !defined( 'WP_PLUGIN_TAGS_URL' ) ) {
 
 
 if ( !function_exists( 'prp_log' ) ) {
-/**
- * Prints a message to the debug log file or to the web page.
- *
- * The message is sent to the error log if the WordPress debug
- * constants (defined in wp-config.php) permit it; likewise to the
- * display. Errors are displayed if the function is instructed to
- * echo the output.
- *
- * @author pandammonium
- * @since 2.0.0
- *
- * @param string message_name  A name to associate with the
- * message. This is useful if logging multiple messages.
- * @param mixed $message The message to be logged.
- * @param bool $error Whether the message is about an error or not.
- * Default is false, the message is not about an error. True if the
- * message is about an error.
- * @param bool $echo Forces the message name and message to be
- * displayed on the web page; overrides WP_DEBUG_DISPLAY. Default
- * is false, the message name and message will not be displayed on
- * the web page.
- * @return string The fully constructed and formatted message.
- */
+  /**
+   * Prints a message to the debug log file or to the web page.
+   *
+   * The message is sent to the error log if the WordPress debug constants
+   * (defined in wp-config.php) permit it; likewise to the display. Errors are
+   * displayed if the function is instructed to echo the output.
+   *
+   * @author pandammonium
+   * @since 2.0.0
+   *
+   * @param string message_name  A name to associate with the message. This is
+   * useful if logging multiple messages.
+   * @param mixed $message The message to be logged.
+   * @param bool $error Whether the message is about an error or not. The
+   * default is false, the message is not about an error. True if the message
+   * is about an error.
+   * @param bool $echo Forces the message name and message to be displayed on
+   * the web page; overrides WP_DEBUG_DISPLAY. The default is false, the
+   * message name and message will not be displayed on the web page.
+   * @throws none.
+   * @return string The fully constructed and formatted message.
+   */
   function prp_log( string $message_name, mixed $message = '', bool $error = false, bool $echo = false ): string {
 
     $debugging = defined( 'WP_DEBUG' ) && WP_DEBUG;
@@ -160,18 +159,16 @@ if ( !function_exists( 'prp_get_wp_error_string' ) ) {
   /**
    * Returns a pretty-printed string from a WP_Error object.
    *
-   * Returns a string containing the error's code, message and any
-   * data it may have. The string is formatted as HTML, if required.
+   * Returns a string containing the error's code, message and any data it may
+   * have. The string is formatted as HTML, if required.
    *
    * @author pandammonium
    * @since 2.0.0
    *
-   * @param WP_Error $error The error object to get the error
-   * information from.
-   * @param bool $html True to format the output as HTML; false
-   * (default) to omit HTML formatting.
-   * @throws PRP_Exception if the wrong type of object was
-   * provided.
+   * @param WP_Error $error The error object to get the error information from.
+   * @param bool $html True to format the output as HTML; false (default) to
+   * omit HTML formatting.
+   * @throws PRP_Exception if the wrong type of object was provided.
    * @return string A pretty-printed string from the WP_Error.
    */
   function prp_get_wp_error_string( WP_Error $error, bool $html = false ): string {
@@ -201,7 +198,9 @@ if ( !function_exists( 'prp_log_truncated_line' ) ) {
    * @since 2.0.0
    *
    * @param string $line The line of text to be truncated.
-   * @param The $line_number line number, if there is one (e.g. the $line is taken from a file).
+   * @param The $line_number line number, if there is one (e.g. the $line is
+   * taken from a file).
+   * @throws none.
    * @return void
    */
   function prp_log_truncated_line( string $line, int $line_number = -1 ): void {
@@ -221,6 +220,24 @@ if ( !function_exists( 'prp_log_truncated_line' ) ) {
 }
 
 if( !function_exists( 'prp_print_debug_status' ) ) {
+  /**
+   * Prints the debug status.
+   *
+   * Prints the debug status to the display, if $echo is true. Always prints to
+   * the error_log. PRinting to each is dependent on the WordPress settings in
+   * wp-config.php.
+   *
+   * For debug use only.
+   *
+   * @author pandammonium
+   * @since 2.0.0
+   *
+   * @param string $line The line of text to be truncated.
+   * @param The $line_number line number, if there is one (e.g. the $line is
+   * taken from a file).
+   * @throws none.
+   * @return void
+   */
   function prp_print_debug_status( bool $debugging, bool $debug_logfile, bool $debug_display, bool $error, bool $echo = false ) {
 
     if ( $echo ) {
@@ -247,14 +264,13 @@ if ( !function_exists( 'prp_check_img_exists' ) ) {
    *
    * @author dartiss, pandammonium
    * @since 1.2
-   * @deprecated 2.0.0 This function is obsolete because it resulted
-   * in an HTTP 403 (Forbidden) error from the WordPress SVN
-   * server. It currently returns an empty strings, and will be
-   * removed from future versions of this plugin.
+   * @deprecated 2.0.0 This function is obsolete because it resulted in an HTTP
+   * 403 (Forbidden) error from the WordPress SVN server. It currently returns
+   * an empty string, and will be removed from future versions of this plugin.
    *
    * @param string $filename The filename minus its extension.
    * @param string $ext The file extension.
-   * @throws E_USER_DEPRECATED to indcicate that this function is deprecated.
+   * @throws E_USER_DEPRECATED to indicate that this function is deprecated.
    * @return false.
    */
   function prp_check_img_exists( string $filename, string $ext ): false {
@@ -265,26 +281,27 @@ if ( !function_exists( 'prp_check_img_exists' ) ) {
 
 if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
   /**
-   * Toggle the shortcodes so that any shortcodes in the readme file
-   * aren't expanded. Expanded shortcodes in the readme files cause
-   * problems if they're used to provide examples of use of the
-   * plugin's shortcode.
+   * Toggle the shortcodes so that any shortcodes in the readme file aren't
+   * expanded.
    *
-   * Some plugins change this filter’s priority, so clear the
-   * global list of registered shortcodes temporarily, except for
-   * this plugin's readme_info, which is needed.
+   * Expanded shortcodes in the readme files cause problems if they're used to
+   * provide examples of use of the plugin's shortcode.
+   *
+   * Some plugins change this filter’s priority, so clear the global list of
+   * registered shortcodes temporarily, except for this plugin's readme_info,
+   * which is needed.
    *
    * @author pandammonium
    * @since 2.0.0
-   * @link https://wordpress.stackexchange.com/a/115176 Stack
-   * Exchange was used to inform the implementation of this
-   * function.
+   * @link https://wordpress.stackexchange.com/a/115176 Stack Exchange was used
+   * to inform the implementation of this function.
    *
    * @param string $content The readme file content.
    * @param string $exceptions The shortcodes to keep active.
-   * @return string|WP_Error The readme file content.
+   * @throws none.
+   * @return string The readme file content or an error message.
    */
-  function prp_toggle_global_shortcodes( string $content ): string|WP_Error {
+  function prp_toggle_global_shortcodes( string $content ): string {
 
     // prp_log( 'function', __FUNCTION__ );
     // prp_log( 'arguments', func_get_args() );
