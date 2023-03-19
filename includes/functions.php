@@ -14,8 +14,6 @@
  * server, to which access from the plugin is forbidden. Improves
  * error handling by using exceptions and WP_Error objects.
  *
- * @todo Add as many functions as is meaningful into the
- * Generate_Output class.
  * @todo Sort out the calls to prp_log().
  * @todo Improve the documentation wrt PHPDoc.
  */
@@ -83,19 +81,7 @@ if ( !function_exists( 'prp_log' ) ) {
     $debug_logfile = defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG;
     $debug_display = defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
 
-    // error_log( print_r( '  WP_DEBUG:         ' . ($debugging ? 'true' : 'false' ), true ) );
-    // error_log( print_r( '  WP_DEBUG_LOG:     ' . ($debug_logfile ? 'true' : 'false' ), true ) );
-    // error_log( print_r( '  WP_DEBUG_DISPLAY: ' . ($debug_display ? 'true' : 'false' ), true ) );
-    // error_log( print_r( '  error:            ' . ($error ? 'true' : 'false' ), true ) );
-    // error_log( print_r( '  echo:             ' . ($echo ? 'true' : 'false' ), true ) );
-
-    // echo '<pre>' .
-    //   print_r( 'WP_DEBUG:         ' . ($debugging ? 'true' : 'false' ), true ) . '<br>' .
-    //   print_r( 'WP_DEBUG_LOG:     ' . ($debug_logfile ? 'true' : 'false' ), true ) . '<br>' .
-    //   print_r( 'WP_DEBUG_DISPLAY: ' . ($debug_display ? 'true' : 'false' ), true ) . '<hr>' .
-    //   print_r( '$error:           ' . ($error ? 'true' : 'false' ), true ) . '<br>' .
-    //   print_r( '$echo:            ' . ($echo ? 'true' : 'false' ), true ) .
-    //  '</pre>';
+    prp_print_debug_status( $debugging, $debug_logfile, $debug_display, $error, true );
 
     $header = ( '' === $message_name ) ? '' : $message_name;
     $divider = ( '' === $message ) ? '' : ': ';
@@ -231,6 +217,27 @@ if ( !function_exists( 'prp_log_truncated_line' ) ) {
     $line = substr( $line, 0, $line_length ) . ( strlen( $line ) > $line_length ? '…' : '' );
 
     // prp_log( __( $line, plugin_readme_parser_domain ) );
+  }
+}
+
+if( !function_exists( 'prp_print_debug_status' ) ) {
+  function prp_print_debug_status( bool $debugging, bool $debug_logfile, bool $debug_display, bool $error, bool $echo = false ) {
+
+    if ( $echo ) {
+      echo '<pre>' .
+        print_r( 'WP_DEBUG:         ' . ($debugging ? 'true' : 'false' ), true ) . '<br>' .
+        print_r( 'WP_DEBUG_LOG:     ' . ($debug_logfile ? 'true' : 'false' ), true ) . '<br>' .
+        print_r( 'WP_DEBUG_DISPLAY: ' . ($debug_display ? 'true' : 'false' ), true ) . '<br><br>' .
+        print_r( '$error:           ' . ($error ? 'true' : 'false' ), true ) . '<br>' .
+        print_r( '$echo:            ' . ($echo ? 'true' : 'false' ), true ) .
+     '</pre>' . '<hr>';
+    }
+    error_log( print_r( '  WP_DEBUG:         ' . ($debugging ? 'true' : 'false' ), true ) );
+    error_log( print_r( '  WP_DEBUG_LOG:     ' . ($debug_logfile ? 'true' : 'false' ), true ) );
+    error_log( print_r( '  WP_DEBUG_DISPLAY: ' . ($debug_display ? 'true' : 'false' ), true ) );
+    error_log( print_r( '  error:            ' . ($error ? 'true' : 'false' ), true ) );
+    error_log( print_r( '  echo:             ' . ($echo ? 'true' : 'false' ), true ) );
+
   }
 }
 
