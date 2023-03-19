@@ -224,21 +224,31 @@ if( !function_exists( 'prp_print_debug_status' ) ) {
    * Prints the debug status.
    *
    * Prints the debug status to the display, if $echo is true. Always prints to
-   * the error_log. PRinting to each is dependent on the WordPress settings in
+   * the error_log. Printing to each is subject to the WordPress settings in
    * wp-config.php.
    *
-   * For debug use only.
+   * For debug use only; may only be called from inside prp_log();
    *
    * @author pandammonium
    * @since 2.0.0
    *
-   * @param string $line The line of text to be truncated.
-   * @param The $line_number line number, if there is one (e.g. the $line is
-   * taken from a file).
-   * @throws none.
+   * @param bool $debugging True if WP_DEBUG is true, otherwise false.
+   * @param bool $ebug_logfile True if WP_DEBUG_LOG is true, otherwise false.
+   * @param bool $debug_display True if WP_DEBUG_DISPLAY is true, otherwise
+   * false.
+   * @param bool $error True if an error is being logged; otherwise false.
+   * @param bool $echo True if the message is being logged to the display;
+   * otherwise false. Also controls whether the output of this function is sent
+   * to the display or nly to the error log.
+   * @throws none
    * @return void
    */
   function prp_print_debug_status( bool $debugging, bool $debug_logfile, bool $debug_display, bool $error, bool $echo = false ) {
+
+    $trace = debug_backtrace();
+    if ( $trace[ 1 ][ 'function' ] !== 'prp_log' ) {
+      throw new PRP_Exception( __FUNCTION__ . '() must be called from inside prp_log()', E_USER_WARNING );
+    }
 
     if ( $echo ) {
       echo '<pre>' .
