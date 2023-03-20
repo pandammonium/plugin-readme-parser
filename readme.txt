@@ -210,6 +210,7 @@ Semantic versioning is used, with the first release being 1.0.
 * Bug fix: corrects variable name; a typo led to a broken plugin in certain circumstances.
 * Bug fix: removes display of screenshots and banners because they aren't accessible from the plugin. The 'readme_banner' shortcode is now obsolete, and displays an error message if used; it will be removed from a later version.
 * Bug fix: fixes non-display of 'Upgrade Notice' when explicitly included.
+* Bug fix: standardises the quotation marks on the parameters in case the browser or WordPress has created curly ones, which can break the shortcode.
 * Enhancement: adds support for block themes.
 * Enhancement: changes behaviour of parameter include="meta,…". If this parameter is specified, it is changed to include="head,…"; without this change, no meta data at all would be output. A message indicating the change is written to the WordPress error log.
 * Enhancement: refactors the code to reduce function size; moves most code into a class.
