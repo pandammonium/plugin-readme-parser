@@ -2,7 +2,7 @@
 /**
  * Generates HTML output from a WordPress plugin readme file.
  *
- * @package Pandammonium-Readme-Parser
+ * @package Pandammonium-ReadmeParser-GenerateOutput
  * @author dartiss, pandammonium
  * @since 1.0
  * @since 2.0.0 Converts the file to a class.
@@ -2198,7 +2198,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       } catch ( PRP_Exception $e ) {
         return $e->get_prp_nice_error();
       } catch ( Exception $e ) {
-        return plugin_readme_parser_name . ': something went wrong with the <samp><kbd>readme</kbd></samp> shortcode: ERROR ' . print_r( $e->getCode(), true ) . ' '  . print_r( $e->getMessage(), true );
+        return plugin_readme_parser_name . ': something went wrong with the <samp><kbd>readme</kbd></samp> shortcode: ERROR ' . print_r( $e->getCode(), true ) . ' ' . print_r( $e->getMessage() . '.', true );
       }
     }
     add_shortcode( 'readme', 'readme_parser' );
@@ -2219,7 +2219,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
       } catch ( PRP_Exception $e ) {
         return $e->get_prp_nice_error();
       } catch ( Exception $e ) {
-        return plugin_readme_parser_name . ': something went wrong with the <samp><kbd>readme_info</kbd></samp> shortcode: ERROR ' . print_r( $e->getCode(), true ) . ' '  . print_r( $e->getMessage(), true );
+        return plugin_readme_parser_name . ': something went wrong with the <samp><kbd>readme_info</kbd></samp> shortcode: ERROR ' . print_r( $e->getCode(), true ) . ' ' . print_r( $e->getMessage() . '.', true );
       }
     }
     add_shortcode( 'readme_info', 'readme_info' );
@@ -2249,7 +2249,7 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       } catch ( Exception $e ) {
         error_log( 'Exception' );
-        return plugin_readme_parser_name . ': something went wrong with the obsolete <samp><kbd>readme_banner</kbd></samp> shortcode: ERROR ' . print_r( $e->getCode(), true ) . ' '  . print_r( $e->getMessage(), true );
+        return plugin_readme_parser_name . ': something went wrong with the obsolete <samp><kbd>readme_banner</kbd></samp> shortcode: ERROR ' . print_r( $e->getCode(), true ) . ' ' . print_r( $e->getMessage() . '.', true );
       }
       return '';
     }

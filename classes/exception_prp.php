@@ -2,7 +2,7 @@
 /**
  * Handles errors.
  *
- * @package Pandammonium-Readme-Parser
+ * @package Pandammonium-ReadmeParser-Exceptions
  * @author pandammonium <internet@pandammonium.org>
  * @since 2.0.0
  *
@@ -26,19 +26,20 @@ if ( !class_exists( 'PRP_Exception' ) ) {
 
     public const PRP_ERROR_NONE = -1;
     public const PRP_ERROR_UNKNOWN = 100;
-    public const PRP_ERROR_BAD_INPUT = 201;
-    public const PRP_ERROR_BAD_FILE = 202;
-    public const PRP_ERROR_BAD_URL = 203;
-    public const PRP_ERROR_BAD_DATA = 204;
-    public const PRP_ERROR_BAD_CACHE = 205;
-    public const PRP_ERROR_DEPRECATED = 205;
+    public const PRP_ERROR_BAD_INPUT = 200;
+    public const PRP_ERROR_BAD_FILE = 201;
+    public const PRP_ERROR_BAD_URL = 202;
+    public const PRP_ERROR_BAD_DATA = 203;
+    public const PRP_ERROR_BAD_CACHE = 204;
+    public const PRP_ERROR_BAD_CALL = 300;
+    public const PRP_ERROR_DEPRECATED = 400;
     protected $code;
 
     /**
      * This method is called when a new exception object is created. It is
      * used to set the error message and any other properties of the exception.
      */
-    public function __construct( $message, $code = PRP_ERROR_UNKNOWN, Throwable $previous = null ) {
+    public function __construct( $message, $code = self::PRP_ERROR_UNKNOWN, Throwable $previous = null ) {
       parent::__construct($message, $code, $previous);
       $this->set_code( $code );
     }
@@ -51,11 +52,17 @@ if ( !class_exists( 'PRP_Exception' ) ) {
         case self::PRP_ERROR_BAD_URL:
         case self::PRP_ERROR_BAD_DATA:
         case self::PRP_ERROR_BAD_CACHE:
+        case self::PRP_ERROR_BAD_CALL:
           $this->code = $code;
         break;
         case self::PRP_ERROR_NONE:
           $this->code = $code;
           throw new InvalidArgumentException( 'Code ' . $code . ' indicates there is no ' . __CLASS__ . ' error' );
+        break;
+        case self::PRP_ERROR_BAD_CALL:
+        case E_USER_WARNING:
+          $this->code = self::PRP_ERROR_BAD_CALL;
+          trigger_error( plugin_readme_parser_name . ': ' . wp_strip_all_tags( $this->get_prp_message() ), E_USER_WARNING );
         break;
         case self::PRP_ERROR_DEPRECATED:
         case E_USER_DEPRECATED:

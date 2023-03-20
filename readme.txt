@@ -109,7 +109,7 @@ If your plugin is hosted at a number of other locations, you can use `mirror` to
 
 **links**
 
-By default, download and other links will be added to the bottom of the readme output. By specifying a section name with this parameter, the links will appear before that section. For example, to appear before the description you'd use:
+By default, download and other links will be added to the bottom of the readme output. By specifying a section name with this parameter, the links will appear immediately before that section. For example, to appear before the description you'd use:
 
 `[readme links="description"]WP readme Parser[/readme]`
 
