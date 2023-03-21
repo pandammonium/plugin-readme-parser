@@ -31,8 +31,9 @@ if ( !class_exists( 'PRP_Exception' ) ) {
     public const PRP_ERROR_BAD_URL = 202;
     public const PRP_ERROR_BAD_DATA = 203;
     public const PRP_ERROR_BAD_CACHE = 204;
-    public const PRP_ERROR_BAD_CALL = 300;
     public const PRP_ERROR_DEPRECATED = 400;
+    public const PRP_WARNING_BAD_CALL = 300;
+    public const PRP_WARNING_BAD_DATA = 503;
     protected $code;
 
     /**
@@ -52,16 +53,16 @@ if ( !class_exists( 'PRP_Exception' ) ) {
         case self::PRP_ERROR_BAD_URL:
         case self::PRP_ERROR_BAD_DATA:
         case self::PRP_ERROR_BAD_CACHE:
-        case self::PRP_ERROR_BAD_CALL:
+        case self::PRP_WARNING_BAD_CALL:
+        case self::PRP_WARNING_BAD_DATA:
           $this->code = $code;
         break;
         case self::PRP_ERROR_NONE:
           $this->code = $code;
           throw new InvalidArgumentException( 'Code ' . $code . ' indicates there is no ' . __CLASS__ . ' error' );
         break;
-        case self::PRP_ERROR_BAD_CALL:
         case E_USER_WARNING:
-          $this->code = self::PRP_ERROR_BAD_CALL;
+          $this->code = self::PRP_WARNING_BAD_CALL;
           trigger_error( plugin_readme_parser_name . ': ' . wp_strip_all_tags( $this->get_prp_message() ), E_USER_WARNING );
         break;
         case self::PRP_ERROR_DEPRECATED:
@@ -80,28 +81,29 @@ if ( !class_exists( 'PRP_Exception' ) ) {
       return $this->code;
     }
 
-    public static function get_code_as_string( int $code ): string {
+    private static function get_severity( int $code ): string {
+      $severity = '';
       switch( $code ) {
         case self::PRP_ERROR_UNKNOWN:
-        return 'Unknown error';
         case self::PRP_ERROR_BAD_INPUT:
-        return 'Bad input';
         case self::PRP_ERROR_BAD_FILE:
-        return 'Bad file';
         case self::PRP_ERROR_BAD_URL:
-        return 'Bad URL';
         case self::PRP_ERROR_BAD_DATA:
-        return 'Bad data';
         case self::PRP_ERROR_BAD_CACHE:
-        return 'Bad cache';
         case self::PRP_ERROR_DEPRECATED:
-        return 'Deprecated';
+          $severity = 'Error';
+        break;
+        case self::PRP_WARNING_BAD_CALL:
+        case self::PRP_WARNING_BAD_DATA:
+          $severity = 'Warning';
+        break;
         case self::PRP_ERROR_NONE:
-        return 'None';
+          $severity = '';
         default:
-          throw new InvalidArgumentException( 'Invalid error code used in ' . __CLASS__ );
+          throw new InvalidArgumentException( 'Invalid error code used in ' . __CLASS__ . ': ' . $code );
         break;
       }
+      return strtoupper( $severity ) . ' ';
     }
 
     /**
@@ -183,7 +185,7 @@ if ( !class_exists( 'PRP_Exception' ) ) {
      *
      * @since 2.0.0
      */
-    public function get_prp_previous(): ?Throwable {
+    private function get_previous(): ?Throwable {
       return parent::getPrevious();
     }
 
@@ -202,21 +204,36 @@ if ( !class_exists( 'PRP_Exception' ) ) {
      */
     public function get_prp_nice_error(): string {
 
+      $this_msg = self::PRP_PREFIX .
+          self::get_severity( $this->get_prp_code() ) .
+          print_r( $this->get_code(), true ) .
+          " " . print_r( $this->get_prp_message_stripped_of_tags(), true );
+      $this_loc = self::PRP_PREFIX .
+          "in " . print_r( $this->get_prp_file() .
+          " on line " . print_r( $this->get_prp_line(), true ), true );
+
       if ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) &&
            ( defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) ) {
-        error_log( self::PRP_PREFIX .
-          "ERROR " . print_r( $this->get_code(), true ) .
-          " " . print_r( $this->get_prp_message_stripped_of_tags(), true ) );
-        error_log( self::PRP_PREFIX .
-          "in " . print_r( $this->get_prp_file() .
-          " on line " . print_r( $this->get_prp_line(), true ), true ) );
+        error_log( $this_msg );
+        error_log( $this_loc );
+        $previous = $this->get_previous();
+        if ( $previous ) {
+          $previous_msg = self::PRP_PREFIX .
+            self::get_severity( $previous->get_prp_code() ) . print_r( $previous->get_code(), true ) .
+            " " . print_r( $previous->get_prp_message_stripped_of_tags(), true );
+          $previous_loc = self::PRP_PREFIX .
+            "in " . print_r( $previous->get_prp_file() .
+            " on line " . print_r( $previous->get_prp_line(), true ), true );
+          error_log( $previous_msg );
+          error_log( $previous_loc );
+        }
       }
 
-      $display = '<p><span class="error">' . plugin_readme_parser_name . '</span>: ' . print_r( 'ERROR ' . $this->get_prp_code(), true ) . ' ' . print_r( $this->get_prp_message(), true ) . '.</p>';
-      $previous = $this->get_prp_previous();
+      $display = '<p><span class="error">' . plugin_readme_parser_name . '</span>: ' . print_r( self::get_severity( $this->get_prp_code() ) . $this->get_prp_code(), true ) . ' ' . print_r( $this->get_prp_message(), true ) . '.</p>';
+      $previous = $this->get_previous();
       if ( $previous ) {
-        $display .= '<p><span class="error">' . plugin_readme_parser_name . '</span>: ' . print_r( 'ERROR ' . $previous->get_prp_code(), true ) . ' ' . print_r( $previous->get_prp_message(), true ) . '.</p>';
-          }
+        $display .= '<p><span class="error">' . plugin_readme_parser_name . '</span>: ' . print_r( self::get_severity( $previous->get_prp_code() ) . $previous->get_prp_code(), true ) . ' ' . print_r( $previous->get_prp_message(), true ) . '.</p>';
+      }
       $delim = ':';
       $pos = strpos( $display, $delim );
       if ( false !== $pos ) {

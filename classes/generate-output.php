@@ -803,12 +803,16 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       if ( !$this->head_explicitly_excluded ) {
         if ( !$this->meta_explicitly_excluded ) {
-          if ( $this->meta_explicitly_included ) {
-            $new_include = str_replace( 'meta', 'head', $this->include );
-            prp_log( __( "Cannot include the metadata part of the head without the summary part:\n  Shortcode parameters supplied:   include=\"" . $this->include . "\"\n  Shortcode parameters changed to: include=\"" . $new_include . "\"", plugin_readme_parser_domain ), "", false, true );
-            // Swap the `meta` value of the `include` parameter to `head`:
-            $this->include = $new_include;
-            // Set the head to be shown as if it had been included in the first place (in the outer `if` statement):
+          try {
+            if ( $this->meta_explicitly_included ) {
+              // The meta section of the head cannot be included without the description. Swap `meta` for `head` in `$this->include` in such a way that the old and new can be output in a message to the user:
+              $old_include = $this->include;
+              $new_include = str_replace( 'meta', 'head', $old_include );
+              $this->include = $new_include;
+              throw new PRP_Exception( "Cannot include the metadata part of the head without the summary part:\n  Shortcode parameters supplied:   include=\"" . $old_include . "\"\n  Shortcode parameters changed to: include=\"" . $new_include . "\"", PRP_Exception::PRP_WARNING_BAD_CALL );
+            }
+          } catch ( PRP_Exception $e ) {
+            $e->get_prp_nice_error();
           }
           $this->show_head = true;
           $this->show_meta = true;
