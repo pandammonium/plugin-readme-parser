@@ -69,26 +69,38 @@ if ( !function_exists( 'prp_log' ) ) {
    * @param string message_name  A name to associate with the message. This is
    * useful if logging multiple messages.
    * @param mixed $message The message to be logged.
-   * @param bool $error Whether the message is about an error or not. The
-   * default is false, the message is not about an error. True if the message
-   * is about an error.
-   * @param bool $echo Forces the message name and message to be displayed on
-   * the web page; overrides WP_DEBUG_DISPLAY. The default is false, the
-   * message name and message will not be displayed on the web page.
-   * @throws none
+   * @param bool $deprecated_param Deprecated since version 2.0.0.
+   * @param bool $echo
+   * * `true`: forces the message name and message to be displayed on
+   * the web page, overriding WP_DEBUG_DISPLAY.
+   * * `false` (default): the message name and message will not be displayed on
+   * the web page.
+   * @throws PRP_Exception if `$deprecated_param === true`.
    * @return string The fully constructed and formatted message.
    */
-  function prp_log( string $message_name, mixed $message = '', bool $error = false, bool $echo = false ): string {
+  function prp_log( string $message_name, mixed $message = '', bool $deprecated_param = false, bool $echo = false ): string {
 
-    // error_log( 'function: ' . __FILE__ . ' ' . __FUNCTION__ );
+    // error_log( 'function: ' . basename( __FILE__ ) . ' ' . __FUNCTION__ );
     // error_log( 'arguments: ' . var_export( func_get_args(), true ) );
 
+    if ( true === $deprecated_param ) {
+      throw new PRP_Exception( 'Don\'t use <samp><kbd>' . __FUNCTION__ . '</kbd></samp> in <samp>' . basename( __FILE__ ) . '</samp> for errors; use exceptions or the <samp>WP_Error</samp> object instead', PRP_EXCEPTION::PRP_WARNING_BAD_CALL, new PRP_Exception( prp_get_prp_log_msg( $message_name, $message, false ) ) );
+    }
+    return prp_get_prp_log_msg( $message_name, $message, $echo );
+  }
+}
+
+if ( !function_exists( 'prp_get_prp_log_msg' ) ) {
+  function prp_get_prp_log_msg( string $message_name, mixed $message = '', bool $echo = false ) {
+
+    // error_log( 'function: ' . basename( __FILE__ ) . ' ' . __FUNCTION__ );
+    // error_log( 'arguments: ' . var_export( func_get_args(), true ) );
 
     $debugging = defined( 'WP_DEBUG' ) && WP_DEBUG;
     $debug_logfile = defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG;
     $debug_display = defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
 
-    prp_print_debug_status( $debugging, $debug_logfile, $debug_display, $error, $echo );
+    // prp_print_debug_status( $debugging, $debug_logfile, $debug_display, $deprecated_param, $echo );
 
     $header = ( '' === $message_name ) ? '' : '<b>' . $message_name . '</b>';
     $divider = ( '' === $message || '' === $message_name ) ? '' : ': ';
@@ -99,16 +111,10 @@ if ( !function_exists( 'prp_log' ) ) {
         $output = print_r( $header . $divider . var_export( strval( $message ),true ), true );
         break;
       case 'string':
-        if ( '' !== $message_name ) {
-          $output = ( $message ) ? trim( $message ) : '';
-          $delim = ':';
-          $pos = strpos( $output, $delim );
-          if ( false !== $pos ) {
-            $output = '<b>' . str_replace( $delim, $delim . '</b>', $output );
-          }
-          $output = print_r( $header . $divider . $output, true );
+        if ( '' === $message_name ) {
+          $output = trim( $message );
         } else {
-          $output = ( $message ) ? '\'' . trim( $message ) . '\'' : '';
+          $output = print_r( $header . $divider . trim( $message ), true );
         }
       break;
       case 'object':
@@ -123,21 +129,10 @@ if ( !function_exists( 'prp_log' ) ) {
       break;
     }
 
-    // if ( $error ) {
-    //   $error_label = 'ERROR';
-    //   if ( false === stripos( $output, 'error' ) ) {
-    //     $output = $error_label . ' ' . $output;
-    //   } else {
-    //     // Make sure the error label is upper case
-    //     $output = str_ireplace( $error_label, strtoupper($error_label), $output );
-    //   }
-    // }
-
     $prefix = ( strncmp( $output, plugin_readme_parser_name, strlen( plugin_readme_parser_name ) ) === 0 ) ? '' : 'PRP | ';
 
 
     if ( ( $debugging && $debug_display ) ||
-         ( $error && $echo ) ||
          ( $echo ) ) {
 
       $output = str_ireplace( "\n", '<br/>', $output );
@@ -149,7 +144,7 @@ if ( !function_exists( 'prp_log' ) ) {
         break;
         case 'object':
           if ( is_wp_error( $message ) ) {
-            // Do nothing: output was formatted in `prp_get_wp_error_string()`.
+            // Do nothing: output was formatted in `prp_get_wp_error_string()`, invoked above.
             break;
           } else {
             // Fall through
@@ -162,7 +157,7 @@ if ( !function_exists( 'prp_log' ) ) {
     }
 
     if ( ( $debugging && $debug_logfile ) ||
-         ( $error && !$echo ) ) {
+         ( !$echo ) ) {
       $output = str_ireplace( '&lt;', '<', $output );
       $output = str_ireplace( '&gt;', '>', $output );
       error_log( $prefix . wp_strip_all_tags( trim( $output ) ) );
@@ -189,7 +184,7 @@ if ( !function_exists( 'prp_get_wp_error_string' ) ) {
    */
   function prp_get_wp_error_string( WP_Error $error, bool $html = false ): string {
 
-    // prp_log( 'function', __FILE__ . ' ' . __FUNCTION__ );
+    // prp_log( 'function', basename( __FILE__ ) . ' ' . __FUNCTION__ );
     // prp_log( 'arguments', func_get_args() );
 
     if ( is_wp_error( $error ) ) {
@@ -224,7 +219,7 @@ if ( !function_exists( 'prp_log_truncated_line' ) ) {
    */
   function prp_log_truncated_line( string $line, int $line_number = -1 ): void {
 
-    // prp_log( 'function', __FILE__ . ' ' . __FUNCTION__ );
+    // prp_log( 'function', basename( __FILE__ ) . ' ' . __FUNCTION__ );
     // prp_log( 'arguments', func_get_args() );
 
     $line_length = 46;
@@ -265,8 +260,8 @@ if( !function_exists( 'prp_print_debug_status' ) ) {
   function prp_print_debug_status( bool $debugging, bool $debug_logfile, bool $debug_display, bool $error, bool $echo = false ) {
 
     $trace = debug_backtrace();
-    if ( $trace[ 1 ][ 'function' ] !== 'prp_log' ) {
-      throw new PRP_Exception( __FUNCTION__ . '() must be called from inside prp_log()', E_USER_WARNING );
+    if ( $trace[ 1 ][ 'function' ] !== 'prp_get_prp_log_msg' ) {
+      throw new PRP_Exception( __FUNCTION__ . '() must be called from inside prp_get_prp_log_msg()', E_USER_WARNING );
     }
 
     if ( $echo ) {
@@ -334,7 +329,7 @@ if ( !function_exists( 'prp_toggle_global_shortcodes' ) ) {
    */
   function prp_toggle_global_shortcodes( string $content ): string {
 
-    // prp_log( 'function', __FILE__ . ' ' . __FUNCTION__ );
+    // prp_log( 'function', basename( __FILE__ ) . ' ' . __FUNCTION__ );
     // prp_log( 'arguments', func_get_args() );
 
     static $original_shortcodes = array();

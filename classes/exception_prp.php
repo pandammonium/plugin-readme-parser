@@ -106,6 +106,10 @@ if ( !class_exists( 'PRP_Exception' ) ) {
       return strtoupper( $severity ) . ' ';
     }
 
+    private static function get_prefix( bool $echo ): string {
+      return $echo ? plugin_readme_parser_name : self::PRP_PREFIX;
+    }
+
     /**
      * This method returns the error code associated with the exception. It is
      * used to provide additional information about the error
@@ -214,14 +218,14 @@ if ( !class_exists( 'PRP_Exception' ) ) {
 
       if ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) &&
            ( defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) ) {
-        error_log( $this_msg );
-        error_log( $this_loc );
+        error_log( $this->get_prefix( false ) . $this_msg );
+        error_log( $this->get_prefix( false ) . $this_loc );
         $previous = $this->get_previous();
         if ( $previous ) {
-          $previous_msg = self::PRP_PREFIX .
+          $previous_msg = $this->get_prefix( false ) .
             self::get_severity( $previous->get_prp_code() ) . print_r( $previous->get_code(), true ) .
             " " . print_r( $previous->get_prp_message_stripped_of_tags(), true );
-          $previous_loc = self::PRP_PREFIX .
+          $previous_loc = $this->get_prefix( false ) .
             "in " . print_r( $previous->get_prp_file() .
             " on line " . print_r( $previous->get_prp_line(), true ), true );
           error_log( $previous_msg );
@@ -229,15 +233,10 @@ if ( !class_exists( 'PRP_Exception' ) ) {
         }
       }
 
-      $display = '<p><span class="error">' . plugin_readme_parser_name . '</span>: ' . print_r( self::get_severity( $this->get_prp_code() ) . $this->get_prp_code(), true ) . ' ' . print_r( $this->get_prp_message(), true ) . '.</p>';
+      $display = '<p><span class="error"><b>' . $this->get_prefix( true ) . '</b></span>: ' . print_r( self::get_severity( $this->get_prp_code() ) . $this->get_prp_code(), true ) . ' ' . print_r( $this->get_prp_message(), true ) . '.</p>';
       $previous = $this->get_previous();
       if ( $previous ) {
-        $display .= '<p><span class="error">' . plugin_readme_parser_name . '</span>: ' . print_r( self::get_severity( $previous->get_prp_code() ) . $previous->get_prp_code(), true ) . ' ' . print_r( $previous->get_prp_message(), true ) . '.</p>';
-      }
-      $delim = ':';
-      $pos = strpos( $display, $delim );
-      if ( false !== $pos ) {
-        $display = '<b>' . str_replace( $delim, $delim . '</b>', $display );
+        $display .= '<p><span class="error"><b>' . $this->get_prefix( true ) . '</b></span>: ' . print_r( self::get_severity( $previous->get_prp_code() ) . $previous->get_prp_code(), true ) . ' ' . print_r( $previous->get_prp_message(), true ) . '.</p>';
       }
 
       return print_r( $display, true );
