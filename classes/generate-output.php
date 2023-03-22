@@ -687,7 +687,6 @@ if ( !class_exists( 'Generate_Output' ) ) {
           if ( false === $result ) {
 
             $this->name = $name;
-            prp_log( 'name', $name );
             $this->target = $target;
             $this->nofollow = 'yes' === strtolower( $nofollow ) ? ' rel="nofollow"' : '';
 
@@ -1134,7 +1133,6 @@ if ( !class_exists( 'Generate_Output' ) ) {
         // // prp_log( __( 'name (from args)', plugin_readme_parser_domain ), $this->name );
 
         if ( '' === $this->plugin_name ) {
-          prp_log( '$this->name', $this->name );
           if ( '' === $this->name ) {
             $this->plugin_name = str_replace( ' ', '-', strtolower( $this->section ) );
           } else {
