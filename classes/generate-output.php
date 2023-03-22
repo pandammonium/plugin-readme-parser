@@ -735,6 +735,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
     private function parse_readme_info(): void {
 
+      // prp_log( 'method', __CLASS__ . '::' . __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
+
       // Get the readme file
 
       try {
@@ -1118,6 +1121,9 @@ if ( !class_exists( 'Generate_Output' ) ) {
     }
 
     private function track_current_section(): void {
+
+      // prp_log( 'method', __CLASS__ . '::' . __FUNCTION__ );
+      // prp_log( 'arguments', func_get_args() );
 
       if ( ( $this->section !== $this->prev_section ) &&
            ( '' === $this->prev_section ) ) {
