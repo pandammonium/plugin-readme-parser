@@ -1526,10 +1526,10 @@ if ( !class_exists( 'Generate_Output' ) ) {
      *
      * @since 1.2
      *
-     * @param string $plugin_url readme name or URL
+     * @param string $plugin_identifier The plugin name, its URL or its slug.
      * @return       void
      */
-    private function get_readme( string $plugin_url, string $version = '' ): void {
+    private function get_readme( string $plugin_identifier, string $version = '' ): void {
 
       // prp_log( 'method', __CLASS__ . '::' . __FUNCTION__ );
       // prp_log( 'arguments', func_get_args() );
@@ -1538,22 +1538,22 @@ if ( !class_exists( 'Generate_Output' ) ) {
 
       // Work out URL and fetch the contents
 
-      if ( strpos( $plugin_url, '://' ) === false ) {
-        $this->file_data[ 'name' ] = str_replace( ' ', '-', strtolower( $plugin_url ) );
+      if ( strpos( $plugin_identifier, '://' ) === false ) {
+        $this->file_data[ 'name' ] = str_replace( ' ', '-', strtolower( $plugin_identifier ) );
         $this->plugin_url = self::WP_PLUGIN_DIR_URL . $this->file_data[ 'name' ] . '/';
-        // prp_log( __( '  url:        \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
+        // prp_log( 'url', $this->plugin_url );
 
         if ( is_numeric( $version ) ) {
           $this->plugin_url .= 'tags/' . $version;
-          // prp_log( __( '  tag url:    \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
+          // prp_log( 'tag url', $this->plugin_url );
 
         } else {
           $this->plugin_url .= 'trunk';
-          // prp_log( __( '  trunk url:  \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
+          // prp_log( 'trunk url', $this->plugin_url );
         }
 
         $this->plugin_url .= '/readme.txt';
-        // prp_log( __( '  readme.txt: \'' . $plugin_url . '\'', plugin_readme_parser_domain ) );
+        // prp_log( 'readme.txt', $this->plugin_url );
       }
 
       try {
