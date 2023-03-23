@@ -180,8 +180,8 @@ if ( !class_exists( 'PRP_Exception' ) ) {
      *
      * @since 2.0.0
      */
-    public function get_prp_trace_as_string(): string {
-      return self::PRP_PREFIX . parent::getTraceAsString();
+    public function get_prp_trace_as_string( $echo = false ): string {
+      return self::get_prefix( $echo ) . parent::getTraceAsString();
     }
 
     /**
@@ -198,8 +198,8 @@ if ( !class_exists( 'PRP_Exception' ) ) {
      *
      * @since 2.0.0
      */
-    public function __prp_to_string(): string {
-      return self::PRP_PREFIX . parent::__toString();
+    public function __prp_to_string( $echo = false ): string {
+      return self::get_prefix( $echo ) . parent::__toString();
     }
 
     /**
@@ -208,11 +208,11 @@ if ( !class_exists( 'PRP_Exception' ) ) {
      */
     public function get_prp_nice_error(): string {
 
-      $this_msg = self::PRP_PREFIX .
+      $this_msg =
           self::get_severity( $this->get_prp_code() ) .
           print_r( $this->get_code(), true ) .
           " " . print_r( $this->get_prp_message_stripped_of_tags(), true );
-      $this_loc = self::PRP_PREFIX .
+      $this_loc =
           "in " . print_r( $this->get_prp_file() .
           " on line " . print_r( $this->get_prp_line(), true ), true );
 
